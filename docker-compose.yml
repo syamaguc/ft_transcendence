@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+  api:
+    build:
+      context: ./backend/api/
+      dockerfile: Dockerfile
+    tty: true
+    ports:
+      - 3000:3000
+    volumes:
+      - type: bind
+        source: ./backend/api
+        target: /api
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: password
+    ports:
+      - 5432:5432
