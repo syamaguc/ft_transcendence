@@ -12,9 +12,12 @@ services:
         source: ./backend/api
         target: /api
   db:
-    image: postgres
-    restart: always
+    image: postgres:12.6
     environment:
+      POSTGRES_USER: root
       POSTGRES_PASSWORD: password
+      POSTGRES_DB: ft_transcendence
+      POSTGRES_INITDB_ARGS: --encoding=UTF-8
+      TZ: Asia/Tokyo
     ports:
       - 5432:5432
