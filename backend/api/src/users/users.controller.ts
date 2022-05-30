@@ -1,39 +1,44 @@
 import { Body, Controller, Delete, Get, Post, Param, ParseIntPipe, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
 import { UserPropertyDto } from './dto/user-property.dto';
 import { UserStatusPipe } from './pipe/user-status.pipe';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
+
 
 @Controller('users')
 export class UsersController {
+	constructor(
+		private usersService: UsersService
+	) { }
 
 	@Get()
 	getUsers() {
-		return "getUsers Success!"
+		return this.usersService.getUsers();
 	}
 
 	@Get('/:id')
 	getUserById(
-		@Param('id', ParseIntPipe) id: number) {
-		return `getUserById Success! Parameter [id:${id}]`
+		@Param('id', ParseIntPipe) id: number): Promise<User> {
+		return this.usersService.getUserById(id);
 	}
 
 	@Post()
 	@UsePipes(ValidationPipe)
 	createUser(
-		@Body() userPropertyDto: UserPropertyDto) {
-		const { name, status } = userPropertyDto
-		return `createUser Success! Prameter [name:${name}, status:${status}]`
+		@Body() userPropertyDto: UserPropertyDto): Promise<User> {
+		return this.usersService.createUser(userPropertyDto);
 	}
 
 	@Delete('/:id')
 	deleteUser(
-		@Param('id', ParseIntPipe) id: number) {
-		return `deleteUser Success! Prameter [id:${id}]`
+		@Param('id', ParseIntPipe) id: number): Promise<void> {
+		return this.usersService.deleteUser(id);
 	}
 
 	@Patch('/:id')
 	updateUser(
 		@Param('id', ParseIntPipe) id: number,
-		@Body('status', UserStatusPipe) status: string) {
-		return `updateUser Success! Prameter [id:${id}, status:${status}]`
+		@Body('status', UserStatusPipe) status: string): Promise<User> {
+		return this.usersService.updateUser(id, status);
 	}
 }

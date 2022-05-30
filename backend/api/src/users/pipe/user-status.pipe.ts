@@ -2,8 +2,8 @@ import { BadRequestException, PipeTransform } from "@nestjs/common";
 
 export class UserStatusPipe implements PipeTransform {
 	readonly allowStatus = [
-		'online',
-		'offline',
+		'ON',
+		'OFF',
 	];
 
 	transform(value: any) {

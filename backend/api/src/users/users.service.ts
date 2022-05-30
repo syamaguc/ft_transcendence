@@ -31,6 +31,7 @@ export class UsersService {
 		const { name, status } = userPropertyDto;
 		const user = new User();
 		user.name = name;
+		user.status = status;
 
 		try {
 			await this.userRepository.save(user);
@@ -53,6 +54,7 @@ export class UsersService {
 		id: number,
 		status: string): Promise<User> {
 		const user = await this.getUserById(id);
+		user.status = status;
 		await this.userRepository.save(user);
 		return user;
 	}
