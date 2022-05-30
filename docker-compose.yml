@@ -11,8 +11,11 @@ services:
       - type: bind
         source: ./backend/api
         target: /api
+    depends_on:
+      - db
   db:
     image: postgres:12.6
+    container_name: postgres
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
