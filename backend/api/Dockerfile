@@ -33,4 +33,6 @@ ENV NODE_ENV=production
 COPY --from=build /api/dist /api/dist
 COPY --from=node_modules /api/node_modules /api/node_modules
 
+EXPOSE 3000
+
 CMD ["dist/main"]
