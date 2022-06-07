@@ -8,14 +8,16 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - type: bind
-        source: ./backend/api
-        target: /api
+      - node_modules:/api/node_modules
+      - dist:/api/dist
+      - ./backend/api/.env:/api/.env
     depends_on:
       - db
   db:
     image: postgres:12.6
     container_name: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: root
       POSTGRES_PASSWORD: password
@@ -24,3 +26,8 @@ services:
       TZ: Asia/Tokyo
     ports:
       - 5432:5432
+  
+volumes:
+  node_modules:
+  dist:
+  postgres:
