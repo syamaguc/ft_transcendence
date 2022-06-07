@@ -8,9 +8,9 @@ services:
     ports:
       - 3000:3000
     volumes:
+      - ./backend/api:/api
       - node_modules:/api/node_modules
       - dist:/api/dist
-      - ./backend/api/.env:/api/.env
     depends_on:
       - db
   db:
