@@ -13,6 +13,20 @@ services:
       - dist:/api/dist
     depends_on:
       - db
+
+  frontend:
+    container_name: frontend
+    build:
+      context: ./frontend
+    ports:
+      - 3001:3000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    working_dir: /app
+    command: npm start
+    restart: on-failure
+
   db:
     image: postgres:12.6
     container_name: postgres
@@ -26,7 +40,7 @@ services:
       TZ: Asia/Tokyo
     ports:
       - 5432:5432
-  
+
 volumes:
   node_modules:
   dist:
