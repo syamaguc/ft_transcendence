@@ -1,4 +1,4 @@
-import APITest from './APITest';
+import APITest from '../../containers/pages/APITest';
 
 const Home = () => (
   <>
