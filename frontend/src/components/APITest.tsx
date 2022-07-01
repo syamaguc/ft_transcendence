@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function APITest() {
+const APITest = () => {
   const [endpoint, setEndpoint] = useState('users');
   const [val, setVal] = useState(endpoint);
 
@@ -30,6 +30,6 @@ function APITest() {
       <iframe title="test" src={`http://localhost:3000/${endpoint}`} />
     </div>
   );
-}
+};
 
 export default APITest;
