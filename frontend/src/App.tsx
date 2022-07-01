@@ -1,10 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
-import APItest from './components/APITest';
+import Home from './components/Home';
 import './App.css';
 
 const App = () => (
   <Routes>
-    <Route path="/" element={<APItest />} />
+    <Route path="/" element={<Home />} />
   </Routes>
 );
 
