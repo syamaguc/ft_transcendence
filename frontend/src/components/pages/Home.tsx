@@ -1,8 +1,9 @@
+import { Typography } from '@mui/material';
 import APITest from '../../containers/pages/APITest';
 
 const Home = () => (
   <>
-    <h1>Home</h1>
+    <Typography variant="h6">Home</Typography>
     <APITest />
   </>
 );
