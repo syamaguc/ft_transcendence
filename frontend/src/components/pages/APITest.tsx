@@ -25,7 +25,6 @@ const APITest = ({ val, endpoint, onInputChange, onButtonClick }: props) => (
           type="search"
           variant="filled"
           placeholder="users"
-          value={val}
           onChange={(e) => onInputChange(e.target.value)}
         />
         <Button
