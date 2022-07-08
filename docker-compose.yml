@@ -1,6 +1,7 @@
-version: "3.8"
+version: '3.8'
 services:
   api:
+    container_name: api
     build:
       context: ./backend/api/
       dockerfile: Dockerfile
@@ -9,10 +10,11 @@ services:
       - 3000:3000
     volumes:
       - ./backend/api:/api
-      - node_modules:/api/node_modules
-      - dist:/api/dist
+      - /api/node_modules
+      - /api/dist
     depends_on:
       - db
+    restart: on-failure
 
   frontend:
     container_name: frontend
@@ -23,8 +25,6 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    working_dir: /app
-    command: npm start
     restart: on-failure
 
   db:
@@ -42,6 +42,4 @@ services:
       - 5432:5432
 
 volumes:
-  node_modules:
-  dist:
   postgres:
