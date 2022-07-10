@@ -1,6 +1,6 @@
 ## Usage
 ```
-cp .env.sample .env
+cp -r .env.sample .env
 
 ```
 
