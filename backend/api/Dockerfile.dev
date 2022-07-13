@@ -2,6 +2,8 @@ FROM node:16
 
 WORKDIR /api
 
+ENV NODE_ENV=development
+
 COPY . .
 RUN npm ci
 
