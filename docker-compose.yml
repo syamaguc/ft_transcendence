@@ -1,6 +1,7 @@
 version: "3.8"
 services:
   api:
+    container_name: api
     build:
       context: ./backend/api/
       dockerfile: Dockerfile.dev
@@ -12,6 +13,7 @@ services:
       - ./backend/api:/api
         #- node_modules:/api/node_modules
         #- dist:/api/dist
+    restart: on-failure
     depends_on:
       - db
 
