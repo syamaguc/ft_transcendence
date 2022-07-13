@@ -3,14 +3,15 @@ services:
   api:
     build:
       context: ./backend/api/
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
+      # dockerfile: Dockerfile.prod
     tty: true
     ports:
       - 3000:3000
     volumes:
       - ./backend/api:/api
-      - node_modules:/api/node_modules
-      - dist:/api/dist
+        #- node_modules:/api/node_modules
+        #- dist:/api/dist
     depends_on:
       - db
 
