@@ -9,7 +9,7 @@ async function bootstrap() {
 	const sync = configService.get('DB_SYNC');
 	const e = configService.get('NODE_ENV');
 	console.log(`TypeORM synchronize is [ ${sync} ]`);
-	console.log(`TypeORM synchronize is [ ${e} ]`);
+	console.log(`NODE_ENV = [ ${e} ]`);
 
 	const port = configService.get('API_PORT');
 	await app.listen(port);
