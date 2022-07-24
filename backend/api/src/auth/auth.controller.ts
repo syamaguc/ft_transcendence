@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 export class AuthController {
 	constructor(private authService: AuthService) {}
 
-	//@UseGuards(LocalAuthGuard)
+	@UseGuards(LocalAuthGuard)
 	@Post('/login')
 	async login(
 		@Body('name') name: string,
