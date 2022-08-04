@@ -130,3 +130,7 @@
 - ユーザー設定
 - チャット
 - ゲームホーム
+
+# figma
+
+https://www.figma.com/file/P0NwTUNMFMfTM6B4zfRBM7/ft_transcendence
