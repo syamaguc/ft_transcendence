@@ -21,14 +21,19 @@ services:
     container_name: frontend
     build:
       context: ./frontend
-    ports:
-      - 3001:3000
+      target: development
     volumes:
       - ./frontend:/app
       - /app/node_modules
       - /app/.next
-    command: npm run dev
+    ports:
+      - 3001:3000
+    tty: true
     restart: on-failure
+    environment:
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - api
 
   db:
     image: postgres:12.6
