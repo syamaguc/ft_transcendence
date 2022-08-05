@@ -26,8 +26,8 @@ services:
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    working_dir: /app
-    command: npm start
+      - /app/.next
+    command: npm run dev
     restart: on-failure
 
   db:
