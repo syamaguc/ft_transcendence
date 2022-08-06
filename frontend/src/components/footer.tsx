@@ -1,5 +1,12 @@
-import { Flex, FlexProps } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 
-const Footer = (props: FlexProps) => <Flex as="footer" py="8rem" {...props} />
+const Footer = () => (
+  <Flex as="footer" width="full" justifyContent="center">
+    <Text fontSize="sm" color="gray.500">
+      {new Date().getFullYear()} - made with ❤️ by mfunyu, ksuzuki, syamaguc,
+      yufukuya
+    </Text>
+  </Flex>
+)
 
 export default Footer

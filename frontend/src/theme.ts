@@ -1,8 +1,14 @@
-import { extendTheme } from '@chakra-ui/react'
+import { extendTheme, ThemeConfig } from '@chakra-ui/react'
+
+const config: ThemeConfig = {
+  initialColorMode: 'light',
+  useSystemColorMode: true,
+}
 
 const fonts = { mono: `'Menlo', monospace` }
 
 const theme = extendTheme({
+  config,
   semanticTokens: {
     colors: {
       error: 'red.500',
