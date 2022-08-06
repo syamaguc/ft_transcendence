@@ -1,5 +1,6 @@
-import { Box } from '@chakra-ui/react'
 import type { ReactNode } from 'react'
+import Head from 'next/head'
+import { Box, Container } from '@chakra-ui/react'
 
 import Header from './header'
 import Footer from './footer'
@@ -10,15 +11,22 @@ type Props = {
 }
 
 const Layout = ({ children, title = 'ft_trans' }: Props) => (
-  <Box margin="0 auto" maxWidth="800">
-    <Box margin="8">
+  <>
+    <Head>
+      <title>{title}</title>
+      <meta charSet="utf-8" />
+      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+    </Head>
+    <Container maxWidth="800px">
       <Header />
-      <Box as="main" my="22">
-        {children}
-      </Box>
+      <Box as="main">{children}</Box>
       <Footer />
-    </Box>
-  </Box>
+    </Container>
+  </>
 )
 
 export default Layout
+
+Layout.defaultProps = {
+  title: 'ft_trans',
+}

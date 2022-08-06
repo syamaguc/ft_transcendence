@@ -1,19 +1,14 @@
 import { Flex, Heading } from '@chakra-ui/react'
 
-const Hero = ({ title }: { title: string }) => (
+const Deadline = () => (
   <Flex
     justifyContent="center"
     alignItems="center"
-    height="100vh"
     bgGradient="linear(to-l, heroGradientStart, heroGradientEnd)"
     bgClip="text"
   >
-    <Heading fontSize="6vw">{title}</Heading>
+    <Heading fontSize="6vw">9/20まであと12週間</Heading>
   </Flex>
 )
 
-Hero.defaultProps = {
-  title: 'ft_transcendence',
-}
-
-export default Hero
+export default Deadline
