@@ -1,65 +1,76 @@
 import {
+  Box,
+  Heading,
   Flex,
+  Spacer,
   Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
 } from '@chakra-ui/react'
-import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
 
-import Hero from '@components/hero'
-import Container from '@components/container'
-import Main from '@components/main'
-import DarkModeSwitch from '@components/dark-mode-switch'
+import NextLink from 'next/link'
+
+import Layout from '@components/layout'
+import Deadline from '@components/deadline'
 
 function Index() {
   return (
-    <Container height="100vh">
+    <Layout>
       <Flex
         direction="column"
         alignItems="center"
-        justifyContent="start"
+        justifyContent="center"
         minHeight="70vh"
         gap={4}
         mb={8}
         w="full"
       >
-        <Hero />
-        <Main>
-          <Text color="text">
-            Example repo of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-            <Code>Typescript</Code>
-          </Text>
-          <List spacing={3} my={0} color="text">
-            <ListItem>
-              <ListIcon as={CheckCircleIcon} color="green.500" />
-              <ChakraLink
-                isExternal
-                href="https://chakra-ui.com"
-                flexGrow={1}
-                mr={2}
-              >
-                Chakra UI <LinkIcon />
-              </ChakraLink>
-            </ListItem>
-            <ListItem>
-              <ListIcon as={CheckCircleIcon} color="green.500" />
-              <ChakraLink
-                isExternal
-                href="https://nextjs.org"
-                flexGrow={1}
-                mr={2}
-              >
-                Next.js <LinkIcon />
-              </ChakraLink>
-            </ListItem>
-          </List>
-        </Main>
+        <Box my={8}>
+          <Deadline />
+        </Box>
+        <Flex
+          w="full"
+          direction="row"
+          alignItems="center"
+          justifyContent="space-around"
+        >
+          <NextLink href="/profile">
+            <Box
+              as="button"
+              borderRadius="4px"
+              p={16}
+              shadow="sm"
+              borderWidth="1px"
+              _hover={{ borderColor: '#00BABC' }}
+            >
+              <Heading fontSize="xl">User</Heading>
+            </Box>
+          </NextLink>
+          <NextLink href="/chat">
+            <Box
+              as="button"
+              borderRadius="4px"
+              p={16}
+              shadow="sm"
+              borderWidth="1px"
+              _hover={{ borderColor: '#00BABC' }}
+            >
+              <Heading fontSize="xl">Chat</Heading>
+            </Box>
+          </NextLink>
+          <NextLink href="/game">
+            <Box
+              as="button"
+              borderRadius="4px"
+              p={16}
+              shadow="sm"
+              borderWidth="1px"
+              _hover={{ borderColor: '#00BABC' }}
+            >
+              <Heading fontSize="xl">Game</Heading>
+            </Box>
+          </NextLink>
+        </Flex>
       </Flex>
-      {/* <DarkModeSwitch /> */}
-    </Container>
+    </Layout>
   )
 }
 
