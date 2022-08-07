@@ -104,5 +104,14 @@
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ]
+  },
+  "lint-staged": {
+   "src/**/*.{js,jsx,ts,tsx}": [
+     "prettier --write --loglevel=error",
+     "eslint --fix --quiet"
+   ],
+   "{public,src}/**/*.{html,gql,graphql,json}": [
+     "prettier --write --loglevel=error"
+   ]
   }
 }
