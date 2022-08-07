@@ -1,7 +1,7 @@
 build:
 	@if [ ! -d backend/api/.env ]; then\
   	echo ".env Directory not exists."; \
-		cp -R backend/api/.env.sample backend/api/.env; \
+		cp -r backend/api/.env.sample backend/api/.env; \
 	fi
 	docker-compose up --build
 
