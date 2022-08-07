@@ -4,9 +4,8 @@ WORKDIR /api
 
 ENV NODE_ENV=development
 
-COPY . . 
+COPY package.json package-lock.json .
 
-RUN npm i -g @nestjs/cli
 RUN npm i
 
 EXPOSE 3000
