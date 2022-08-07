@@ -11,6 +11,7 @@ services:
       - 3000:3000
     volumes:
       - ./backend/api:/api
+      - ./upload/:/upload
         #- node_modules:/api/node_modules
         #- dist:/api/dist
     restart: on-failure
@@ -45,6 +46,6 @@ services:
       - 5432:5432
 
 volumes:
-  node_modules:
-  dist:
+  # node_modules:
+  # dist:
   postgres:
