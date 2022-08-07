@@ -18,8 +18,8 @@ export class AdminController {
 	constructor(private readonly adminService: AdminService) {}
 
 	@Get('/test')
-	getTest(): string {
-		return 'debug';
+	getTest(): Promise<Partial<User[]>> {
+		return this.adminService.getAllUsers();
 	}
 
 	@ApiOperation({ description: 'Get numbers Users' })
