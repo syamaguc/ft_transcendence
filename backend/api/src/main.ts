@@ -1,17 +1,32 @@
-import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import { AppModule } from './app/app.module';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
+	// check ENV
+	console.log(process.env);
 	const app = await NestFactory.create(AppModule);
-	const configService = new ConfigService();
 
-	const sync = configService.get('DB_SYNC');
-	const e = configService.get('NODE_ENV');
-	console.log(`NODE_ENV is [ ${e} ]`);
-	console.log(`TypeORM synchronize is [ ${sync} ]`);
+	app.enableCors({
+		origin: true,
+		credentials: true,
+	});
 
-	const port = configService.get('API_PORT');
-	await app.listen(port);
+	app.use(cookieParser());
+
+	const config = new DocumentBuilder()
+		.setTitle('ft_transcendence')
+		.setDescription('Pong')
+		.setVersion('1.0')
+		.addTag('Pong')
+		.build();
+	const document = SwaggerModule.createDocument(app, config);
+	SwaggerModule.setup('api', app, document);
+
+	app.useGlobalPipes(new ValidationPipe());
+
+	await app.listen(3000);
 }
 bootstrap();
