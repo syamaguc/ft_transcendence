@@ -12,6 +12,7 @@ services:
     volumes:
       - ./backend/api:/api
       - ./upload/:/upload
+      - /api/node_modules
         #- node_modules:/api/node_modules
         #- dist:/api/dist
     restart: on-failure
