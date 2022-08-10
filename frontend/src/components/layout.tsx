@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import Head from 'next/head'
-import { Box, Container } from '@chakra-ui/react'
+import { Box, Flex, Container } from '@chakra-ui/react'
 
 import Header from './header'
 import Footer from './footer'
@@ -14,14 +14,16 @@ const Layout = ({ children, title = 'ft_trans' }: Props) => (
   <>
     <Head>
       <title>{title}</title>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>
-    <Container maxWidth="800px">
-      <Header />
-      <Box as="main">{children}</Box>
-      <Footer />
-    </Container>
+    <Header />
+    <Box bg="red.100" as="main" w="full" maxW="8xl" mx="auto">
+      <Box bg="blue.100" maxW="8xl" mx="auto" minH="76vh">
+        {children}
+        <Box pb="20">
+          <Footer />
+        </Box>
+      </Box>
+    </Box>
   </>
 )
 
