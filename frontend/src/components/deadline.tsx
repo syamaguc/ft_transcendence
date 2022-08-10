@@ -7,12 +7,12 @@ const Deadline = () => {
 
   return (
     <Flex
-      justifyContent="center"
-      alignItems="center"
-      bgGradient="linear(to-l, heroGradientStart, heroGradientEnd)"
-      bgClip="text"
+      justifyContent='center'
+      alignItems='center'
+      bgGradient='linear(to-l, heroGradientStart, heroGradientEnd)'
+      bgClip='text'
     >
-      <Heading fontSize="4xl">9/20まであと{weeks}週間</Heading>
+      <Heading fontSize='4xl'>9/20まであと{weeks}週間</Heading>
     </Flex>
   )
 }

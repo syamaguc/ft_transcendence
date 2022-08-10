@@ -9,11 +9,11 @@ const ThemeToggle = () => {
 
   return (
     <IconButton
-      size="md"
-      fontSize="lg"
+      size='md'
+      fontSize='lg'
       aria-label={`Switch to ${text} mode`}
-      variant="ghost"
-      color="current"
+      variant='ghost'
+      color='current'
       ml={{ base: '0', md: '3' }}
       onClick={toggleMode}
       icon={<SwitchIcon />}

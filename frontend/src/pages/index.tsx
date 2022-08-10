@@ -15,57 +15,57 @@ function Index() {
   return (
     <Layout>
       <Flex
-        direction="column"
-        alignItems="center"
-        justifyContent="center"
-        minHeight="70vh"
+        direction='column'
+        alignItems='center'
+        justifyContent='center'
+        minHeight='70vh'
         gap={4}
         mb={8}
-        w="full"
+        w='full'
       >
         <Box my={8}>
           <Deadline />
         </Box>
         <Flex
-          w="full"
-          direction="row"
-          alignItems="center"
-          justifyContent="space-around"
+          w='full'
+          direction='row'
+          alignItems='center'
+          justifyContent='space-around'
         >
-          <NextLink href="/profile">
+          <NextLink href='/profile'>
             <Box
-              as="button"
-              borderRadius="4px"
+              as='button'
+              borderRadius='4px'
               p={16}
-              shadow="sm"
-              borderWidth="1px"
+              shadow='sm'
+              borderWidth='1px'
               _hover={{ borderColor: '#00BABC' }}
             >
-              <Heading fontSize="xl">User</Heading>
+              <Heading fontSize='xl'>User</Heading>
             </Box>
           </NextLink>
-          <NextLink href="/chat">
+          <NextLink href='/chat'>
             <Box
-              as="button"
-              borderRadius="4px"
+              as='button'
+              borderRadius='4px'
               p={16}
-              shadow="sm"
-              borderWidth="1px"
+              shadow='sm'
+              borderWidth='1px'
               _hover={{ borderColor: '#00BABC' }}
             >
-              <Heading fontSize="xl">Chat</Heading>
+              <Heading fontSize='xl'>Chat</Heading>
             </Box>
           </NextLink>
-          <NextLink href="/game">
+          <NextLink href='/game'>
             <Box
-              as="button"
-              borderRadius="4px"
+              as='button'
+              borderRadius='4px'
               p={16}
-              shadow="sm"
-              borderWidth="1px"
+              shadow='sm'
+              borderWidth='1px'
               _hover={{ borderColor: '#00BABC' }}
             >
-              <Heading fontSize="xl">Game</Heading>
+              <Heading fontSize='xl'>Game</Heading>
             </Box>
           </NextLink>
         </Flex>
