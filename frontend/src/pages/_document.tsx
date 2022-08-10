@@ -16,12 +16,7 @@ class MyDocument extends Document {
   render() {
     return (
       <Html lang="ja">
-        <Head>
-          <meta
-            name="viewport"
-            content="minimum-scale=1, initial-scale=1, width=device-width, shrink-to-fit=no, viewport-fit=cover"
-          />
-        </Head>
+        <Head />
         <body>
           {/* Make Color mode to persist when you refresh page*/}
           <ColorModeScript initialColorMode={theme.config.initialColorMode} />
