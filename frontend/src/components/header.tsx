@@ -5,7 +5,6 @@ import {
   HTMLChakraProps,
   Flex,
   Avatar,
-  Spacer,
   Stack,
   HStack,
   Icon,
@@ -22,8 +21,10 @@ import {
   useDisclosure,
   chakra,
 } from '@chakra-ui/react'
-import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
+import { useScroll } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 
+import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import NextLink from 'next/link'
 
 import { GithubIcon } from '@components/icons'
@@ -47,7 +48,7 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 
 const HeaderContent = () => {
   const { toggleColorMode: toggleMode } = useColorMode()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const mobileNav = useDisclosure()
   const bgColor = useColorModeValue('white', 'gray.800')
 
   const text = useColorModeValue('dark', 'light')
@@ -119,8 +120,8 @@ const HeaderContent = () => {
               variant='ghost'
               color='current'
               display={{ md: 'none' }}
-              onClick={isOpen ? onClose : onOpen}
-              icon={isOpen ? <CloseIcon /> : <HamburgerIcon />}
+              onClick={mobileNav.isOpen ? mobileNav.onClose : mobileNav.onOpen}
+              icon={mobileNav.isOpen ? <CloseIcon /> : <HamburgerIcon />}
             />
             <Flex alignItems='center' display={{ base: 'none', md: 'flex' }}>
               <Menu>
@@ -148,7 +149,7 @@ const HeaderContent = () => {
         </Flex>
       </Flex>
 
-      {isOpen ? (
+      {mobileNav.isOpen ? (
         <Box pb={4} display={{ md: 'none' }}>
           <Stack
             as='nav'
@@ -169,9 +170,30 @@ const HeaderContent = () => {
 
 const Header = (props: HTMLChakraProps<'header'>) => {
   const { maxW = '8xl', maxWidth = '8xl' } = props
+  const ref = useRef<HTMLHeadingElement>()
+  const [y, setY] = useState(0)
+  const { height = 0 } = ref.current?.getBoundingClientRect() ?? {}
+
+  const { scrollY } = useScroll()
+  useEffect(() => {
+    return scrollY.onChange(() => setY(scrollY.get()))
+  }, [scrollY])
 
   return (
-    <chakra.header>
+    <chakra.header
+      ref={ref}
+      shadow={y > height ? 'sm' : undefined}
+      transition='box-shadow 0.2s, background-color 0.2s'
+      pos='sticky'
+      top='0'
+      zIndex='3'
+      bg='white'
+      _dark={{ bg: 'gray.800' }}
+      left='0'
+      right='0'
+      width='full'
+      {...props}
+    >
       <chakra.div height='4.5rem' mx='auto' maxW={maxW} maxWidth={maxWidth}>
         <HeaderContent />
       </chakra.div>

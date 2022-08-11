@@ -69,6 +69,7 @@ function Index() {
             </Box>
           </NextLink>
         </Flex>
+        <Box h='1000px'>hello</Box>
       </Flex>
     </Layout>
   )
