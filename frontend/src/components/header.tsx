@@ -29,7 +29,23 @@ import NextLink from 'next/link'
 
 import { GithubIcon } from '@components/icons'
 
-const Links = ['Users', 'Chat', 'Game']
+const links = [
+  {
+    icon: null,
+    label: 'Users',
+    href: '',
+  },
+  {
+    icon: null,
+    label: 'Chat',
+    href: '',
+  },
+  {
+    icon: null,
+    label: 'Game',
+    href: '',
+  },
+]
 
 const NavLink = ({ children }: { children: ReactNode }) => (
   <ChakraLink
@@ -49,7 +65,6 @@ const NavLink = ({ children }: { children: ReactNode }) => (
 const HeaderContent = () => {
   const { toggleColorMode: toggleMode } = useColorMode()
   const mobileNav = useDisclosure()
-  const bgColor = useColorModeValue('white', 'gray.800')
 
   const text = useColorModeValue('dark', 'light')
   const SwitchIcon = useColorModeValue(MoonIcon, SunIcon)
@@ -81,8 +96,8 @@ const HeaderContent = () => {
               fontWeight='semibold'
               display={{ base: 'none', md: 'flex' }}
             >
-              {Links.map((link) => (
-                <NavLink key={link}>{link}</NavLink>
+              {links.map((link) => (
+                <NavLink key={link.label}>{link.label}</NavLink>
               ))}
             </HStack>
             <HStack spacing='4' display={{ base: 'none', md: 'flex' }}>
@@ -158,8 +173,8 @@ const HeaderContent = () => {
             _dark={{ color: 'whiteAlpha.600' }}
             fontWeight='semibold'
           >
-            {Links.map((link) => (
-              <NavLink key={link}>{link}</NavLink>
+            {links.map((link) => (
+              <NavLink key={link.label}>{link.label}</NavLink>
             ))}
           </Stack>
         </Box>
@@ -176,7 +191,9 @@ const Header = (props: HTMLChakraProps<'header'>) => {
 
   const { scrollY } = useScroll()
   useEffect(() => {
-    return scrollY.onChange(() => setY(scrollY.get()))
+    return scrollY.onChange((latest) => {
+      setY(latest)
+    })
   }, [scrollY])
 
   return (

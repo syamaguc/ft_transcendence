@@ -1,12 +1,11 @@
-import { Flex, Text } from '@chakra-ui/react'
+import { VStack, StackProps, Text } from '@chakra-ui/react'
 
-const Footer = () => (
-  <Flex bg='blue' as='footer' width='full' justifyContent='center'>
-    <Text fontSize='sm' color='gray.500'>
-      {new Date().getFullYear()} - made with ❤️ by mfunyu, ksuzuki, syamaguc,
-      yufukuya
+const Footer = (props: StackProps) => (
+  <VStack as='footer' spacing={4} mt={12} textAlign='center' {...props}>
+    <Text fontSize='sm'>
+      <span>Made with ❤️ by mfunyu, ksuzuki, syamaguc, yufukuya</span>
     </Text>
-  </Flex>
+  </VStack>
 )
 
 export default Footer
