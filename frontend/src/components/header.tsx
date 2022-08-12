@@ -1,4 +1,5 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
+import NextLink from 'next/link'
 import {
   Box,
   Heading,
@@ -22,11 +23,10 @@ import {
   chakra,
 } from '@chakra-ui/react'
 import { useScroll } from 'framer-motion'
-import { useEffect, useRef, useState } from 'react'
+
+import { MobileNavButton } from '@components/mobile-nav'
 
 import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
-import NextLink from 'next/link'
-
 import { GithubIcon } from '@components/icons'
 
 const links = [
@@ -128,6 +128,11 @@ const HeaderContent = () => {
               onClick={toggleMode}
               icon={<SwitchIcon />}
             />
+            <MobileNavButton
+              ref={mobileNavBtnRef}
+              aria-label='Open menu'
+              onClick={mobileNav.onOpen}
+            />
             <IconButton
               size='md'
               fontSize='lg'
@@ -163,6 +168,7 @@ const HeaderContent = () => {
           </HStack>
         </Flex>
       </Flex>
+      <MobileNavContent isOpen={mobileNav.isOpen} onClose={mobileNav.onClose} />
 
       {mobileNav.isOpen ? (
         <Box pb={4} display={{ md: 'none' }}>
