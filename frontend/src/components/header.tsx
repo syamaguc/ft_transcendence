@@ -21,29 +21,31 @@ import {
   useColorModeValue,
   useDisclosure,
   chakra,
+  useUpdateEffect,
 } from '@chakra-ui/react'
 import { useScroll } from 'framer-motion'
 
-import { MobileNavButton } from '@components/mobile-nav'
+import { MobileNavButton, MobileNavContent } from '@components/mobile-nav'
+import { Logo } from '@components/logo'
 
 import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { GithubIcon } from '@components/icons'
 
-const links = [
+export const mainNavLinks = [
   {
     icon: null,
     label: 'Users',
-    href: '',
+    href: '/users',
   },
   {
     icon: null,
     label: 'Chat',
-    href: '',
+    href: '/chat',
   },
   {
     icon: null,
     label: 'Game',
-    href: '',
+    href: '/game',
   },
 ]
 
@@ -69,14 +71,17 @@ const HeaderContent = () => {
   const text = useColorModeValue('dark', 'light')
   const SwitchIcon = useColorModeValue(MoonIcon, SunIcon)
 
+  const mobileNavBtnRef = useRef<HTMLButtonElement>()
+  useUpdateEffect(() => {
+    mobileNavBtnRef.current?.focus()
+  }, [mobileNav.isOpen])
+
   return (
     <>
       <Flex w='100%' h='100%' px='6' align='center' justify='space-between'>
         <NextLink href='/' passHref>
           <chakra.a display='block' aria-label='Back to homepage'>
-            <Heading size='md' display='block'>
-              ft_transcendence
-            </Heading>
+            <Logo />
           </chakra.a>
         </NextLink>
 
@@ -96,7 +101,7 @@ const HeaderContent = () => {
               fontWeight='semibold'
               display={{ base: 'none', md: 'flex' }}
             >
-              {links.map((link) => (
+              {mainNavLinks.map((link) => (
                 <NavLink key={link.label}>{link.label}</NavLink>
               ))}
             </HStack>
@@ -169,22 +174,6 @@ const HeaderContent = () => {
         </Flex>
       </Flex>
       <MobileNavContent isOpen={mobileNav.isOpen} onClose={mobileNav.onClose} />
-
-      {mobileNav.isOpen ? (
-        <Box pb={4} display={{ md: 'none' }}>
-          <Stack
-            as='nav'
-            spacing='4'
-            color='gray.600'
-            _dark={{ color: 'whiteAlpha.600' }}
-            fontWeight='semibold'
-          >
-            {links.map((link) => (
-              <NavLink key={link.label}>{link.label}</NavLink>
-            ))}
-          </Stack>
-        </Box>
-      ) : null}
     </>
   )
 }
