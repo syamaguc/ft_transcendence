@@ -32,7 +32,7 @@ function Index() {
           alignItems='center'
           justifyContent='space-around'
         >
-          <NextLink href='/profile'>
+          <NextLink href='/users'>
             <Box
               as='button'
               borderRadius='4px'

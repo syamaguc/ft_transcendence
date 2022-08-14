@@ -16,7 +16,7 @@ import {
   useBreakpointValue,
   useUpdateEffect,
 } from '@chakra-ui/react'
-import { AnimatePresence, motion, useElementScroll } from 'framer-motion'
+import { AnimatePresence, motion, useScroll } from 'framer-motion'
 import { AiOutlineMenu } from 'react-icons/ai'
 
 import { RemoveScroll } from 'react-remove-scroll'
@@ -46,11 +46,11 @@ const NavLink = ({ href, children }: NavLinkProps) => {
         rounded='md'
         transition='0.2s all'
         fontWeight={isActive ? 'semibold' : 'medium'}
-        bg={isActive ? 'gray.400' : undefined}
+        bg={isActive ? 'blackAlpha.800' : undefined}
         borderWidth={isActive ? undefined : '1px'}
         color={isActive ? 'white' : undefined}
         _hover={{
-          bg: isActive ? 'gray.500' : bgActiveHoverColor,
+          bg: isActive ? 'blackAlpha.900' : bgActiveHoverColor,
         }}
       >
         {children}
@@ -158,10 +158,12 @@ const ScrollView = (props: BoxProps & { onScroll?: any }) => {
   const { onScroll, ...rest } = props
   const [y, setY] = useState(0)
   const ref = useRef<any>()
-  const { scrollY } = useElementScroll(ref)
+  const { scrollY } = useScroll({ container: ref })
 
   useEffect(() => {
-    return scrollY.onChange(() => setY(scrollY.get()))
+    return scrollY.onChange((latest) => {
+      setY(latest)
+    })
   }, [scrollY])
 
   useUpdateEffect(() => {

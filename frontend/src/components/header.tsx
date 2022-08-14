@@ -49,19 +49,25 @@ export const mainNavLinks = [
   },
 ]
 
-const NavLink = ({ children }: { children: ReactNode }) => (
-  <ChakraLink
-    px={2}
-    py={1}
-    rounded={'md'}
-    _hover={{
-      textDecoration: 'none',
-      bg: useColorModeValue('gray.100', 'gray.700'),
-    }}
-    href={'#'}
-  >
-    {children}
-  </ChakraLink>
+type NavLinkProps = {
+  href: string
+  children: ReactNode
+}
+
+const NavLink = ({ href, children }: NavLinkProps) => (
+  <NextLink href={href} passHref>
+    <ChakraLink
+      px={2}
+      py={1}
+      rounded={'md'}
+      _hover={{
+        textDecoration: 'none',
+        bg: useColorModeValue('gray.100', 'gray.700'),
+      }}
+    >
+      {children}
+    </ChakraLink>
+  </NextLink>
 )
 
 const HeaderContent = () => {
@@ -102,7 +108,9 @@ const HeaderContent = () => {
               display={{ base: 'none', md: 'flex' }}
             >
               {mainNavLinks.map((link) => (
-                <NavLink key={link.label}>{link.label}</NavLink>
+                <NavLink href={link.href} key={link.label}>
+                  {link.label}
+                </NavLink>
               ))}
             </HStack>
             <HStack spacing='4' display={{ base: 'none', md: 'flex' }}>
@@ -138,16 +146,16 @@ const HeaderContent = () => {
               aria-label='Open menu'
               onClick={mobileNav.onOpen}
             />
-            <IconButton
-              size='md'
-              fontSize='lg'
-              aria-label='Open menu'
-              variant='ghost'
-              color='current'
-              display={{ md: 'none' }}
-              onClick={mobileNav.isOpen ? mobileNav.onClose : mobileNav.onOpen}
-              icon={mobileNav.isOpen ? <CloseIcon /> : <HamburgerIcon />}
-            />
+            {/* <IconButton */}
+            {/* size='md' */}
+            {/* fontSize='lg' */}
+            {/* aria-label='Open menu' */}
+            {/* variant='ghost' */}
+            {/* color='current' */}
+            {/* display={{ md: 'none' }} */}
+            {/* onClick={mobileNav.isOpen ? mobileNav.onClose : mobileNav.onOpen} */}
+            {/* icon={mobileNav.isOpen ? <CloseIcon /> : <HamburgerIcon />} */}
+            {/* /> */}
             <Flex alignItems='center' display={{ base: 'none', md: 'flex' }}>
               <Menu>
                 <MenuButton
@@ -163,7 +171,9 @@ const HeaderContent = () => {
                   />
                 </MenuButton>
                 <MenuList>
-                  <MenuItem>Link 1</MenuItem>
+                  <NextLink href='/profile' passHref>
+                    <MenuItem as='a'>Profile</MenuItem>
+                  </NextLink>
                   <MenuItem>Link 1</MenuItem>
                   <MenuDivider />
                   <MenuItem>Link 1</MenuItem>

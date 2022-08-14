@@ -4,9 +4,8 @@ import { useEffect } from 'react'
 const useRouteChanged = (fn: () => void) => {
   const router = useRouter()
   useEffect(() => {
-    const handleRouteChange = (url: string) => {
+    const handleRouteChange = (_url: string) => {
       fn()
-      console.log('App is changing to: ', url)
     }
 
     router.events.on('routeChangeComplete', handleRouteChange)
