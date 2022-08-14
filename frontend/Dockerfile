@@ -14,6 +14,8 @@ RUN \
   fi
 
 
+USER node
+
 # Build target development
 FROM node:16-alpine AS development
 WORKDIR /app
