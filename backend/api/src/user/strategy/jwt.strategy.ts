@@ -15,7 +15,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 	) {
 		super({
 			//secretOrKey: process.env.SECRET_JWT,
-			secretOrKey: "superSecret2022",
+			secretOrKey: 'superSecret2022',
 			jwtFromRequest: ExtractJwt.fromExtractors([
 				(request: Request) => {
 					const accessToken = request?.cookies['jwt'];
@@ -27,7 +27,11 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
 	async validate(payload: JwtPayload): Promise<User> {
 		const { username } = payload;
-		const user: User = await this.usersRepository.findOne({ username });
+		const user: User = await this.usersRepository.findOne({
+			where: {
+				username: username,
+			},
+		});
 
 		if (!user) {
 			throw new UnauthorizedException();
