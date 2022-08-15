@@ -22,7 +22,7 @@ import { AdminModule } from 'src/admin/admin.module';
 			password: process.env.DB_PASS,
 			database: process.env.DB_NAME,
 			autoLoadEntities: true,
-			synchronize: true,
+			synchronize: false,
 		}),
 		UserModule,
 		AuthModule,
