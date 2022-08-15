@@ -56,10 +56,14 @@ export class UserService {
 		let user: User = undefined;
 
 		const { login42 } = userData;
-		user = await this.usersRepository.findOne({ login42: login42 });
+		user = await this.usersRepository.findOne({
+			where: { login42: login42 },
+		});
 		if (user) return user;
 		let { username } = userData;
-		user = await this.usersRepository.findOne({ username });
+		user = await this.usersRepository.findOne({
+			where: { username: username },
+		});
 		if (user) {
 			const rand = Math.random().toString(16).substr(2, 5);
 			username = username + '-' + rand;
@@ -80,9 +84,9 @@ export class UserService {
 		const { id, password } = userData;
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({ username: id });
+		user = await this.usersRepository.findOne({ where: { username: id } });
 		if (user === undefined) {
-			user = await this.usersRepository.findOne({ email: id });
+			user = await this.usersRepository.findOne({ where: { email: id } });
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const username = user.username;
@@ -100,15 +104,19 @@ export class UserService {
 
 	async currentUser(user: User): Promise<Partial<User>> {
 		let userFound: User = undefined;
-		userFound = await this.usersRepository.findOne(user.userId);
-		if (!user) throw new NotFoundException('No user found');
+		userFound = await this.usersRepository.findOne({
+			where: { userId: user.userId },
+		});
+		if (!userFound) throw new NotFoundException('No user found');
 		const { password, ...res } = user;
 		return res;
 	}
 
 	async userInfo(username: string): Promise<Partial<User>> {
 		let user: User = undefined;
-		user = await this.usersRepository.findOne({ username: username });
+		user = await this.usersRepository.findOne({
+			where: { username: username },
+		});
 		if (!user) throw new NotFoundException('No user found');
 		const { password, ...res } = user;
 		return res;
@@ -117,7 +125,7 @@ export class UserService {
 	async getPartialUserInfo(id: string): Promise<Partial<User>> {
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({ userId: id });
+		user = await this.usersRepository.findOne({ where: { userId: id } });
 		if (!user) return user;
 		return {
 			userId: user.userId,
@@ -241,7 +249,9 @@ export class UserService {
 
 		// if (userIsAdmin.isAdmin === false)
 		// 	throw new UnauthorizedException('You aren\'t an administrator');
-		user = await this.usersRepository.findOne({ userId: userId });
+		user = await this.usersRepository.findOne({
+			where: { userId: userId },
+		});
 		if (!user) throw new NotFoundException('No user found');
 		return user.isBan;
 	}
@@ -259,7 +269,9 @@ export class UserService {
 			);
 		}
 
-		user = await this.usersRepository.findOne({ userId: userId });
+		user = await this.usersRepository.findOne({
+			where: { userId: userId },
+		});
 		if (!user) throw new NotFoundException('No user found');
 
 		user.isBan = bool;
@@ -274,7 +286,9 @@ export class UserService {
 	async getIsAdmin(userId: string, userIsAdmin: User): Promise<boolean> {
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({ userId: userId });
+		user = await this.usersRepository.findOne({
+			where: { userId: userId },
+		});
 		if (!user) throw new NotFoundException('No user found');
 		return user.isAdmin;
 	}
@@ -292,7 +306,9 @@ export class UserService {
 			);
 		}
 
-		user = await this.usersRepository.findOne({ userId: userId });
+		user = await this.usersRepository.findOne({
+			where: { userId: userId },
+		});
 		if (!user) throw new NotFoundException('No user found');
 
 		user.isAdmin = bool;
