@@ -2,12 +2,20 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import { AppDataSource } from './app/app.datasource';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
 	// check ENV
 	console.log(process.env);
 	const app = await NestFactory.create(AppModule);
+	AppDataSource.initialize()
+		.then(() => {
+			console.log('Data Source has been initialized!');
+		})
+		.catch((err) => {
+			console.error('Error during Data Source initialization', err);
+		});
 
 	app.enableCors({
 		origin: true,

@@ -14,13 +14,15 @@ import { GetUserFilterDto } from './dto/get-user-filter.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User42Dto } from './dto/user42.dto';
 import { v4 as uuidv4 } from 'uuid';
+import { AppDataSource } from '../app/app.datasource';
 
-@EntityRepository(User)
-export class UsersRepository extends Repository<User> {
+//@EntityRepository(User)
+//export class UsersRepository extends Repository<User> {
+export const UsersRepository = AppDataSource.getRepository(User).extend({
 	randomHexColorCode(): string {
 		const n = (Math.random() * 0xfffff * 1000000).toString(16);
 		return '#' + n.slice(0, 6);
-	}
+	},
 
 	async replaceColor(): Promise<string> {
 		const replaceColor = require('replace-color');
@@ -46,11 +48,11 @@ export class UsersRepository extends Repository<User> {
 				console.log(err);
 			});
 		return nameProfilePicture;
-	}
+	},
 
 	generateProfilePicture(): Promise<string> {
 		return this.replaceColor();
-	}
+	},
 
 	async createUser(userData: CreateUserDto): Promise<User> {
 		const user = this.create(userData);
@@ -75,7 +77,7 @@ export class UsersRepository extends Repository<User> {
 			}
 		}
 		return user;
-	}
+	},
 
 	async createUser42(userData: User42Dto): Promise<User> {
 		const user: User = this.create(userData);
@@ -89,7 +91,7 @@ export class UsersRepository extends Repository<User> {
 			.catch(() => 0);
 		if (numberUsers === 0) user.isAdmin = true;
 		return this.save(user);
-	}
+	},
 
 	async getUsersWithFilters(
 		filterDto: GetUserFilterDto,
@@ -115,7 +117,7 @@ export class UsersRepository extends Repository<User> {
 		}
 		const users = await query.getMany();
 		return users;
-	}
+	},
 
 	async updateUser(updateUser: UpdateUserDto, user: User): Promise<boolean> {
 		const { username, email, password } = updateUser;
@@ -140,7 +142,7 @@ export class UsersRepository extends Repository<User> {
 				);
 			throw new InternalServerErrorException();
 		}
-	}
+	},
 
 	deleteOldImage(image: string) {
 		const fs = require('fs');
@@ -152,9 +154,9 @@ export class UsersRepository extends Repository<User> {
 			}
 			fs.unlinkSync(filePath);
 		});
-	}
+	},
 
-	async saveImage(@UploadedFile() file, user: User): Promise<string> {
+	async saveImage(file, user: User): Promise<string> {
 		if (!file?.filename)
 			throw new ForbiddenException('Only image files are allowed !');
 
@@ -167,7 +169,7 @@ export class UsersRepository extends Repository<User> {
 			throw new InternalServerErrorException();
 		}
 		return file.filename;
-	}
+	},
 
 	async addFriend(friend: string, user: User): Promise<void> {
 		const found = user.friends.find((element) => element === friend);
@@ -184,7 +186,7 @@ export class UsersRepository extends Repository<User> {
 			console.log(e);
 			throw new InternalServerErrorException();
 		}
-	}
+	},
 
 	async deleteFriend(friend: string, user: User): Promise<void> {
 		const index = user.friends.indexOf(friend);
@@ -202,7 +204,7 @@ export class UsersRepository extends Repository<User> {
 			console.log(e);
 			throw new InternalServerErrorException();
 		}
-	}
+	},
 
 	async updateBlockUser(
 		block: boolean,
@@ -232,5 +234,5 @@ export class UsersRepository extends Repository<User> {
 			}
 		}
 		return user;
-	}
-}
+	},
+});

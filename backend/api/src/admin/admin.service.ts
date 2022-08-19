@@ -5,14 +5,10 @@ import { UsersRepository } from 'src/user/user.repository';
 
 @Injectable()
 export class AdminService {
-	constructor(
-		@InjectRepository(UsersRepository)
-		private usersRepository: UsersRepository,
-	) {}
+	//constructor() {} //private usersRepository: UsersRepository, //@InjectRepository(UsersRepository)
 
 	async getAllUsers(): Promise<Partial<User[]>> {
-		const query = await this.usersRepository
-			.createQueryBuilder('user')
+		const query = await UsersRepository.createQueryBuilder('user')
 			.select([
 				'user.userId',
 				'user.username',
@@ -26,8 +22,7 @@ export class AdminService {
 	}
 
 	async getAllAdmin(): Promise<Partial<User[]>> {
-		const query = await this.usersRepository
-			.createQueryBuilder('user')
+		const query = await UsersRepository.createQueryBuilder('user')
 			.andWhere('user.isAdmin = :isAdmin', { isAdmin: true })
 			.select([
 				'user.userId',

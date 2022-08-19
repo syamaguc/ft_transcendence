@@ -28,8 +28,8 @@ import { Response, Request } from 'express';
 @Injectable()
 export class UserService {
 	constructor(
-		@InjectRepository(UsersRepository)
-		private usersRepository: UsersRepository,
+		//@InjectRepository(UsersRepository)
+		//private usersRepository: UsersRepository,
 		private jwtService: JwtService,
 	) {}
 
@@ -38,7 +38,7 @@ export class UserService {
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ accessToken: string }> {
 		const { username, password } = userData;
-		const user: Promise<User> = this.usersRepository.createUser(userData);
+		const user: Promise<User> = UsersRepository.createUser(userData);
 		if (await bcrypt.compare(password, (await user).password)) {
 			const auth = false;
 			const payload: JwtPayload = { username, auth };
@@ -56,12 +56,12 @@ export class UserService {
 		let user: User = undefined;
 
 		const { login42 } = userData;
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { login42: login42 },
 		});
 		if (user) return user;
 		let { username } = userData;
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { username: username },
 		});
 		if (user) {
@@ -74,7 +74,7 @@ export class UserService {
 	}
 
 	createUser42(userData: User42Dto): Promise<User> {
-		return this.usersRepository.createUser42(userData);
+		return UsersRepository.createUser42(userData);
 	}
 
 	async signIn(
@@ -84,9 +84,9 @@ export class UserService {
 		const { id, password } = userData;
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({ where: { username: id } });
+		user = await UsersRepository.findOne({ where: { username: id } });
 		if (user === undefined) {
-			user = await this.usersRepository.findOne({ where: { email: id } });
+			user = await UsersRepository.findOne({ where: { email: id } });
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const username = user.username;
@@ -104,7 +104,7 @@ export class UserService {
 
 	async currentUser(user: User): Promise<Partial<User>> {
 		let userFound: User = undefined;
-		userFound = await this.usersRepository.findOne({
+		userFound = await UsersRepository.findOne({
 			where: { userId: user.userId },
 		});
 		if (!userFound) throw new NotFoundException('No user found');
@@ -114,7 +114,7 @@ export class UserService {
 
 	async userInfo(username: string): Promise<Partial<User>> {
 		let user: User = undefined;
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { username: username },
 		});
 		if (!user) throw new NotFoundException('No user found');
@@ -125,7 +125,7 @@ export class UserService {
 	async getPartialUserInfo(id: string): Promise<Partial<User>> {
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({ where: { userId: id } });
+		user = await UsersRepository.findOne({ where: { userId: id } });
 		if (!user) return user;
 		return {
 			userId: user.userId,
@@ -136,7 +136,7 @@ export class UserService {
 	}
 
 	getUserWithFilters(filterDto: GetUserFilterDto): Promise<Partial<User[]>> {
-		return this.usersRepository.getUsersWithFilters(filterDto);
+		return UsersRepository.getUsersWithFilters(filterDto);
 	}
 
 	async updateUser(
@@ -146,7 +146,7 @@ export class UserService {
 	): Promise<void> {
 		const { username } = updateUser;
 
-		const updated: boolean = await this.usersRepository.updateUser(
+		const updated: boolean = await UsersRepository.updateUser(
 			updateUser,
 			user,
 		);
@@ -162,9 +162,9 @@ export class UserService {
 		id: string,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
-		const query = await this.usersRepository
-			.createQueryBuilder('user')
-			.getMany();
+		const query = await UsersRepository.createQueryBuilder(
+			'user',
+		).getMany();
 
 		for (const user of query) {
 			if (user.friends.indexOf(id) > -1) {
@@ -172,11 +172,11 @@ export class UserService {
 			}
 		}
 		res.clearCookie('jwt');
-		const result = await this.usersRepository.delete(id);
+		const result = await UsersRepository.delete(id);
 	}
 
 	uploadImage(@UploadedFile() file, user: User): Promise<string> {
-		return this.usersRepository.saveImage(file, user);
+		return UsersRepository.saveImage(file, user);
 	}
 
 	async getProfilePicture(
@@ -200,11 +200,11 @@ export class UserService {
 	}
 
 	addFriend(friend: string, user: User): Promise<void> {
-		return this.usersRepository.addFriend(friend, user);
+		return UsersRepository.addFriend(friend, user);
 	}
 
 	deleteFriend(friend: string, user: User): Promise<void> {
-		return this.usersRepository.deleteFriend(friend, user);
+		return UsersRepository.deleteFriend(friend, user);
 	}
 
 	async getFriendList(user: User): Promise<object> {
@@ -233,7 +233,7 @@ export class UserService {
 		user.twoFactorAuth = bool;
 		const username = user.username;
 		try {
-			await this.usersRepository.save(user);
+			await UsersRepository.save(user);
 			const auth = true;
 			const payload: JwtPayload = { username, auth };
 			const accessToken: string = await this.jwtService.sign(payload);
@@ -249,7 +249,7 @@ export class UserService {
 
 		// if (userIsAdmin.isAdmin === false)
 		// 	throw new UnauthorizedException('You aren\'t an administrator');
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { userId: userId },
 		});
 		if (!user) throw new NotFoundException('No user found');
@@ -269,14 +269,14 @@ export class UserService {
 			);
 		}
 
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { userId: userId },
 		});
 		if (!user) throw new NotFoundException('No user found');
 
 		user.isBan = bool;
 		try {
-			await this.usersRepository.save(user);
+			await UsersRepository.save(user);
 		} catch (e) {
 			console.log(e);
 			throw new InternalServerErrorException();
@@ -286,7 +286,7 @@ export class UserService {
 	async getIsAdmin(userId: string, userIsAdmin: User): Promise<boolean> {
 		let user: User = undefined;
 
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { userId: userId },
 		});
 		if (!user) throw new NotFoundException('No user found');
@@ -306,14 +306,14 @@ export class UserService {
 			);
 		}
 
-		user = await this.usersRepository.findOne({
+		user = await UsersRepository.findOne({
 			where: { userId: userId },
 		});
 		if (!user) throw new NotFoundException('No user found');
 
 		user.isAdmin = bool;
 		try {
-			await this.usersRepository.save(user);
+			await UsersRepository.save(user);
 		} catch (e) {
 			console.log(e);
 			throw new InternalServerErrorException();
@@ -335,6 +335,6 @@ export class UserService {
 		user: User,
 		userToBlock: User,
 	): Promise<User> {
-		return this.usersRepository.updateBlockUser(block, user, userToBlock);
+		return UsersRepository.updateBlockUser(block, user, userToBlock);
 	}
 }
