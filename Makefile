@@ -5,11 +5,19 @@ build:
 	fi
 	docker-compose up --build
 
+restart:
+	docker-compose up
+
 down:
 	docker-compose down
+
+image_clean:
+	docker rmi $$(docker images -a -q)
 
 volume_clean:
 	docker volume prune -f
 
-fclean:
-	docker system prune
+clean:
+	docker system prune -f
+
+fclean: clean volume_clean image_clean
