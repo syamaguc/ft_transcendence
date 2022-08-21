@@ -33,7 +33,7 @@ const SideBar = ({
   const onClickChannel = (chatRoom: ChatRoom) => {
     setCurrentRoom(chatRoom.name)
     socket.emit('joinRoom', chatRoom.id)
-    setChatLog([])
+    socket.emit('getMessageLog', chatRoom.id)
     setInputMessage('')
   }
 
@@ -41,6 +41,10 @@ const SideBar = ({
     socket.on('updateNewRoom', ({ id, name }) => {
       console.log('created : ', id)
       setRoom({ id: id, name: name })
+    })
+    socket.on('getMessageLog', (messageLog: string[]) => {
+      console.log('messageLog loaded', messageLog)
+      setChatLog(messageLog)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

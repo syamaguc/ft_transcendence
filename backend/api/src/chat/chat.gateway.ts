@@ -9,6 +9,7 @@ import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
+import { MessageI } from './interface/message.interface';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway {
@@ -34,6 +35,18 @@ export class ChatGateway {
 		const room = [...socket.rooms].slice(0)[1];
 		const newMessage = this.chatService.addMessage(addMessageDto, room);
 		this.server.to(room).emit('updateNewMessage', newMessage.message);
+	}
+
+	@SubscribeMessage('getMessageLog')
+	getMessageLog(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`getMessageLog: for ${roomId}`);
+		const messageLog: MessageI[] = this.chatService.getMessageLog(roomId);
+		const messageStrings: string[] = [];
+		messageLog.map((log) => messageStrings.push(log.message));
+		socket.emit('getMessageLog', messageStrings);
 	}
 
 	@SubscribeMessage('joinRoom')

@@ -39,4 +39,9 @@ export class ChatService {
 		room.logs.push(newMessage);
 		return newMessage;
 	}
+
+	getMessageLog(roomId: string): MessageI[] {
+		const room = this.charRooms.find((r) => r.id == roomId);
+		return room.logs;
+	}
 }
