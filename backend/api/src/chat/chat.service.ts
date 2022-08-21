@@ -10,6 +10,7 @@ export class ChatService {
 		{
 			id: '1',
 			name: 'random',
+			members: ['all'],
 			owner: null,
 			admins: null,
 			is_private: false,
@@ -21,6 +22,7 @@ export class ChatService {
 	createRoom(createChatRoomDto: CreateChatRoomDto): ChatRoomI {
 		const newChatRoom: ChatRoomI = {
 			id: uuidv4(),
+			members: [],
 			...createChatRoomDto,
 			logs: [],
 			admins: [],
@@ -47,5 +49,10 @@ export class ChatService {
 
 	getRooms(): ChatRoomI[] {
 		return this.charRooms;
+	}
+
+	joinRoom(roomId: string) {
+		const room = this.charRooms.find((r) => r.id == roomId);
+		room.members.push('user1');
 	}
 }

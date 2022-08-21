@@ -60,6 +60,7 @@ export class ChatGateway {
 		socket.emit('getRooms', roomsList);
 	}
 
+	// room which user is watching
 	@SubscribeMessage('watchRoom')
 	watchOrSwitchRoom(
 		@MessageBody() roomId: string,
@@ -69,6 +70,14 @@ export class ChatGateway {
 		const rooms = [...socket.rooms].slice(0);
 		if (rooms.length == 2) socket.leave(rooms[1]);
 		socket.join(roomId);
+	}
+
+	// join room to be a member
+	@SubscribeMessage('joinRoom')
+	joinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`);
+		this.chatService.joinRoom(roomId);
+		this.watchOrSwitchRoom(roomId, socket);
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
@@ -85,7 +94,7 @@ export class ChatGateway {
 			channel_type: 'channel',
 		};
 		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
-		this.watchOrSwitchRoom(newChatRoom.id, socket);
+		this.joinRoom(newChatRoom.id, socket);
 		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
 		this.server.emit('updateNewRoom', chatRoom);
 	}
