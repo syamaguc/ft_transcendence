@@ -5,6 +5,7 @@ import { UserModule } from '../user/user.module';
 import { AuthModule } from '../auth/auth.module';
 import { AdminModule } from 'src/admin/admin.module';
 import { User } from '../user/entities/user.entity';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import { User } from '../user/entities/user.entity';
 		UserModule,
 		AuthModule,
 		AdminModule,
+		ChatModule,
 	],
 	providers: [],
 })
