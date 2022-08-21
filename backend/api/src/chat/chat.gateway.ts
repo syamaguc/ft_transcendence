@@ -60,12 +60,12 @@ export class ChatGateway {
 		socket.emit('getRooms', roomsList);
 	}
 
-	@SubscribeMessage('joinRoom')
-	joinOrUpdateRoom(
+	@SubscribeMessage('watchRoom')
+	watchOrSwitchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`joinRoom: ${socket.id} joined ${roomId}`);
+		this.logger.log(`watchRoom: ${socket.id} watched ${roomId}`);
 		const rooms = [...socket.rooms].slice(0);
 		if (rooms.length == 2) socket.leave(rooms[1]);
 		socket.join(roomId);
@@ -85,7 +85,7 @@ export class ChatGateway {
 			channel_type: 'channel',
 		};
 		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
-		this.joinOrUpdateRoom(newChatRoom.id, socket);
+		this.watchOrSwitchRoom(newChatRoom.id, socket);
 		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
 		this.server.emit('updateNewRoom', chatRoom);
 	}

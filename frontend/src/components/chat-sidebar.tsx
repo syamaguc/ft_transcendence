@@ -33,7 +33,7 @@ const SideBar = ({
 
   const onClickChannel = (chatRoom: ChatRoom) => {
     setCurrentRoom(chatRoom.name)
-    socket.emit('joinRoom', chatRoom.id)
+    socket.emit('watchRoom', chatRoom.id)
     socket.emit('getMessageLog', chatRoom.id)
     setInputMessage('')
   }
