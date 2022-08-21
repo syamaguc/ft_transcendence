@@ -44,4 +44,8 @@ export class ChatService {
 		const room = this.charRooms.find((r) => r.id == roomId);
 		return room.logs;
 	}
+
+	getRooms(): ChatRoomI[] {
+		return this.charRooms;
+	}
 }

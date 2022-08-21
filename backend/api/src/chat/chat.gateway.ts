@@ -10,6 +10,7 @@ import { Server, Socket } from 'socket.io';
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
 import { MessageI } from './interface/message.interface';
+import { ChatRoomI } from './interface/chat-room.interface';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway {
@@ -47,6 +48,16 @@ export class ChatGateway {
 		const messageStrings: string[] = [];
 		messageLog.map((log) => messageStrings.push(log.message));
 		socket.emit('getMessageLog', messageStrings);
+	}
+
+	@SubscribeMessage('getRooms')
+	getRooms(@ConnectedSocket() socket: Socket) {
+		this.logger.log(`getRooms: for ${socket.id}`);
+		const rooms: ChatRoomI[] = this.chatService.getRooms();
+		//tmp
+		const roomsList = [];
+		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }));
+		socket.emit('getRooms', roomsList);
 	}
 
 	@SubscribeMessage('joinRoom')

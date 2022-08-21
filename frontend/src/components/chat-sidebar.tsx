@@ -46,6 +46,14 @@ const SideBar = ({
       console.log('messageLog loaded', messageLog)
       setChatLog(messageLog)
     })
+    socket.on('getRooms', (rooms: ChatRoom[]) => {
+      setChatRooms(rooms)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    socket.emit('getRooms')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
