@@ -62,7 +62,8 @@ export class ChatGateway {
 		};
 		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
 		this.joinOrUpdateRoom(newChatRoom.id, socket);
-		this.server.emit('updateNewRoom', newChatRoom.name);
+		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
+		this.server.emit('updateNewRoom', chatRoom);
 	}
 }
 

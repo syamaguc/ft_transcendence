@@ -7,10 +7,15 @@ type Props = {
   socket: Socket
 }
 
+type ChatRoom = {
+  id: string
+  name: string
+}
+
 const SideBar = ({ setCurrentRoom, socket }: Props) => {
   const [inputText, setInputText] = useState('')
-  const [chatRooms, setChatRooms] = useState<string[]>([])
-  const [room, setRoom] = useState('random')
+  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
+  const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
 
   const onClickCreate = useCallback(() => {
     console.log('onClickCreate called')
@@ -18,15 +23,15 @@ const SideBar = ({ setCurrentRoom, socket }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputText])
 
-  const onClickChannel = (chatRoom: string) => {
-    setCurrentRoom(chatRoom)
-    socket.emit('joinRoom', chatRoom)
+  const onClickChannel = (chatRoom: ChatRoom) => {
+    setCurrentRoom(chatRoom.name)
+    socket.emit('joinRoom', chatRoom.id)
   }
 
   useEffect(() => {
-    socket.on('updateNewRoom', (room: string) => {
-      console.log('created : ', room)
-      setRoom(room)
+    socket.on('updateNewRoom', ({ id, name }) => {
+      console.log('created : ', id)
+      setRoom({ id: id, name: name })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -62,9 +67,9 @@ const SideBar = ({ setCurrentRoom, socket }: Props) => {
             onClick={() => {
               onClickChannel(chatRoom)
             }}
-            key={chatRoom}
+            key={chatRoom.id}
           >
-            {chatRoom}
+            {chatRoom.name}
           </Box>
         ))}
       </Stack>
