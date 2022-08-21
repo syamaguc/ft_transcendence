@@ -27,6 +27,7 @@ const SideBar = ({
   const onClickCreate = useCallback(() => {
     console.log('onClickCreate called')
     socket.emit('createRoom', inputText)
+    setInputText('')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputText])
 

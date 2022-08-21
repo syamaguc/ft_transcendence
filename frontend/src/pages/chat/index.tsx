@@ -25,6 +25,7 @@ const Chat = () => {
 
   const onClickSubmit = useCallback(() => {
     socket.emit('addMessage', inputText)
+    setInputText('')
   }, [inputText])
 
   useEffect(() => {
