@@ -43,7 +43,12 @@ const Chat = () => {
     <Layout>
       <Box>
         <HStack>
-          <ChatSideBar socket={socket} setCurrentRoom={setCurrentRoom} />
+          <ChatSideBar
+            socket={socket}
+            setCurrentRoom={setCurrentRoom}
+            setChatLog={setChatLog}
+            setInputMessage={setInputText}
+          />
           <Stack>
             <Box>Current Channel:{currentRoom}</Box>
             <Spacer />

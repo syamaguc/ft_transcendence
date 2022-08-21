@@ -3,8 +3,10 @@ import { useState, useCallback, useEffect } from 'react'
 import { io, Socket } from 'socket.io-client'
 
 type Props = {
-  setCurrentRoom: (room: string) => void
   socket: Socket
+  setCurrentRoom: (room: string) => void
+  setChatLog: (chatLog: string[]) => void
+  setInputMessage: (input: string) => void
 }
 
 type ChatRoom = {
@@ -12,7 +14,12 @@ type ChatRoom = {
   name: string
 }
 
-const SideBar = ({ setCurrentRoom, socket }: Props) => {
+const SideBar = ({
+  socket,
+  setCurrentRoom,
+  setChatLog,
+  setInputMessage,
+}: Props) => {
   const [inputText, setInputText] = useState('')
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
@@ -26,6 +33,8 @@ const SideBar = ({ setCurrentRoom, socket }: Props) => {
   const onClickChannel = (chatRoom: ChatRoom) => {
     setCurrentRoom(chatRoom.name)
     socket.emit('joinRoom', chatRoom.id)
+    setChatLog([])
+    setInputMessage('')
   }
 
   useEffect(() => {
