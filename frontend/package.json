@@ -21,6 +21,7 @@
     "react-dom": "18.2.0",
     "react-icons": "^4.4.0",
     "react-remove-scroll": "^2.5.5",
+    "react-use": "^17.4.0",
     "socket.io-client": "^4.5.1"
   },
   "devDependencies": {
