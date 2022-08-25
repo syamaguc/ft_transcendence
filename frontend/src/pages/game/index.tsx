@@ -52,7 +52,7 @@ export default function GameMatching() {
       }
       if (cancelButton) {
         const buttonStyle = window.getComputedStyle(cancelButton);
-        setMatchDisplay(buttonStyle.getPropertyValue('display'));
+        setCancelDisplay(buttonStyle.getPropertyValue('display'));
         cancelButton.style.display = 'none';
       }
     }
