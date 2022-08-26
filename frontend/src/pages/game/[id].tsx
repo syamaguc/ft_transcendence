@@ -4,6 +4,8 @@ import io from 'socket.io-client';
 import style from "../../styles/game.module.css"
 import { GameObject } from "../../interfaces/game"
 import Pong from "../../components/game-pong"
+import GameSetting from "../../components/game-setting"
+import GameResult from "../../components/game-result"
 
 
 // export interface GameSetting{
@@ -38,6 +40,7 @@ export default function Game() {
   const router = useRouter();
   const [gameStatus, setGameStatus] = useState<number>(0);
   const [server, setServer] = useState();
+  const [playerRole, setPlayerRole] = useState();
 
 
   useEffect(() => {
@@ -54,23 +57,7 @@ export default function Game() {
     server.emit("connectServer", roomId);
     server.on("connectClient", (data) => {
       playerStatus.role = data;
-
-      const registerButton = () => {
-        if (playerStatus.role == 0) {
-          const startButton = document.getElementById('startButton');
-          const endButton = document.getElementById('endButton');
-          if (startButton) {
-            startButton.addEventListener('click', () => {
-              server.emit('start', {id: roomId});
-            });
-          }
-          if (endButton) {
-            endButton.addEventListener('click', () => {
-              server.emit('retry', {id: roomId});
-            });
-          }
-        }
-      };
+      setPlayerRole(data);
 
       server.on('clientMove', (data: GameObject) => {
         setGameObject(data)
@@ -108,37 +95,34 @@ export default function Game() {
             keyStatus.downPressed = false;
           }
         };
-        document.addEventListener("keydown", keyDownHandler);
-        document.addEventListener("keyup", keyUpHandler);
+        const screen = document.getElementById('screen')
+        if (screen) {
+          screen.addEventListener("keydown", keyDownHandler);
+          screen.addEventListener("keyup", keyUpHandler);
+        }
       }
-
-      registerButton();
     });
   }, [server, router])
 
 
   return (
-    <div className={style.screen} tabIndex={0}>
-      <div className={gameStatus == 0? style.startBox: style.boxNonActive} id="startBox">
-        <div>
-
-        </div>
-        <div className={style.underButtonBox}>
-          <button className={style.startButton} id="startButton">start</button>
-        </div>
-      </div>
+    <div className={style.screen} tabIndex={0} id="screen">
+      <GameSetting
+        gameStatus={gameStatus}
+        playerRole={playerRole}
+        roomId={router.query.id}
+        server={server}
+      />
       <Pong
         gameObject={gameObject}
       />
-      <div className={gameStatus == 2? style.endBox: style.boxNonActive} id="endBox">
-        <div>
-
-        </div>
-        <div className={style.underButtonBox}>
-          <button className={style.startButton} id="quitButton" onClick={() => router.back()}>quit</button>
-          <button className={style.startButton} id="endButton">retry</button>
-        </div>
-      </div>
+      <GameResult
+        gameStatus={gameStatus}
+        playerRole={playerRole}
+        roomId={router.query.id}
+        server={server}
+        router={router}
+      />
     </div>
   )
 }
