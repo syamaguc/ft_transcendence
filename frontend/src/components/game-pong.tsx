@@ -19,7 +19,9 @@ const Pong = ({ gameObject }: Props) => {
   const { width: screenWidth, height: screenHeight } = useWindowSize()
 
   const canvasRender = () => {
-    const canvasElem = document.getElementById('gameCanvas')
+    const canvasElem = document.getElementById(
+      'gameCanvas'
+    ) as HTMLCanvasElement
     if (!canvasElem) return
     canvasElem.width = Math.ceil(screenWidth * canvasRatio)
     canvasElem.height = Math.ceil(screenHeight * canvasRatio)
