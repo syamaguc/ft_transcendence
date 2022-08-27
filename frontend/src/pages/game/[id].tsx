@@ -98,6 +98,7 @@ export default function Game() {
         roomId={router.query.id}
         server={server}
         gameSetting={gameObject.gameSetting}
+        gameObject={gameObject}
       />
       <Pong gameObject={gameObject} />
       <GameResult

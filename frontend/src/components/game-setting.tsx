@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useEffect } from 'react'
 import style from '../styles/game.module.css'
-import { GameSetting } from '../types/game'
+import { GameObject, GameSetting } from '../types/game'
 
 type Props = {
   gameStatus: number
@@ -8,6 +8,7 @@ type Props = {
   roomId: string
   server
   gameSetting: GameSetting
+  gameObject: GameObject
 }
 
 const GameSettingForm = ({
@@ -16,6 +17,7 @@ const GameSettingForm = ({
   roomId,
   server,
   gameSetting,
+  gameObject,
 }: Props) => {
   const didLogRef = useRef(false)
 
@@ -99,6 +101,13 @@ const GameSettingForm = ({
       className={gameStatus == 0 ? style.startBox : style.boxNonActive}
       id='startBox'
     >
+      <div>
+        <p>
+          {playerRole == 0 ? <font size="+2">player1</font> : "player1"}
+          {" vs "}
+          {playerRole == 1 ? <font size="+2">player2</font> : "player2"}
+        </p>
+      </div>
       <div>
         <p>point</p>
         <input type='radio' name='point' value='2' /> 2
