@@ -59,17 +59,7 @@ export default function Game() {
         }
       })
 
-      server.on('gameEnd', (data) => {
-        setGameObject(data.data)
-        setGameStatus(data.data.gameStatus)
-      })
-
-      server.on('gameRetry', (data: GameObject) => {
-        setGameObject(data)
-        setGameStatus(data.gameStatus)
-      })
-
-      server.on('settingReflect', (data: GameObject) => {
+      server.on('updateGameObject', (data) => {
         setGameObject(data)
         setGameStatus(data.gameStatus)
       })

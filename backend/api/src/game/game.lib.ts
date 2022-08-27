@@ -160,7 +160,7 @@ export class GameRoom {
     }
     else {
       this.gameObject.gameStatus = 2;
-      this.server.to(this.id).emit('gameEnd', {data: this.gameObject, finishFlag: finishFlag - 1});
+      this.server.to(this.id).emit('updateGameObject', this.gameObject);
     }
   }
 
@@ -207,7 +207,7 @@ export class GameRoom {
 
   retry() {
     this.gameObject.gameStatus = 0;
-    this.server.to(this.id).emit('gameRetry', this.gameObject);
+    this.server.to(this.id).emit('updateGameObject', this.gameObject);
   }
 
 
@@ -221,7 +221,7 @@ export class GameRoom {
         this.gameObject.gameSetting.speed = value
       }
     }
-    this.server.to(this.id).emit('settingReflect', this.gameObject);
+    this.server.to(this.id).emit('updateGameObject', this.gameObject);
   }
 
 
