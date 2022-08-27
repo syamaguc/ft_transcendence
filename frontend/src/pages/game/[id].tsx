@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 import io from 'socket.io-client'
 import style from '../../styles/game.module.css'
 import { GameObject } from 'src/types/game'
-import Pong from '../../components/game-pong'
-import GameSetting from '../../components/game-setting'
-import GameResult from '../../components/game-result'
+import Pong from '@components/game-pong'
+import GameSetting from '@components/game-setting'
+import GameResult from '@components/game-result'
 
 // export interface GameSetting{
 //   point: number;
