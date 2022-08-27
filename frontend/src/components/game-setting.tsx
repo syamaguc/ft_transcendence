@@ -103,9 +103,9 @@ const GameSettingForm = ({
     >
       <div>
         <p>
-          {playerRole == 0 ? <font size="+2">player1</font> : "player1"}
-          {" vs "}
-          {playerRole == 1 ? <font size="+2">player2</font> : "player2"}
+          {playerRole == 0 ? <font size='+2'>player1</font> : 'player1'}
+          {' vs '}
+          {playerRole == 1 ? <font size='+2'>player2</font> : 'player2'}
         </p>
       </div>
       <div>
