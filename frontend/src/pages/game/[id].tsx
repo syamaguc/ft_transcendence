@@ -106,6 +106,7 @@ export default function Game() {
         roomId={router.query.id}
         server={server}
         router={router}
+        gameObject={gameObject}
       />
     </div>
   )
