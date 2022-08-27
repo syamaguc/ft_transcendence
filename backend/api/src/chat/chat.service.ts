@@ -14,8 +14,9 @@ export class ChatService {
 			owner: null,
 			admins: null,
 			is_private: false,
-			channel_type: 'channel',
+			// channel_type: 'channel',
 			logs: [],
+			password: 'Test123!'
 		},
 	];
 
@@ -26,6 +27,7 @@ export class ChatService {
 			...createChatRoomDto,
 			logs: [],
 			admins: [],
+			password:""
 		};
 		this.charRooms.push(newChatRoom);
 		return newChatRoom;
