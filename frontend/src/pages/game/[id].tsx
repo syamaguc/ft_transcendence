@@ -4,7 +4,7 @@ import io from 'socket.io-client'
 import style from '../../styles/game.module.css'
 import { GameObject } from 'src/types/game'
 import Pong from '@components/game-pong'
-import GameSetting from '@components/game-setting'
+import GameSettingForm from '@components/game-setting'
 import GameResult from '@components/game-result'
 
 export interface KeyStatus {
@@ -24,7 +24,7 @@ export default function Game() {
     player1: { num: 0, point: 0 },
     player2: { num: 0, point: 0 },
     gameStatus: 0,
-    gameSetting: { point: 0, speed: 0 },
+    gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
@@ -69,6 +69,11 @@ export default function Game() {
         setGameStatus(data.gameStatus)
       })
 
+      server.on('settingReflect', (data: GameObject) => {
+        setGameObject(data)
+        setGameStatus(data.gameStatus)
+      })
+
       if (playerStatus.role <= 1) {
         const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
           console.log(event.code)
@@ -97,11 +102,12 @@ export default function Game() {
 
   return (
     <div className={style.screen} tabIndex={0} id='screen'>
-      <GameSetting
+      <GameSettingForm
         gameStatus={gameStatus}
         playerRole={playerRole}
         roomId={router.query.id}
         server={server}
+        gameSetting={gameObject.gameSetting}
       />
       <Pong gameObject={gameObject} />
       <GameResult

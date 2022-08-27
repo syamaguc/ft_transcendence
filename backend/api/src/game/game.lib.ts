@@ -211,6 +211,20 @@ export class GameRoom {
   }
 
 
+  settingChange(name: string, checked: boolean, value: number) {
+    if (name == "point") {
+      if (checked) {
+        this.gameObject.gameSetting.point = value
+      }
+    } else if (name == "speed") {
+      if (checked) {
+        this.gameObject.gameSetting.speed = value
+      }
+    }
+    this.server.to(this.id).emit('settingReflect', this.gameObject);
+  }
+
+
   barMove(keyStatus: KeyStatus, position: Position) {
     if (keyStatus.upPressed) {
       if (position.top >= barSpeed)

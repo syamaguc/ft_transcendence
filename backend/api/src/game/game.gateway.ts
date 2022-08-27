@@ -50,6 +50,20 @@ export class GameGateway {
   }
 
 
+  @SubscribeMessage('settingChange')
+  handleSettingChange(@MessageBody() data: any) {
+    const roomId = data["id"];
+    const name = data["name"];
+    const checked = data["checked"];
+    const value = data["value"];
+    for (let i = 0; i < this.gameRooms.length; i++) {
+      if (roomId == this.gameRooms[i].id) {
+        this.gameRooms[i].settingChange(name, checked, value);
+      }
+    }
+  }
+
+
   @SubscribeMessage('start')
   handleStart(@MessageBody() data: any) {
     const roomId = data["id"];
