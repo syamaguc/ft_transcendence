@@ -39,8 +39,27 @@ const GameSettingForm = ({ gameStatus, playerRole, roomId, server, gameSetting }
     return
   }
 
+  const radioSetting = (point: number, speed: number) => {
+    let elements = document.getElementsByName(
+      'point'
+    ) as NodeListOf<HTMLInputElement>
+    for (let i = 0; i < elements.length; i++) {
+      if (Number(elements.item(i).value) == point) {
+        elements.item(i).checked = true
+      }
+    }
+    elements = document.getElementsByName(
+      'speed'
+    ) as NodeListOf<HTMLInputElement>
+    for (let i = 0; i < elements.length; i++) {
+      if (Number(elements.item(i).value) == speed) {
+        elements.item(i).checked = true
+      }
+    }
+  }
+
   useEffect(() => {
-    if (!didLogRef.current && server) {
+    if (!didLogRef.current && server && roomId && playerRole != -1) {
       didLogRef.current = true
       const addChangeEvent = (name: string) => {
         let elements = document.getElementsByName(
@@ -52,28 +71,16 @@ const GameSettingForm = ({ gameStatus, playerRole, roomId, server, gameSetting }
           })
         }
       }
-      addChangeEvent('point')
-      addChangeEvent('speed')
+      if (playerRole == 0) {
+        addChangeEvent('point')
+        addChangeEvent('speed')
+      }
+      radioSetting(gameSetting.point, gameSetting.speed)
     }
-  }, [server])
+  }, [server, roomId, playerRole])
 
   useEffect(() => {
-    let elements = document.getElementsByName(
-      'point'
-    ) as NodeListOf<HTMLInputElement>
-    for (let i = 0; i < elements.length; i++) {
-      if (Number(elements.item(i).value) == gameSetting.point) {
-        elements.item(i).checked = true
-      }
-    }
-    elements = document.getElementsByName(
-      'speed'
-    ) as NodeListOf<HTMLInputElement>
-    for (let i = 0; i < elements.length; i++) {
-      if (Number(elements.item(i).value) == gameSetting.speed) {
-        elements.item(i).checked = true
-      }
-    }
+    radioSetting(gameSetting.point, gameSetting.speed)
   }, [gameSetting])
 
   return (

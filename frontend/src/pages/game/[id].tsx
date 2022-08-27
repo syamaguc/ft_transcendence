@@ -33,7 +33,7 @@ export default function Game() {
   const router = useRouter()
   const [gameStatus, setGameStatus] = useState<number>(0)
   const [server, setServer] = useState()
-  const [playerRole, setPlayerRole] = useState()
+  const [playerRole, setPlayerRole] = useState(-1)
 
   useEffect(() => {
     if (didLogRef.current === false) {
