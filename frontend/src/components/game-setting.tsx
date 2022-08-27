@@ -9,9 +9,25 @@ type Props = {
 }
 
 const GameSetting = ({ gameStatus, playerRole, roomId, server }: Props) => {
+  const getRadioValue = (name: string) => {
+    let elements = document.getElementsByName(
+      name
+    ) as NodeListOf<HTMLInputElement>
+    if (!elements) return ''
+    let checkValue = ''
+    for (let i = 0; i < elements.length; i++) {
+      if (elements.item(i).checked) {
+        checkValue = elements.item(i).value
+      }
+    }
+    return checkValue
+  }
+
   const start = useCallback(() => {
     if (!server || !roomId) return
-    server.emit('start', { id: roomId })
+    let pointValue = Number(getRadioValue('point'))
+    let speedValue = Number(getRadioValue('speed'))
+    server.emit('start', { id: roomId, point: pointValue, speed: speedValue })
   }, [roomId, server])
 
   const nop = () => {
@@ -23,7 +39,17 @@ const GameSetting = ({ gameStatus, playerRole, roomId, server }: Props) => {
       className={gameStatus == 0 ? style.startBox : style.boxNonActive}
       id='startBox'
     >
-      <div></div>
+      <div>
+        <p>point</p>
+        <input type='radio' name='point' value='2' checked /> 2
+        <input type='radio' name='point' value='5' /> 5
+        <input type='radio' name='point' value='7' /> 7
+      </div>
+      <div>
+        <p>speed</p>
+        <input type='radio' name='speed' value='1' checked /> 1
+        <input type='radio' name='speed' value='2' /> 2
+      </div>
       <div className={style.underButtonBox}>
         <button
           className={style.startButton}

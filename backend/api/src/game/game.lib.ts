@@ -10,7 +10,6 @@ const barBaseWidth = 50;
 const ballBaseSize = 50;
 const ballSpeed = 20;
 const barSpeed = 20;
-const finishPoint = 2;
 
 
 class BallDirection {
@@ -30,7 +29,7 @@ export class GameRoom {
   logger: Logger;
 
 
-  gameObjectInit() {
+  gameObjectInit(point: number, speed: number) {
     this.gameObject = {
       bar1: {
         top: (heightBaseSize - barBaseHeight) / 2,
@@ -47,6 +46,7 @@ export class GameRoom {
       player1: {role: 0, point: 0},
       player2: {role: 1, point: 0},
       gameStatus: 0,
+      gameSetting: {point: point, speed: speed}
     };
   }
 
@@ -54,7 +54,7 @@ export class GameRoom {
   constructor(id: string, server: Server) {
     this.id = id;
     this.server = server;
-    this.gameObjectInit();
+    this.gameObjectInit(2, 1);
     this.ballDirection = {
       ballRadian: 0,
       moveX: 0,
@@ -64,7 +64,7 @@ export class GameRoom {
     this.logger = new Logger('GameRoom Log');
   }
 
-  
+
   setBallBounce(barTop: number) {
     const directionX = (this.ballDirection.moveX > 0) ? -1 : 1;
     const top = barTop - ballBaseSize;
@@ -87,8 +87,8 @@ export class GameRoom {
       radianRatio = (1 - (conflictPosition / whole) * 2);
     }
     this.ballDirection.ballRadian = radianRatio * Math.PI / 4;
-    this.ballDirection.moveX = directionX * Math.cos(this.ballDirection.ballRadian) * ballSpeed;
-    this.ballDirection.moveY = directionY * Math.sin(this.ballDirection.ballRadian) * ballSpeed;
+    this.ballDirection.moveX = directionX * Math.cos(this.ballDirection.ballRadian) * ballSpeed * this.gameObject.gameSetting.speed;
+    this.ballDirection.moveY = directionY * Math.sin(this.ballDirection.ballRadian) * ballSpeed * this.gameObject.gameSetting.speed;
   }
 
 
@@ -133,22 +133,22 @@ export class GameRoom {
     this.gameObject.ball.top = (heightBaseSize - ballBaseSize) / 2;
     this.gameObject.ball.left = (widthBaseSize - ballBaseSize) / 2
     this.ballDirection.ballRadian = Math.random() * Math.PI / 4;
-    this.ballDirection.moveX = (Math.random() < 0.5 ? 1 : -1) * Math.cos(this.ballDirection.ballRadian) * ballSpeed;
-    this.ballDirection.moveY = (Math.random() < 0.5 ? 1 : -1) * Math.sin(this.ballDirection.ballRadian) * ballSpeed;
+    this.ballDirection.moveX = (Math.random() < 0.5 ? 1 : -1) * Math.cos(this.ballDirection.ballRadian) * ballSpeed * this.gameObject.gameSetting.speed;
+    this.ballDirection.moveY = (Math.random() < 0.5 ? 1 : -1) * Math.sin(this.ballDirection.ballRadian) * ballSpeed * this.gameObject.gameSetting.speed;
   }
 
-  
+
   turnFinish() {
     let finishFlag = 0;
     // Add Points
     if (this.gameObject.ball.left == 0) {
       this.gameObject.player2.point += 1;
-      if (this.gameObject.player2.point == finishPoint) {
+      if (this.gameObject.player2.point == this.gameObject.gameSetting.point) {
         finishFlag = 2;
       }
     } else {
       this.gameObject.player1.point += 1;
-      if (this.gameObject.player1.point == finishPoint) {
+      if (this.gameObject.player1.point == this.gameObject.gameSetting.point) {
         finishFlag = 1;
       }
     }
@@ -199,8 +199,8 @@ export class GameRoom {
   }
 
 
-  start() {
-    this.gameObjectInit();
+  start(point: number, speed: number) {
+    this.gameObjectInit(point, speed);
     this.play();
   }
 

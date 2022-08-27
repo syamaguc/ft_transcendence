@@ -53,9 +53,11 @@ export class GameGateway {
   @SubscribeMessage('start')
   handleStart(@MessageBody() data: any) {
     const roomId = data["id"];
+    const point = data["point"];
+    const speed = data["speed"];
     for (let i = 0; i < this.gameRooms.length; i++) {
       if (roomId == this.gameRooms[i].id) {
-        this.gameRooms[i].start();
+        this.gameRooms[i].start(point, speed);
       }
     }
   }

@@ -7,11 +7,6 @@ import Pong from '@components/game-pong'
 import GameSetting from '@components/game-setting'
 import GameResult from '@components/game-result'
 
-// export interface GameSetting{
-//   point: number;
-//   speed: number;
-// }
-
 export interface KeyStatus {
   upPressed: boolean
   downPressed: boolean
@@ -29,7 +24,7 @@ export default function Game() {
     player1: { num: 0, point: 0 },
     player2: { num: 0, point: 0 },
     gameStatus: 0,
-    // gameSetting: {point: 0, speed: 0},
+    gameSetting: { point: 0, speed: 0 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
