@@ -8,6 +8,9 @@ build:
 restart:
 	docker-compose up
 
+format_frontend:
+	docker-compose exec frontend npm run format
+
 down:
 	docker-compose down
 

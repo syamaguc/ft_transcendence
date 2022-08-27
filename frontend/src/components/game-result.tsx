@@ -39,7 +39,12 @@ const GameResult = ({
       id='endBox'
     >
       <div>
-        <p>{gameObject.player1.point > gameObject.player2.point ? "player1" : "player2"} WIN</p>
+        <p>
+          {gameObject.player1.point > gameObject.player2.point
+            ? 'player1'
+            : 'player2'}{' '}
+          WIN
+        </p>
       </div>
       <div>
         <p>player1: {gameObject.player1.point}</p>
