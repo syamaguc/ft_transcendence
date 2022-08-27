@@ -10,7 +10,13 @@ type Props = {
   gameSetting: GameSetting
 }
 
-const GameSettingForm = ({ gameStatus, playerRole, roomId, server, gameSetting }: Props) => {
+const GameSettingForm = ({
+  gameStatus,
+  playerRole,
+  roomId,
+  server,
+  gameSetting,
+}: Props) => {
   const didLogRef = useRef(false)
 
   const getRadioValue = (name: string) => {
@@ -67,7 +73,12 @@ const GameSettingForm = ({ gameStatus, playerRole, roomId, server, gameSetting }
         ) as NodeListOf<HTMLInputElement>
         for (let i = 0; i < elements.length; i++) {
           elements.item(i).addEventListener('change', () => {
-            server.emit('settingChange', {id: roomId, name: name, checked: elements.item(i).checked, value: Number(elements.item(i).value)})
+            server.emit('settingChange', {
+              id: roomId,
+              name: name,
+              checked: elements.item(i).checked,
+              value: Number(elements.item(i).value),
+            })
           })
         }
       }
