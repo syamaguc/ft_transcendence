@@ -1,5 +1,15 @@
-import { Box, Stack, Button, Input, Radio, RadioGroup, FormControl, FormLabel, FormHelperText } from '@chakra-ui/react'
-import { useState, useCallback, useEffect } from 'react'
+import {
+  Box,
+  Stack,
+  Button,
+  Input,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+} from '@chakra-ui/react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 
 type Props = {
@@ -23,6 +33,7 @@ const SideBar = ({
   const [inputText, setInputText] = useState('')
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
+  const didLogRef = useRef(false)
 
   const onClickCreate = useCallback(() => {
     console.log('onClickCreate called')
@@ -39,17 +50,20 @@ const SideBar = ({
   }
 
   useEffect(() => {
-    socket.on('updateNewRoom', ({ id, name }) => {
-      console.log('created : ', id)
-      setRoom({ id: id, name: name })
-    })
-    socket.on('getMessageLog', (messageLog: string[]) => {
-      console.log('messageLog loaded', messageLog)
-      setChatLog(messageLog)
-    })
-    socket.on('getRooms', (rooms: ChatRoom[]) => {
-      setChatRooms(rooms)
-    })
+    if (didLogRef.current === false) {
+      didLogRef.current = true
+      socket.on('updateNewRoom', ({ id, name }) => {
+        console.log('created : ', id)
+        setRoom({ id: id, name: name })
+      })
+      socket.on('getMessageLog', (messageLog: string[]) => {
+        console.log('messageLog loaded', messageLog)
+        setChatLog(messageLog)
+      })
+      socket.on('getRooms', (rooms: ChatRoom[]) => {
+        setChatRooms(rooms)
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -93,7 +107,6 @@ const SideBar = ({
             Create New Channel
           </Button>
         </Stack>
-
       </Box>
 
       <Stack width='sm'>
