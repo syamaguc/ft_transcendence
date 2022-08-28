@@ -93,10 +93,16 @@ export class ChatGateway {
 			is_private: false,
 			channel_type: 'channel',
 		};
-		const newChatRoom = await this.chatService.createRoom(createChatRoomDto);
-		// this.joinRoom(newChatRoom.id, socket);
-		// const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
-		// this.server.emit('updateNewRoom', chatRoom);
+		const newChatRoom = await this.chatService.createRoom(createChatRoomDto)
+			// .then(function(newChatRoom) {
+			// 	this.joinRoom(newChatRoom.id, socket);
+			// 	const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
+			// 	this.server.emit('updateNewRoom', chatRoom);
+			// });
+		console.log(newChatRoom);
+		this.joinRoom(newChatRoom.id, socket);
+		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
+		this.server.emit('updateNewRoom', chatRoom);
 	}
 }
 

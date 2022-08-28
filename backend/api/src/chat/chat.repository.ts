@@ -1,13 +1,14 @@
 import { AppDataSource } from "src/app/app.datasource"
 import { CreateChatRoomDto } from "./dto/chat-property.dto";
 import { ChatRoom } from "./entities/chat-room.entity"
+import { v4 as uuidv4 } from 'uuid';
 
 
 
 export const chatRepository = AppDataSource.getRepository(ChatRoom).extend({
 	async createChatRoom(chatRoomData: CreateChatRoomDto): Promise<ChatRoom> {
 		const chat = this.create(chatRoomData);
-		console.log(chat);
+		chat.id = uuidv4();
 		await this.save(chat);
 		return chat;
 	}

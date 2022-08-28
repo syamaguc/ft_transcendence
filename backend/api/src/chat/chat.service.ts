@@ -65,6 +65,6 @@ export class ChatService {
 
 	joinRoom(roomId: string) {
 		const room = this.charRooms.find((r) => r.id == roomId);
-		room.members.push('user1');
+		// room.members.push('user1');
 	}
 }
