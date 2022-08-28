@@ -19,7 +19,8 @@
   transform: translate(-50%, -50%);
   display: flex;
   /* display: none; */
-  align-items: flex-end;
+  flex-flow: column;
+  /* align-items: flex-end; */
 }
 
 .endBox {

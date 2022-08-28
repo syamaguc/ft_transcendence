@@ -110,19 +110,21 @@ const Pong = ({ gameObject }: Props) => {
     context.textBaseline = 'middle'
     context.font = fontSize + 'vh sans-serif'
     context.fillText(
-      gameObject.player1.point,
+      gameObject.player1.point.toString(),
       player1PointBox.left,
       player1PointBox.top
     )
     context.fillText(
-      gameObject.player2.point,
+      gameObject.player2.point.toString(),
       player2PointBox.left,
       player2PointBox.top
     )
   }
 
   const clearCanvas = () => {
-    const canvasElem = document.getElementById('gameCanvas')
+    const canvasElem = document.getElementById(
+      'gameCanvas'
+    ) as HTMLCanvasElement
     if (!canvasElem) return
     canvasElem.width = Math.ceil(screenWidth * canvasRatio)
     canvasElem.height = Math.ceil(screenHeight * canvasRatio)

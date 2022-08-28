@@ -3,14 +3,9 @@ import { useRouter } from 'next/router'
 import io from 'socket.io-client'
 import style from '../../styles/game.module.css'
 import { GameObject } from 'src/types/game'
-import Pong from '../../components/game-pong'
-import GameSetting from '../../components/game-setting'
-import GameResult from '../../components/game-result'
-
-// export interface GameSetting{
-//   point: number;
-//   speed: number;
-// }
+import Pong from '@components/game-pong'
+import GameSettingForm from '@components/game-setting'
+import GameResult from '@components/game-result'
 
 export interface KeyStatus {
   upPressed: boolean
@@ -29,7 +24,7 @@ export default function Game() {
     player1: { num: 0, point: 0 },
     player2: { num: 0, point: 0 },
     gameStatus: 0,
-    // gameSetting: {point: 0, speed: 0},
+    gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
@@ -38,7 +33,7 @@ export default function Game() {
   const router = useRouter()
   const [gameStatus, setGameStatus] = useState<number>(0)
   const [server, setServer] = useState()
-  const [playerRole, setPlayerRole] = useState()
+  const [playerRole, setPlayerRole] = useState(-1)
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -64,12 +59,7 @@ export default function Game() {
         }
       })
 
-      server.on('gameEnd', (data) => {
-        setGameObject(data.data)
-        setGameStatus(data.data.gameStatus)
-      })
-
-      server.on('gameRetry', (data: GameObject) => {
+      server.on('updateGameObject', (data) => {
         setGameObject(data)
         setGameStatus(data.gameStatus)
       })
@@ -102,11 +92,13 @@ export default function Game() {
 
   return (
     <div className={style.screen} tabIndex={0} id='screen'>
-      <GameSetting
+      <GameSettingForm
         gameStatus={gameStatus}
         playerRole={playerRole}
         roomId={router.query.id}
         server={server}
+        gameSetting={gameObject.gameSetting}
+        gameObject={gameObject}
       />
       <Pong gameObject={gameObject} />
       <GameResult
@@ -115,6 +107,7 @@ export default function Game() {
         roomId={router.query.id}
         server={server}
         router={router}
+        gameObject={gameObject}
       />
     </div>
   )
