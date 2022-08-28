@@ -1,4 +1,4 @@
-import { Box, Stack, Button, Input } from '@chakra-ui/react'
+import { Box, Stack, Button, Input, Radio, RadioGroup, FormControl, FormLabel, FormHelperText } from '@chakra-ui/react'
 import { useState, useCallback, useEffect } from 'react'
 import { io, Socket } from 'socket.io-client'
 
@@ -66,17 +66,36 @@ const SideBar = ({
   return (
     <Box>
       <Box>
-        <Input
-          type='text'
-          value={inputText}
-          onChange={(event) => {
-            setInputText(event.target.value)
-          }}
-        />
-        <Button onClick={onClickCreate} type='submit'>
-          Create New Channel
-        </Button>
+        <Stack spacing='12px'>
+          <Input
+            type='text'
+            value={inputText}
+            onChange={(event) => {
+              setInputText(event.target.value)
+            }}
+          />
+          <RadioGroup defaultValue='2'>
+            <Stack spacing={5} direction='row'>
+              <Radio colorScheme='blue' value='1'>
+                public
+              </Radio>
+              <Radio colorScheme='blue' value='2'>
+                private
+              </Radio>
+            </Stack>
+          </RadioGroup>
+          <FormControl>
+            <FormLabel>Password</FormLabel>
+            <Input type='password' />
+            <FormHelperText>Please enter your password</FormHelperText>
+          </FormControl>
+          <Button onClick={onClickCreate} type='submit'>
+            Create New Channel
+          </Button>
+        </Stack>
+
       </Box>
+
       <Stack width='sm'>
         {chatRooms.map((chatRoom) => (
           <Box
