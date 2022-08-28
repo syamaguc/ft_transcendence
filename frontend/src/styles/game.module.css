@@ -1,65 +1,65 @@
 .screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-  }
-  
-  
-  .startBox {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    padding: 1em;
-    font-weight: bold;
-    border: solid 3px #000000;
-    background-color: #fff;
-    width: 85vw;
-    max-height: 90vh;
-    aspect-ratio: 2 / 1;
-    transform: translate(-50%,-50%);
-    display: flex;
-    /* display: none; */
-    align-items: flex-end;
-  }
-  
-  .endBox {
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    padding: 1em;
-    font-weight: bold;
-    border: solid 3px #000000;
-    background-color: #fff;
-    width: 85vw;
-    max-height: 90vh;
-    aspect-ratio: 2 / 1;
-    transform: translate(-50%,-50%);
-    display: flex;
-    /* display: none; */
-    align-items: flex-end;
-  }
-  
-  .boxNonActive {
-    display: none;
-  }
-  
-  /* .configBox {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.startBox {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  padding: 1em;
+  font-weight: bold;
+  border: solid 3px #000000;
+  background-color: #fff;
+  width: 85vw;
+  max-height: 90vh;
+  aspect-ratio: 2 / 1;
+  transform: translate(-50%, -50%);
+  display: flex;
+  /* display: none; */
+  flex-flow: column;
+  /* align-items: flex-end; */
+}
+
+.endBox {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  padding: 1em;
+  font-weight: bold;
+  border: solid 3px #000000;
+  background-color: #fff;
+  width: 85vw;
+  max-height: 90vh;
+  aspect-ratio: 2 / 1;
+  transform: translate(-50%, -50%);
+  display: flex;
+  /* display: none; */
+  align-items: flex-end;
+}
+
+.boxNonActive {
+  display: none;
+}
+
+/* .configBox {
   } */
-  
-  .underButtonBox {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .startButton {
-    position: relative;
-    padding: 0.1em 0.5em;
-    font-size: 1.5em;
-  }
-  
-  /*
+
+.underButtonBox {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.startButton {
+  position: relative;
+  padding: 0.1em 0.5em;
+  font-size: 1.5em;
+}
+
+/*
   .player {
     width: 100px;
     height: 100px;

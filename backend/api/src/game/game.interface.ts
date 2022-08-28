@@ -10,6 +10,11 @@ export interface Player {
   point: number;
 }
 
+export interface GameSetting{
+  point: number;
+  speed: number;
+}
+
 export interface GameObject {
   bar1: Position;
   bar2: Position;
@@ -17,6 +22,7 @@ export interface GameObject {
   player1: Player;
   player2: Player;
   gameStatus: number;
+  gameSetting: GameSetting;
 }
 
 export interface socketData {
