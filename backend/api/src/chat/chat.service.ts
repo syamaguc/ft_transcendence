@@ -3,6 +3,8 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatRoomI } from './interface/chat-room.interface';
 import { MessageI } from './interface/message.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { ChatRoom } from './entities/chat-room.entity';
+import { chatRepository } from './chat.repository';
 
 @Injectable()
 export class ChatService {
@@ -20,18 +22,26 @@ export class ChatService {
 		},
 	];
 
-	createRoom(createChatRoomDto: CreateChatRoomDto): ChatRoomI {
-		const newChatRoom: ChatRoomI = {
-			id: uuidv4(),
-			members: [],
-			...createChatRoomDto,
-			logs: [],
-			admins: [],
-			password:""
-		};
-		this.charRooms.push(newChatRoom);
-		return newChatRoom;
+
+	// createRoom(createChatRoomDto: CreateChatRoomDto): ChatRoomI {
+	// 	const newChatRoom: ChatRoomI = {
+	// 		id: uuidv4(),
+	// 		members: [],
+	// 		...createChatRoomDto,
+	// 		logs: [],
+	// 		admins: [],
+	// 		password:""
+	// 	};
+	// 	this.charRooms.push(newChatRoom);
+	// 	return newChatRoom;
+	// }
+
+	async createRoom(chatRoomData: CreateChatRoomDto): Promise<ChatRoom> {
+		const chat = await chatRepository.createChatRoom(chatRoomData);
+		return chat;
 	}
+
+
 
 	addMessage(addMessageDto: AddMessageDto, roomId: uuidv4): MessageI {
 		const newMessage: MessageI = {

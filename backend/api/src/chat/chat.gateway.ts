@@ -82,7 +82,7 @@ export class ChatGateway {
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@SubscribeMessage('createRoom')
-	createRoom(
+	async createRoom(
 		// @MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@MessageBody() chatname: string,
 		@ConnectedSocket() socket: Socket,
@@ -93,10 +93,10 @@ export class ChatGateway {
 			is_private: false,
 			channel_type: 'channel',
 		};
-		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
-		this.joinRoom(newChatRoom.id, socket);
-		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
-		this.server.emit('updateNewRoom', chatRoom);
+		const newChatRoom = await this.chatService.createRoom(createChatRoomDto);
+		// this.joinRoom(newChatRoom.id, socket);
+		// const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
+		// this.server.emit('updateNewRoom', chatRoom);
 	}
 }
 
