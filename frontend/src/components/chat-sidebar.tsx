@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import ChatCreationForm from './chat-creation-form'
 
 type Props = {
   socket: Socket
@@ -30,17 +31,9 @@ const SideBar = ({
   setChatLog,
   setInputMessage,
 }: Props) => {
-  const [inputText, setInputText] = useState('')
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
   const didLogRef = useRef(false)
-
-  const onClickCreate = useCallback(() => {
-    console.log('onClickCreate called')
-    socket.emit('createRoom', inputText)
-    setInputText('')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputText])
 
   const onClickChannel = (chatRoom: ChatRoom) => {
     setCurrentRoom(chatRoom.name)
@@ -81,31 +74,7 @@ const SideBar = ({
     <Box>
       <Box>
         <Stack spacing='12px'>
-          <Input
-            type='text'
-            value={inputText}
-            onChange={(event) => {
-              setInputText(event.target.value)
-            }}
-          />
-          <RadioGroup defaultValue='2'>
-            <Stack spacing={5} direction='row'>
-              <Radio colorScheme='blue' value='1'>
-                public
-              </Radio>
-              <Radio colorScheme='blue' value='2'>
-                private
-              </Radio>
-            </Stack>
-          </RadioGroup>
-          <FormControl>
-            <FormLabel>Password</FormLabel>
-            <Input type='password' />
-            <FormHelperText>Please enter your password</FormHelperText>
-          </FormControl>
-          <Button onClick={onClickCreate} type='submit'>
-            Create New Channel
-          </Button>
+          <ChatCreationForm socket={socket} />
         </Stack>
       </Box>
 
