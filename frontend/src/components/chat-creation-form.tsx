@@ -1,8 +1,7 @@
 import {
   Input,
   Stack,
-  Radio,
-  RadioGroup,
+  Switch,
   FormControl,
   FormLabel,
   FormHelperText,
@@ -17,29 +16,31 @@ type Props = {
 
 const ChatCreationForm = ({ socket }: Props) => {
   const channelNameInputRef = useRef<HTMLInputElement>()
+  const isPrivateInputRef = useRef<HTMLInputElement>()
+  const passwordInputRef = useRef<HTMLInputElement>()
 
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('onClickCreate called')
-    socket.emit('createRoom', channelNameInputRef.current.value)
+    const enteredChannelName = channelNameInputRef.current.value
+    const enteredIsPrivate = isPrivateInputRef.current.checked
+    const enteredPassword = passwordInputRef.current.value
+    console.log('onClickCreate called', enteredIsPrivate, enteredPassword)
+
+    socket.emit('createRoom', enteredChannelName)
   }
 
   return (
     <form onSubmit={onClickCreate}>
       <Input type='text' ref={channelNameInputRef} />
-      <RadioGroup defaultValue='2'>
-        <Stack spacing={5} direction='row'>
-          <Radio colorScheme='blue' value='1'>
-            public
-          </Radio>
-          <Radio colorScheme='blue' value='2'>
-            private
-          </Radio>
-        </Stack>
-      </RadioGroup>
+      <FormControl display='flex' alignItems='center'>
+        <FormLabel htmlFor='is_private' mb='0'>
+          Private Channel
+        </FormLabel>
+        <Switch id='is_private' ref={isPrivateInputRef} />
+      </FormControl>
       <FormControl>
-        <FormLabel>Password</FormLabel>
-        <Input type='password' />
+        <FormLabel htmlFor='password'>Password</FormLabel>
+        <Input type='password' id='password' ref={passwordInputRef} />
         <FormHelperText>Please enter your password</FormHelperText>
       </FormControl>
       <Button type='submit'>Create New Channel</Button>
