@@ -6,6 +6,7 @@ import {
   FormLabel,
   FormHelperText,
   Button,
+  useBoolean,
 } from '@chakra-ui/react'
 import { useRef } from 'react'
 import { Socket } from 'socket.io-client'
@@ -15,6 +16,8 @@ type Props = {
 }
 
 const ChatCreationForm = ({ socket }: Props) => {
+  const [hideFlag, setHideFlag] = useBoolean()
+
   const channelNameInputRef = useRef<HTMLInputElement>()
   const isPrivateInputRef = useRef<HTMLInputElement>()
   const passwordInputRef = useRef<HTMLInputElement>()
@@ -36,13 +39,19 @@ const ChatCreationForm = ({ socket }: Props) => {
         <FormLabel htmlFor='is_private' mb='0'>
           Private Channel
         </FormLabel>
-        <Switch id='is_private' ref={isPrivateInputRef} />
+        <Switch
+          id='is_private'
+          ref={isPrivateInputRef}
+          onChange={setHideFlag.toggle}
+        />
       </FormControl>
-      <FormControl>
-        <FormLabel htmlFor='password'>Password</FormLabel>
-        <Input type='password' id='password' ref={passwordInputRef} />
-        <FormHelperText>Please enter your password</FormHelperText>
-      </FormControl>
+      {hideFlag ? (
+        <FormControl>
+          <FormLabel htmlFor='password'>Password</FormLabel>
+          <Input type='password' id='password' ref={passwordInputRef} />
+          <FormHelperText>Please enter your password</FormHelperText>
+        </FormControl>
+      ) : null}
       <Button type='submit'>Create New Channel</Button>
     </form>
   )
