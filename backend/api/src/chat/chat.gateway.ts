@@ -51,14 +51,16 @@ export class ChatGateway {
 	}
 
 	@SubscribeMessage('getRooms')
-	getRooms(@ConnectedSocket() socket: Socket) {
+	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`);
-		const rooms: ChatRoomI[] = this.chatService.getRooms();
+		const rooms = await this.chatService.getRooms();
 		//tmp
 		const roomsList = [];
 		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }));
 		socket.emit('getRooms', roomsList);
 	}
+
+
 
 	// room which user is watching
 	@SubscribeMessage('watchRoom')

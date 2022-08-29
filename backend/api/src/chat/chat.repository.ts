@@ -11,6 +11,10 @@ export const chatRepository = AppDataSource.getRepository(ChatRoom).extend({
 		chat.id = uuidv4();
 		await this.save(chat);
 		return chat;
+	},
+
+	async findAll(): Promise<ChatRoom[]> {
+		return await this.find();
 	}
 });
 

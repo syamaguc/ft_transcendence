@@ -59,12 +59,18 @@ export class ChatService {
 		return room.logs;
 	}
 
-	getRooms(): ChatRoomI[] {
-		return this.charRooms;
+	// getRooms(): ChatRoomI[] {
+	// 	return this.charRooms;
+	// }
+
+	async getRooms(): Promise<ChatRoomI[]> {
+		const rooms = await chatRepository.findAll();
+		return rooms;
 	}
 
 	joinRoom(roomId: string) {
 		const room = this.charRooms.find((r) => r.id == roomId);
+		// gets error when trying to access room.members
 		// room.members.push('user1');
 	}
 }
