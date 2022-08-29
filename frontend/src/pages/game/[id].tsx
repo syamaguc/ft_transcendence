@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import io from 'socket.io-client'
 import style from '../../styles/game.module.css'
 import { GameObject } from 'src/types/game'
+import Layout from '@components/layout'
 import Pong from '@components/game-pong'
 import GameSettingForm from '@components/game-setting'
 import GameResult from '@components/game-result'
@@ -91,24 +92,26 @@ export default function Game() {
   }, [server, router])
 
   return (
-    <div className={style.screen} tabIndex={0} id='screen'>
-      <GameSettingForm
-        gameStatus={gameStatus}
-        playerRole={playerRole}
-        roomId={router.query.id}
-        server={server}
-        gameSetting={gameObject.gameSetting}
-        gameObject={gameObject}
-      />
-      <Pong gameObject={gameObject} />
-      <GameResult
-        gameStatus={gameStatus}
-        playerRole={playerRole}
-        roomId={router.query.id}
-        server={server}
-        router={router}
-        gameObject={gameObject}
-      />
-    </div>
+    <Layout>
+      <div className={style.screen} tabIndex={0} id='screen'>
+        <GameSettingForm
+          gameStatus={gameStatus}
+          playerRole={playerRole}
+          roomId={router.query.id}
+          server={server}
+          gameSetting={gameObject.gameSetting}
+          gameObject={gameObject}
+        />
+        <Pong gameObject={gameObject} />
+        <GameResult
+          gameStatus={gameStatus}
+          playerRole={playerRole}
+          roomId={router.query.id}
+          server={server}
+          router={router}
+          gameObject={gameObject}
+        />
+      </div>
+    </Layout>
   )
 }

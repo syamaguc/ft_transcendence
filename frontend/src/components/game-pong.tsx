@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useWindowSize } from 'react-use'
 import { Position, GameObject } from 'src/types/game'
+import style from '../styles/game.module.css'
 
 type Props = {
   gameObject: GameObject
@@ -140,7 +141,7 @@ const Pong = ({ gameObject }: Props) => {
     }
   }, [screenWidth, screenHeight, gameObject])
 
-  return <canvas id='gameCanvas'></canvas>
+  return <canvas id='gameCanvas' className={gameObject.gameStatus == 1 ? style.canvasBox : style.boxNonActive}></canvas>
 }
 
 export default Pong
