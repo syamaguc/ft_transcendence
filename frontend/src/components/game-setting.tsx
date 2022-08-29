@@ -109,14 +109,44 @@ const GameSettingForm = ({
       </div>
       <div>
         <p>point</p>
-        <input type='radio' name='point' value='2' disabled={playerRole != 0} /> 2
-        <input type='radio' name='point' value='5' disabled={playerRole != 0} /> 5
-        <input type='radio' name='point' value='7' disabled={playerRole != 0} /> 7
+        <input
+          type='radio'
+          name='point'
+          value='2'
+          disabled={playerRole != 0}
+        />{' '}
+        2
+        <input
+          type='radio'
+          name='point'
+          value='5'
+          disabled={playerRole != 0}
+        />{' '}
+        5
+        <input
+          type='radio'
+          name='point'
+          value='7'
+          disabled={playerRole != 0}
+        />{' '}
+        7
       </div>
       <div>
         <p>speed</p>
-        <input type='radio' name='speed' value='1' disabled={playerRole != 0} /> 1
-        <input type='radio' name='speed' value='2' disabled={playerRole != 0} /> 2
+        <input
+          type='radio'
+          name='speed'
+          value='1'
+          disabled={playerRole != 0}
+        />{' '}
+        1
+        <input
+          type='radio'
+          name='speed'
+          value='2'
+          disabled={playerRole != 0}
+        />{' '}
+        2
       </div>
       <div className={style.underButtonBox}>
         <button

@@ -141,7 +141,14 @@ const Pong = ({ gameObject }: Props) => {
     }
   }, [screenWidth, screenHeight, gameObject])
 
-  return <canvas id='gameCanvas' className={gameObject.gameStatus == 1 ? style.canvasBox : style.boxNonActive}></canvas>
+  return (
+    <canvas
+      id='gameCanvas'
+      className={
+        gameObject.gameStatus == 1 ? style.canvasBox : style.boxNonActive
+      }
+    ></canvas>
+  )
 }
 
 export default Pong
