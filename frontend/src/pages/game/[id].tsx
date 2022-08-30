@@ -13,10 +13,6 @@ export interface KeyStatus {
   downPressed: boolean
 }
 
-export interface PlayerStatus {
-  role: number
-}
-
 export default function Game() {
   const [gameObject, setGameObject] = useState<GameObject>({
     bar1: { top: 0, left: 0 },
@@ -29,12 +25,39 @@ export default function Game() {
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
-  const keyStatus: KeyStatus = { upPressed: false, downPressed: false }
-  let playerStatus: PlayerStatus = { role: 2 }
+  const keyStatus = useRef({ upPressed: false, downPressed: false })
   const router = useRouter()
   const [gameStatus, setGameStatus] = useState<number>(0)
   const [server, setServer] = useState()
   const [playerRole, setPlayerRole] = useState(-1)
+
+  const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    console.log(event.code)
+    if (event.code === 'ArrowUp') {
+      keyStatus.current.upPressed = true
+    } else if (event.code === 'ArrowDown') {
+      keyStatus.current.downPressed = true
+    }
+  }
+
+  const keyUpHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    console.log(event.code)
+    if (event.code === 'ArrowUp') {
+      keyStatus.current.upPressed = false
+    } else if (event.code === 'ArrowDown') {
+      keyStatus.current.downPressed = false
+    }
+  }
+
+  useEffect(() => {
+    if (0 <= playerRole && playerRole <= 1) {
+      const screen = document.getElementById('screen')
+      if (screen) {
+        screen.addEventListener('keydown', keyDownHandler)
+        screen.addEventListener('keyup', keyUpHandler)
+      }
+    }
+  }, [playerRole])
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -48,15 +71,15 @@ export default function Game() {
     const roomId = router.query.id
     server.emit('connectServer', roomId)
     server.on('connectClient', (data) => {
-      playerStatus.role = data
+      const playerStatus = data
       setPlayerRole(data)
 
       server.on('clientMove', (data: GameObject) => {
         setGameObject(data)
         setGameStatus(data.gameStatus)
-        if (playerStatus.role <= 1) {
-          if (keyStatus.downPressed || keyStatus.upPressed)
-            server.emit('move', { key: keyStatus, id: roomId })
+        if (playerStatus <= 1) {
+          if (keyStatus.current.downPressed || keyStatus.current.upPressed)
+            server.emit('move', { key: keyStatus.current, id: roomId })
         }
       })
 
@@ -64,30 +87,6 @@ export default function Game() {
         setGameObject(data)
         setGameStatus(data.gameStatus)
       })
-
-      if (playerStatus.role <= 1) {
-        const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
-          console.log(event.code)
-          if (event.code === 'ArrowUp') {
-            keyStatus.upPressed = true
-          } else if (event.code === 'ArrowDown') {
-            keyStatus.downPressed = true
-          }
-        }
-        const keyUpHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
-          console.log(event.code)
-          if (event.code === 'ArrowUp') {
-            keyStatus.upPressed = false
-          } else if (event.code === 'ArrowDown') {
-            keyStatus.downPressed = false
-          }
-        }
-        const screen = document.getElementById('screen')
-        if (screen) {
-          screen.addEventListener('keydown', keyDownHandler)
-          screen.addEventListener('keyup', keyUpHandler)
-        }
-      }
     })
   }, [server, router])
 
