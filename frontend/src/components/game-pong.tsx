@@ -19,7 +19,11 @@ const ballBaseSize = 50
 const Pong = ({ gameObject }: Props) => {
   const { width: screenWidth, height: screenHeight } = useWindowSize()
 
-  const canvasRender = (gameObject: GameObject, screenWidth: number, screenHeight: number) => {
+  const canvasRender = (
+    gameObject: GameObject,
+    screenWidth: number,
+    screenHeight: number
+  ) => {
     const canvasElem = document.getElementById(
       'gameCanvas'
     ) as HTMLCanvasElement
@@ -135,7 +139,8 @@ const Pong = ({ gameObject }: Props) => {
   }
 
   useEffect(() => {
-    if (gameObject.gameStatus == 1) canvasRender(gameObject, screenWidth, screenHeight)
+    if (gameObject.gameStatus == 1)
+      canvasRender(gameObject, screenWidth, screenHeight)
     else {
       clearCanvas(screenWidth, screenHeight)
     }
