@@ -178,12 +178,12 @@ const HeaderContent = () => {
                     />
                   </MenuButton>
                   <MenuList>
-                    <NextLink href='/users' passHref>
+                    <NextLink href='/profile' passHref>
                       <MenuItem as='a'>Profile</MenuItem>
                     </NextLink>
                     <MenuItem>Link 1</MenuItem>
                     <MenuDivider />
-                    <MenuItem>Link 1</MenuItem>
+                    <MenuItem>Link 2</MenuItem>
                   </MenuList>
                 </Menu>
               </Flex>

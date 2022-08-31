@@ -10,14 +10,12 @@ import {
   Input,
   Heading,
   Stack,
-  HStack,
   Text,
   useBreakpointValue,
   useColorModeValue,
 } from '@chakra-ui/react'
 
 import { useEffect, useState } from 'react'
-import Router from 'next/router'
 import { useRouter } from 'next/router'
 import useSWR, { useSWRConfig } from 'swr'
 import ApiTester from '@components/api-tester'
@@ -147,7 +145,6 @@ function Login() {
     console.log('username: ', username)
     console.log('password: ', password)
 
-    // Signin
     let res = await fetch(`${API_URL}/api/user/signin`, {
       method: 'POST',
       credentials: 'include',
@@ -174,17 +171,6 @@ function Login() {
     })
 
     console.log(await res.json())
-
-    // res = await fetch(`${API_URL}/api/user/userInfo?username=fkymy`, {
-    //   method: 'GET',
-    //   credentials: 'include',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     // Cookie: `jwt=${accessToken}`,
-    //   },
-    // })
-    //
-    // console.log(await res.json())
 
     mutate(`${API_URL}/api/user/currentUser`)
     setUsername('')
@@ -263,7 +249,6 @@ function Profile({ user }: ProfileProps) {
 
     console.log(res)
 
-    // tell all SWRs with this key to revalidate
     mutate(`${API_URL}/api/user/currentUser`)
   }
 
@@ -297,7 +282,6 @@ function Users() {
   const router = useRouter()
 
   const testUpdate = async () => {
-    // Signin
     console.log('Testing Update...')
 
     let res = await fetch(`${API_URL}/api/user/currentUser`, {
@@ -340,16 +324,16 @@ function Users() {
 
     console.log(await res.json())
 
-    // res = await fetch(`${API_URL}/api/user/userInfo?username=fkymy`, {
-    //   method: 'GET',
-    //   credentials: 'include',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //     // Cookie: `jwt=${accessToken}`,
-    //   },
-    // })
-    //
-    // console.log(await res.json())
+    res = await fetch(`${API_URL}/api/user/userInfo?username=test`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        // Cookie: `jwt=${accessToken}`,
+      },
+    })
+
+    console.log(await res.json())
   }
 
   return (
