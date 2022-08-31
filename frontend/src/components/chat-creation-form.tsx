@@ -29,6 +29,13 @@ type Refs = {
   passwordInputRef: MutableRefObject<HTMLInputElement>
 }
 
+type CreateChatRoomDto = {
+  name: string
+  owner: string
+  is_private: boolean
+  password: string
+}
+
 const ChatCreationFormContent = ({
   channelNameInputRef,
   isPrivateInputRef,
@@ -86,8 +93,13 @@ const ChatCreationForm = ({ socket }: Props) => {
       enteredIsProtected,
       enteredPassword
     )
-
-    socket.emit('createRoom', enteredChannelName)
+    const enterdData: CreateChatRoomDto = {
+      name: enteredChannelName,
+      owner: 'user',
+      is_private: enteredIsPrivate,
+      password: enteredPassword,
+    }
+    socket.emit('createRoom', enterdData)
   }
 
   const { isOpen, onOpen, onClose } = useDisclosure()
