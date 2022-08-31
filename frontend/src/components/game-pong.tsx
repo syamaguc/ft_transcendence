@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useWindowSize } from 'react-use'
 import { Position, GameObject } from 'src/types/game'
+import style from '../styles/game.module.css'
 
 type Props = {
   gameObject: GameObject
@@ -18,7 +19,11 @@ const ballBaseSize = 50
 const Pong = ({ gameObject }: Props) => {
   const { width: screenWidth, height: screenHeight } = useWindowSize()
 
-  const canvasRender = () => {
+  const canvasRender = (
+    gameObject: GameObject,
+    screenWidth: number,
+    screenHeight: number
+  ) => {
     const canvasElem = document.getElementById(
       'gameCanvas'
     ) as HTMLCanvasElement
@@ -110,19 +115,21 @@ const Pong = ({ gameObject }: Props) => {
     context.textBaseline = 'middle'
     context.font = fontSize + 'vh sans-serif'
     context.fillText(
-      gameObject.player1.point,
+      gameObject.player1.point.toString(),
       player1PointBox.left,
       player1PointBox.top
     )
     context.fillText(
-      gameObject.player2.point,
+      gameObject.player2.point.toString(),
       player2PointBox.left,
       player2PointBox.top
     )
   }
 
-  const clearCanvas = () => {
-    const canvasElem = document.getElementById('gameCanvas')
+  const clearCanvas = (screenWidth: number, screenHeight: number) => {
+    const canvasElem = document.getElementById(
+      'gameCanvas'
+    ) as HTMLCanvasElement
     if (!canvasElem) return
     canvasElem.width = Math.ceil(screenWidth * canvasRatio)
     canvasElem.height = Math.ceil(screenHeight * canvasRatio)
@@ -132,13 +139,21 @@ const Pong = ({ gameObject }: Props) => {
   }
 
   useEffect(() => {
-    if (gameObject.gameStatus == 1) canvasRender()
+    if (gameObject.gameStatus == 1)
+      canvasRender(gameObject, screenWidth, screenHeight)
     else {
-      clearCanvas()
+      clearCanvas(screenWidth, screenHeight)
     }
   }, [screenWidth, screenHeight, gameObject])
 
-  return <canvas id='gameCanvas'></canvas>
+  return (
+    <canvas
+      id='gameCanvas'
+      className={
+        gameObject.gameStatus == 1 ? style.canvasBox : style.boxNonActive
+      }
+    ></canvas>
+  )
 }
 
 export default Pong

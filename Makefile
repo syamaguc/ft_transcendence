@@ -8,6 +8,12 @@ build:
 restart:
 	docker-compose up
 
+format_frontend:
+	docker-compose exec frontend npm run format
+
+lint_frontend:
+	docker-compose exec frontend npm run lint
+
 down:
 	docker-compose down
 
