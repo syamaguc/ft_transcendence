@@ -365,13 +365,7 @@ function Users() {
       >
         <Stack spacing='6'>
           <Box>
-            {user ? (
-              <Profile user={user} />
-            ) : (
-              <>
-                <Text>User not found</Text>
-              </>
-            )}
+            {user ? <Profile user={user} /> : <Text>User not found</Text>}
           </Box>
           <Stack direction={['column', 'row']} spacing='8px'>
             <Signup />

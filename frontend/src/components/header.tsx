@@ -31,6 +31,10 @@ import { Logo } from '@components/logo'
 import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { GithubIcon } from '@components/icons'
 
+import { useUser } from 'src/lib/use-user'
+
+const API_URL = 'http://localhost:3000'
+
 export const mainNavLinks = [
   {
     icon: null,
@@ -71,6 +75,8 @@ const NavLink = ({ href, children }: NavLinkProps) => (
 )
 
 const HeaderContent = () => {
+  const user = useUser()
+
   const { toggleColorMode: toggleMode } = useColorMode()
   const mobileNav = useDisclosure()
 
@@ -156,30 +162,37 @@ const HeaderContent = () => {
             {/* onClick={mobileNav.isOpen ? mobileNav.onClose : mobileNav.onOpen} */}
             {/* icon={mobileNav.isOpen ? <CloseIcon /> : <HamburgerIcon />} */}
             {/* /> */}
-            <Flex alignItems='center' display={{ base: 'none', md: 'flex' }}>
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded='full'
-                  variant='link'
-                  cursor='pointer'
-                  minW={0}
-                >
-                  <Avatar
-                    size='sm'
-                    src='https://cdn.intra.42.fr/users/default.png'
-                  />
-                </MenuButton>
-                <MenuList>
-                  <NextLink href='/profile' passHref>
-                    <MenuItem as='a'>Profile</MenuItem>
-                  </NextLink>
-                  <MenuItem>Link 1</MenuItem>
-                  <MenuDivider />
-                  <MenuItem>Link 1</MenuItem>
-                </MenuList>
-              </Menu>
-            </Flex>
+            {user && (
+              <Flex alignItems='center' display={{ base: 'none', md: 'flex' }}>
+                <Menu>
+                  <MenuButton
+                    as={Button}
+                    rounded='full'
+                    variant='link'
+                    cursor='pointer'
+                    minW={0}
+                  >
+                    <Avatar
+                      size='sm'
+                      src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                    />
+                  </MenuButton>
+                  <MenuList>
+                    <NextLink href='/users' passHref>
+                      <MenuItem as='a'>Profile</MenuItem>
+                    </NextLink>
+                    <MenuItem>Link 1</MenuItem>
+                    <MenuDivider />
+                    <MenuItem>Link 1</MenuItem>
+                  </MenuList>
+                </Menu>
+              </Flex>
+            )}
+            {!user && (
+              <NextLink href='/users' passHref>
+                <Button as='a'>Login</Button>
+              </NextLink>
+            )}
           </HStack>
         </Flex>
       </Flex>
