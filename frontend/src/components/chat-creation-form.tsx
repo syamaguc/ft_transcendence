@@ -25,12 +25,14 @@ type Props = {
 type Refs = {
   channelNameInputRef: MutableRefObject<HTMLInputElement>
   isPrivateInputRef: MutableRefObject<HTMLInputElement>
+  isProtectedInputRef: MutableRefObject<HTMLInputElement>
   passwordInputRef: MutableRefObject<HTMLInputElement>
 }
 
 const ChatCreationFormContent = ({
   channelNameInputRef,
   isPrivateInputRef,
+  isProtectedInputRef,
   passwordInputRef,
 }: Refs) => {
   const [hideFlag, setHideFlag] = useBoolean()
@@ -42,9 +44,13 @@ const ChatCreationFormContent = ({
         <FormLabel htmlFor='is_private' mb='0'>
           Private Channel
         </FormLabel>
+        <Switch id='is_private' ref={isPrivateInputRef} />
+        <FormLabel htmlFor='is_private' mb='0'>
+          Protect Channel
+        </FormLabel>
         <Switch
-          id='is_private'
-          ref={isPrivateInputRef}
+          id='is_protected'
+          ref={isProtectedInputRef}
           onChange={setHideFlag.toggle}
         />
       </FormControl>
@@ -62,17 +68,24 @@ const ChatCreationFormContent = ({
 const ChatCreationForm = ({ socket }: Props) => {
   const channelNameInputRef = useRef<HTMLInputElement>()
   const isPrivateInputRef = useRef<HTMLInputElement>()
+  const isProtectedInputRef = useRef<HTMLInputElement>()
   const passwordInputRef = useRef<HTMLInputElement>()
 
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const enteredChannelName = channelNameInputRef.current.value
     const enteredIsPrivate = isPrivateInputRef.current.checked
+    const enteredIsProtected = isProtectedInputRef.current.checked
     let enteredPassword = ''
-    if (enteredIsPrivate == true) {
+    if (enteredIsProtected == true) {
       enteredPassword = passwordInputRef.current.value
     }
-    console.log('onClickCreate called', enteredIsPrivate, enteredPassword)
+    console.log(
+      'onClickCreate called',
+      enteredIsPrivate,
+      enteredIsProtected,
+      enteredPassword
+    )
 
     socket.emit('createRoom', enteredChannelName)
   }
@@ -80,27 +93,28 @@ const ChatCreationForm = ({ socket }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <>
-      <Button onClick={onOpen}>Create New Channel</Button>
+      <Button onClick={onOpen}>Create Channel</Button>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
           <form onSubmit={onClickCreate}>
-            <ModalHeader>Create New Channel</ModalHeader>
+            <ModalHeader>Create Channel</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
               <ChatCreationFormContent
                 channelNameInputRef={channelNameInputRef}
                 isPrivateInputRef={isPrivateInputRef}
+                isProtectedInputRef={isProtectedInputRef}
                 passwordInputRef={passwordInputRef}
               />
             </ModalBody>
 
             <ModalFooter>
               <Button colorScheme='blue' mr={3} onClick={onClose}>
-                Close
+                Cancel
               </Button>
               <Button variant='ghost' type='submit' onClick={onClose}>
-                Create New Channel
+                Create Channel
               </Button>
             </ModalFooter>
           </form>
