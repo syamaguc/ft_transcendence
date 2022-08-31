@@ -1,4 +1,12 @@
 import { Socket } from 'socket.io';
+import { User } from '../user/entities/user.entity'
+
+export class gameInfo {
+  userOne: User
+  userTwo: User
+
+  //scoreとかgameidとかここでぜんぶ持つイメージ?
+}
 
 export interface Position {
   top: number;
