@@ -15,16 +15,51 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useRef } from 'react'
+import { MutableRefObject, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 
 type Props = {
   socket: Socket
 }
 
-const ChatCreationForm = ({ socket }: Props) => {
+type Refs = {
+  channelNameInputRef: MutableRefObject<HTMLInputElement>
+  isPrivateInputRef: MutableRefObject<HTMLInputElement>
+  passwordInputRef: MutableRefObject<HTMLInputElement>
+}
+
+const ChatCreationFormContent = ({
+  channelNameInputRef,
+  isPrivateInputRef,
+  passwordInputRef,
+}: Refs) => {
   const [hideFlag, setHideFlag] = useBoolean()
 
+  return (
+    <>
+      <Input type='text' ref={channelNameInputRef} />
+      <FormControl display='flex' alignItems='center'>
+        <FormLabel htmlFor='is_private' mb='0'>
+          Private Channel
+        </FormLabel>
+        <Switch
+          id='is_private'
+          ref={isPrivateInputRef}
+          onChange={setHideFlag.toggle}
+        />
+      </FormControl>
+      {hideFlag ? (
+        <FormControl>
+          <FormLabel htmlFor='password'>Password</FormLabel>
+          <Input type='password' id='password' ref={passwordInputRef} />
+          <FormHelperText>Please enter your password</FormHelperText>
+        </FormControl>
+      ) : null}
+    </>
+  )
+}
+
+const ChatCreationForm = ({ socket }: Props) => {
   const channelNameInputRef = useRef<HTMLInputElement>()
   const isPrivateInputRef = useRef<HTMLInputElement>()
   const passwordInputRef = useRef<HTMLInputElement>()
@@ -53,24 +88,11 @@ const ChatCreationForm = ({ socket }: Props) => {
             <ModalHeader>Create New Channel</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
-              <Input type='text' ref={channelNameInputRef} />
-              <FormControl display='flex' alignItems='center'>
-                <FormLabel htmlFor='is_private' mb='0'>
-                  Private Channel
-                </FormLabel>
-                <Switch
-                  id='is_private'
-                  ref={isPrivateInputRef}
-                  onChange={setHideFlag.toggle}
-                />
-              </FormControl>
-              {hideFlag ? (
-                <FormControl>
-                  <FormLabel htmlFor='password'>Password</FormLabel>
-                  <Input type='password' id='password' ref={passwordInputRef} />
-                  <FormHelperText>Please enter your password</FormHelperText>
-                </FormControl>
-              ) : null}
+              <ChatCreationFormContent
+                channelNameInputRef={channelNameInputRef}
+                isPrivateInputRef={isPrivateInputRef}
+                passwordInputRef={passwordInputRef}
+              />
             </ModalBody>
 
             <ModalFooter>
