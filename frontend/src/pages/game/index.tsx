@@ -1,10 +1,7 @@
 import Layout from '@components/layout'
-import { Box } from '@chakra-ui/react'
-
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
-// import style from "../../styles/game.module.css"
 
 export default function GameMatching() {
   const [server, setServer] = useState()
@@ -66,13 +63,15 @@ export default function GameMatching() {
   }, [server, router])
 
   return (
-    <div>
-      <button id='matchButton' onClick={matching}>
-        Matching
-      </button>
-      <button id='cancelButton' onClick={cancel}>
-        Cancel
-      </button>
-    </div>
+    <Layout>
+      <div>
+        <button id='matchButton' onClick={matching}>
+          Matching
+        </button>
+        <button id='cancelButton' onClick={cancel}>
+          Cancel
+        </button>
+      </div>
+    </Layout>
   )
 }
