@@ -18,6 +18,10 @@ function MyApp({ Component, pageProps }: AppProps) {
           value={{
             fetcher: fetchJson,
             onError: (err) => {
+              if (err.response.status === 401) {
+                return
+              }
+
               console.error(err)
             },
           }}

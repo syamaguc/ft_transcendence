@@ -1,7 +1,9 @@
 import Layout from '@components/layout'
 import {
+  Avatar,
   Box,
   Button,
+  Container,
   Flex,
   FormControl,
   FormLabel,
@@ -14,65 +16,17 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 
-enum UserStatus {
-  ONLINE = 'Online',
-  INGAME = 'In Game',
-  OFFLINE = 'Offline',
-}
+import { useEffect, useState } from 'react'
+import Router from 'next/router'
+import { useRouter } from 'next/router'
+import useSWR, { useSWRConfig } from 'swr'
+import ApiTester from '@components/api-tester'
 
-interface User {
-  userId: string
-  username: string
-  email: string
-  // password: string;
-  profile_picture: string
-  elo: number
-  game_won: number
-  lost_game: number
-  numberOfParty: number
-  ratio: number
-  status: UserStatus
-  sign_up_date: Date
-  friends: string[]
-  login42: string
-  twoFactorAuth: boolean
-  isBan: boolean
-  isAdmin: boolean
-  blockedUsers: string[]
-}
+import { useUser } from 'src/lib/use-user'
 
 const API_URL = 'http://localhost:3000'
 
-function Users() {
-  const testApi = async () => {
-    let res = await fetch(`${API_URL}/api/admin/test`, {
-      method: 'GET',
-      headers: {},
-    })
-
-    console.log(await res.json())
-
-    res = await fetch(`${API_URL}/api/user/currentUser`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-
-    console.log(await res.json())
-
-    res = await fetch(`${API_URL}/api/user/isLogin`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-
-    console.log(await res.json())
-  }
-
+function Signup() {
   const testSignup = async () => {
     // Signup
     console.log('Testing signup...')
@@ -83,8 +37,8 @@ function Users() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: 'test4',
-        email: 'test4@example.com',
+        username: 'test',
+        email: 'test@example.com',
         password: 'Test123!',
         passwordConfirm: 'Test123!',
       }),
@@ -105,6 +59,20 @@ function Users() {
     console.log(await res.json())
   }
 
+  return (
+    <>
+      <Button w='100%' onClick={testSignup}>
+        Signup
+      </Button>
+    </>
+  )
+}
+
+function Users() {
+  const user = useUser()
+  const { mutate } = useSWRConfig()
+  const router = useRouter()
+
   const testLogout = async () => {
     let res = await fetch(`${API_URL}/api/user/logout`, {
       method: 'DELETE',
@@ -115,6 +83,9 @@ function Users() {
     })
 
     console.log(res)
+
+    // tell all SWRs with this key to revalidate
+    mutate(`${API_URL}/api/user/currentUser`)
   }
 
   const testSignin = async () => {
@@ -146,6 +117,9 @@ function Users() {
     })
 
     console.log(await res.json())
+
+    // tell all SWRs with this key to revalidate
+    mutate(`${API_URL}/api/user/currentUser`)
 
     // res = await fetch(`${API_URL}/api/user/userInfo?username=fkymy`, {
     //   method: 'GET',
@@ -226,41 +200,36 @@ function Users() {
         gap='4'
         w='full'
       >
-        <Box>
-          <Heading>/api/user/signup</Heading>
-          <Stack spacing='6'>
-            <Button w='100%' onClick={testApi}>
-              Test API
-            </Button>
-            <Button w='100%' onClick={testSignup}>
-              Test Signup
-            </Button>
-            <Button w='100%' onClick={testSignin}>
-              Test Signin
-            </Button>
-            <Button w='100%' onClick={testLogout}>
-              Test Logout
-            </Button>
-            <Button w='100%' onClick={testUpdate}>
-              Test Update
-            </Button>
-          </Stack>
-          <Box
-            py={{ base: '0', sm: '8' }}
-            px={{ base: '4', sm: '10' }}
-            bg={useBreakpointValue({ base: 'transparent', sm: 'bg-surface' })}
-            boxShadow={{ base: 'none', sm: useColorModeValue('md', 'md-dark') }}
-            borderRadius={{ base: 'none', sm: 'xl' }}
-          >
-            <Stack spacing='6'>
-              <Stack spacing='5'>
-                <FormControl>
-                  <FormLabel htmlFor='email'>Email</FormLabel>
-                  <Input id='email' type='email' />
-                </FormControl>
-              </Stack>
-            </Stack>
+        <Stack spacing='6'>
+          <Box>
+            {user ? (
+              <>
+                <Text>User found</Text>
+                <Text>{user.username}</Text>
+                <Avatar
+                  size='sm'
+                  src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                />
+              </>
+            ) : (
+              <>
+                <Text>User not found</Text>
+              </>
+            )}
           </Box>
+          <Signup />
+          <Button w='100%' onClick={testSignin}>
+            Login
+          </Button>
+          <Button w='100%' onClick={testLogout}>
+            Logout
+          </Button>
+          <Button w='100%' onClick={testUpdate}>
+            Update
+          </Button>
+        </Stack>
+        <Box>
+          <ApiTester />
         </Box>
       </Flex>
     </Layout>
