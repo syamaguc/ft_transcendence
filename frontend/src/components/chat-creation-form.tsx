@@ -26,7 +26,10 @@ const ChatCreationForm = ({ socket }: Props) => {
     event.preventDefault()
     const enteredChannelName = channelNameInputRef.current.value
     const enteredIsPrivate = isPrivateInputRef.current.checked
-    const enteredPassword = passwordInputRef.current.value
+    let enteredPassword = ''
+    if (enteredIsPrivate == true) {
+      enteredPassword = passwordInputRef.current.value
+    }
     console.log('onClickCreate called', enteredIsPrivate, enteredPassword)
 
     socket.emit('createRoom', enteredChannelName)
