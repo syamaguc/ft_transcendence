@@ -18,9 +18,9 @@ function ApiTester() {
 
   return (
     <>
-      <HStack mb='4'>
+      <HStack spacing='1' justify='center' mb='4'>
         <InputGroup>
-          <InputLeftAddon children={API_URL} />
+          <InputLeftAddon>{API_URL}</InputLeftAddon>
           <Input
             placeholder=''
             width='auto'

@@ -21,15 +21,25 @@ import Router from 'next/router'
 import { useRouter } from 'next/router'
 import useSWR, { useSWRConfig } from 'swr'
 import ApiTester from '@components/api-tester'
+import PasswordField from '@components/password-field'
 
+import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 
 const API_URL = 'http://localhost:3000'
 
 function Signup() {
-  const testSignup = async () => {
-    // Signup
-    console.log('Testing signup...')
+  const { mutate } = useSWRConfig()
+  const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
+  const handleSubmit = async () => {
+    console.log('Sign up...')
+    console.log('username: ', username)
+    console.log('email: ', email)
+    console.log('password: ', password)
+
     let res = await fetch(`${API_URL}/api/user/signup`, {
       method: 'POST',
       credentials: 'include',
@@ -37,10 +47,10 @@ function Signup() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: 'test',
-        email: 'test@example.com',
-        password: 'Test123!',
-        passwordConfirm: 'Test123!',
+        username: username,
+        email: email,
+        password: password,
+        passwordConfirm: password,
       }),
     })
 
@@ -57,40 +67,87 @@ function Signup() {
     })
 
     console.log(await res.json())
+
+    mutate(`${API_URL}/api/user/currentUser`)
+    setUsername('')
+    setEmail('')
+    setPassword('')
   }
 
   return (
     <>
-      <Button w='100%' onClick={testSignup}>
-        Signup
-      </Button>
+      <Container
+        maxW='lg'
+        py={{ base: '12', md: '24' }}
+        px={{ base: '0', sm: '8' }}
+      >
+        <Stack spacing='8'>
+          <Stack spacing='6'>
+            <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
+              <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
+                Sign up
+              </Heading>
+            </Stack>
+          </Stack>
+          <Box
+            py={{ base: '0', sm: '8' }}
+            px={{ base: '4', sm: '10' }}
+            bg={useBreakpointValue({ base: 'transparent', sm: 'bg-surface' })}
+            boxShadow={{
+              base: 'none',
+              sm: useColorModeValue('base', 'md-dark'),
+            }}
+            borderRadius={{ base: 'none', sm: 'xl' }}
+          >
+            <Stack spacing='6'>
+              <Stack spacing='5'>
+                <FormControl>
+                  <FormLabel htmlFor='username'>Username</FormLabel>
+                  <Input
+                    id='username'
+                    type='username'
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </FormControl>
+                <FormControl>
+                  <FormLabel htmlFor='email'>Email</FormLabel>
+                  <Input
+                    id='email'
+                    type='email'
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </FormControl>
+                <PasswordField
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Stack>
+              <Stack spacing='6'>
+                <Button colorScheme='blue' onClick={handleSubmit}>
+                  Sign up
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        </Stack>
+      </Container>
     </>
   )
 }
 
-function Users() {
-  const user = useUser()
+function Login() {
   const { mutate } = useSWRConfig()
-  const router = useRouter()
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
 
-  const testLogout = async () => {
-    let res = await fetch(`${API_URL}/api/user/logout`, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+  const handleSubmit = async () => {
+    console.log('Login...')
+    console.log('username: ', username)
+    console.log('password: ', password)
 
-    console.log(res)
-
-    // tell all SWRs with this key to revalidate
-    mutate(`${API_URL}/api/user/currentUser`)
-  }
-
-  const testSignin = async () => {
     // Signin
-    console.log('Testing signin...')
     let res = await fetch(`${API_URL}/api/user/signin`, {
       method: 'POST',
       credentials: 'include',
@@ -98,8 +155,8 @@ function Users() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        username: 'test4',
-        password: 'Test123!',
+        username: username,
+        password: password,
       }),
     })
 
@@ -118,9 +175,6 @@ function Users() {
 
     console.log(await res.json())
 
-    // tell all SWRs with this key to revalidate
-    mutate(`${API_URL}/api/user/currentUser`)
-
     // res = await fetch(`${API_URL}/api/user/userInfo?username=fkymy`, {
     //   method: 'GET',
     //   credentials: 'include',
@@ -131,7 +185,116 @@ function Users() {
     // })
     //
     // console.log(await res.json())
+
+    mutate(`${API_URL}/api/user/currentUser`)
+    setUsername('')
+    setPassword('')
   }
+
+  return (
+    <>
+      <Container
+        maxW='lg'
+        py={{ base: '12', md: '24' }}
+        px={{ base: '0', sm: '8' }}
+      >
+        <Stack spacing='8'>
+          <Stack spacing='6'>
+            <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
+              <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
+                Login
+              </Heading>
+            </Stack>
+          </Stack>
+          <Box
+            py={{ base: '0', sm: '8' }}
+            px={{ base: '4', sm: '10' }}
+            bg={useBreakpointValue({ base: 'transparent', sm: 'bg-surface' })}
+            boxShadow={{
+              base: 'none',
+              sm: useColorModeValue('base', 'md-dark'),
+            }}
+            borderRadius={{ base: 'none', sm: 'xl' }}
+          >
+            <Stack spacing='6'>
+              <Stack spacing='5'>
+                <FormControl>
+                  <FormLabel htmlFor='username'>Username</FormLabel>
+                  <Input
+                    id='username'
+                    type='username'
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                  />
+                </FormControl>
+                <PasswordField
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </Stack>
+              <Stack spacing='6'>
+                <Button colorScheme='blue' onClick={handleSubmit}>
+                  Login
+                </Button>
+              </Stack>
+            </Stack>
+          </Box>
+        </Stack>
+      </Container>
+    </>
+  )
+}
+
+type ProfileProps = {
+  user: User
+}
+
+function Profile({ user }: ProfileProps) {
+  const { mutate } = useSWRConfig()
+
+  const handleLogout = async () => {
+    let res = await fetch(`${API_URL}/api/user/logout`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    console.log(res)
+
+    // tell all SWRs with this key to revalidate
+    mutate(`${API_URL}/api/user/currentUser`)
+  }
+
+  return (
+    <>
+      <Container maxW='lg' px={{ base: '0', sm: '8' }}>
+        <Stack spacing='8'>
+          <Box boxShadow='base' p='8'>
+            <Stack direction={'row'} spacing='8' align='center'>
+              <Avatar
+                size='2xl'
+                src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+              />
+              <Stack direction='column' spacing='0' fontSize='md'>
+                <Text fontWeight='600'>username: {user.username}</Text>
+                <Text>email: {user.email}</Text>
+                <Text>userId: {user.userId}</Text>
+                <Button onClick={handleLogout}>Logout</Button>
+              </Stack>
+            </Stack>
+          </Box>
+        </Stack>
+      </Container>
+    </>
+  )
+}
+
+function Users() {
+  const user = useUser()
+  const { mutate } = useSWRConfig()
+  const router = useRouter()
 
   const testUpdate = async () => {
     // Signin
@@ -203,30 +366,17 @@ function Users() {
         <Stack spacing='6'>
           <Box>
             {user ? (
-              <>
-                <Text>User found</Text>
-                <Text>{user.username}</Text>
-                <Avatar
-                  size='sm'
-                  src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                />
-              </>
+              <Profile user={user} />
             ) : (
               <>
                 <Text>User not found</Text>
               </>
             )}
           </Box>
-          <Signup />
-          <Button w='100%' onClick={testSignin}>
-            Login
-          </Button>
-          <Button w='100%' onClick={testLogout}>
-            Logout
-          </Button>
-          <Button w='100%' onClick={testUpdate}>
-            Update
-          </Button>
+          <Stack direction={['column', 'row']} spacing='8px'>
+            <Signup />
+            <Login />
+          </Stack>
         </Stack>
         <Box>
           <ApiTester />
