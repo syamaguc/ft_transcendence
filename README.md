@@ -2,7 +2,6 @@
 
 - [RESOURCES](https://quilled-discovery-253.notion.site/ft_transcendence-01d977dd4ba8439daa74b019bfec495b)
 
-
 ## Usage
 
 /backend/api/.env.sample/default.env内の以下に正しい値を入れる
@@ -25,3 +24,9 @@ SECRET=''
 - volume_clean: volumeの全削除
 - clean: 稼働していないコンテナの情報をすべて削除（一部残る場合もある）
 - fclean: image, volume, network, container等すべて削除
+
+## pgadmin
+```
+email: admin@gamil.com
+password: admin
+```
