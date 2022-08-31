@@ -1,12 +1,13 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { UserModule } from '../user/user.module';
-import { AuthModule } from '../auth/auth.module';
-import { AdminModule } from 'src/admin/admin.module';
-import { User } from '../user/entities/user.entity';
-import { GameModule } from '../game/game.module';
-import { ChatModule } from 'src/chat/chat.module';
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { TypeOrmModule } from '@nestjs/typeorm'
+import { UserModule } from '../user/user.module'
+import { AuthModule } from '../auth/auth.module'
+import { AdminModule } from 'src/admin/admin.module'
+import { User } from '../user/entities/user.entity'
+import { GameHistory } from '../game/entities/gameHistory.entity'
+import { GameModule } from '../game/game.module'
+import { ChatModule } from 'src/chat/chat.module'
 
 @Module({
 	imports: [
@@ -24,7 +25,7 @@ import { ChatModule } from 'src/chat/chat.module';
 			username: process.env.DB_USER,
 			password: process.env.DB_PASS,
 			database: process.env.DB_NAME,
-			entities: [User],
+			entities: [User, GameHistory],
 			autoLoadEntities: true,
 			synchronize: true,
 		}),
