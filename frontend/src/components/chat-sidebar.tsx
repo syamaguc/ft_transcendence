@@ -50,7 +50,7 @@ const SideBar = ({
         console.log('created : ', id)
         setRoom({ id: id, name: name })
       })
-      socket.on('getMessageLog', (messageLog: string[]) => {
+      socket.on('getMessageLog', (messageLog: MessageObject[]) => {
         console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
       })

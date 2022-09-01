@@ -40,9 +40,7 @@ export class ChatGateway {
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`);
 		const messageLog: MessageI[] = this.chatService.getMessageLog(roomId);
-		const messageStrings: string[] = [];
-		messageLog.map((log) => messageStrings.push(log.message));
-		socket.emit('getMessageLog', messageStrings);
+		socket.emit('getMessageLog', messageLog);
 	}
 
 	@SubscribeMessage('getRooms')
