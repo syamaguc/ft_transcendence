@@ -11,12 +11,13 @@ import {
 } from '@chakra-ui/react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { MessageObject } from 'src/types/chat'
 import ChatCreationForm from './chat-creation-form'
 
 type Props = {
   socket: Socket
   setCurrentRoom: (room: string) => void
-  setChatLog: (chatLog: string[]) => void
+  setChatLog: (chatLog: MessageObject[]) => void
   setInputMessage: (input: string) => void
 }
 

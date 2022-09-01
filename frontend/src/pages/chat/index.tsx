@@ -3,37 +3,14 @@ import { Box, Button, HStack, Input, Spacer, Stack } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
+import { MessageObject } from 'src/types/chat'
 
 const socket = io('http://localhost:3000')
 
-type AddMessageDto = {
-  user: string
-  message: string
-  timestamp: Date
-}
-
-type MessageI = {
-  id: string
-  user: string
-  message: string
-  timestamp: Date
-}
-
-type ChatRoomI = {
-  id: string
-  name: string
-  members: string[]
-  owner: string
-  admins: string[]
-  is_private: boolean
-  logs: MessageI[]
-  password: string
-}
-
 const Chat = () => {
   const [inputText, setInputText] = useState('')
-  const [chatLog, setChatLog] = useState<string[]>([])
-  const [msg, setMsg] = useState('')
+  const [chatLog, setChatLog] = useState<MessageObject[]>([])
+  const [msg, setMsg] = useState<MessageObject>()
   const [currentRoom, setCurrentRoom] = useState('')
 
   const didLogRef = useRef(false)
@@ -44,7 +21,7 @@ const Chat = () => {
       socket.on('connect', () => {
         console.log('connection ID : ', socket.id)
       })
-      socket.on('updateNewMessage', (message: string) => {
+      socket.on('updateNewMessage', (message: MessageObject) => {
         console.log('recieved : ', message)
         setMsg(message)
       })
@@ -52,17 +29,20 @@ const Chat = () => {
   }, [])
 
   const onClickSubmit = useCallback(() => {
-    const message: AddMessageDto = {
+    const message = {
       user: 'tmp_user',
       message: inputText,
       timestamp: new Date(),
     }
+    console.log('send : ', message)
     socket.emit('addMessage', message)
     setInputText('')
   }, [inputText])
 
   useEffect(() => {
-    setChatLog([...chatLog, msg])
+    if (msg) {
+      setChatLog([...chatLog, msg])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
 
@@ -79,9 +59,11 @@ const Chat = () => {
           <Stack>
             <Box>Current Channel:{currentRoom}</Box>
             <Spacer />
-            {chatLog.map((message, index) => (
-              <p key={index}>{message}</p>
-            ))}
+            {chatLog.length
+              ? chatLog.map((message: MessageObject) => (
+                  <p key={message.id}>{message.message}</p>
+                ))
+              : null}
             <Input
               type='text'
               value={inputText}

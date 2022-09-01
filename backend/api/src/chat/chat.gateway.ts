@@ -30,7 +30,7 @@ export class ChatGateway {
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`);
 		const room = [...socket.rooms].slice(0)[1];
 		const newMessage = this.chatService.addMessage(addMessageDto, room);
-		this.server.to(room).emit('updateNewMessage', newMessage.message);
+		this.server.to(room).emit('updateNewMessage', newMessage);
 	}
 
 	@SubscribeMessage('getMessageLog')
@@ -83,9 +83,8 @@ export class ChatGateway {
 	) {
 		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
 		this.joinRoom(newChatRoom.id, socket);
-		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
 		this.logger.log(newChatRoom);
-		this.server.emit('updateNewRoom', chatRoom);
+		this.server.emit('updateNewRoom', newChatRoom);
 	}
 }
 
