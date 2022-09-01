@@ -1,5 +1,5 @@
 import Layout from '@components/layout'
-import { Box, Heading, Text } from '@chakra-ui/react'
+import { Avatar, Heading, Text } from '@chakra-ui/react'
 
 import { useUser } from 'src/lib/use-user'
 
@@ -11,7 +11,14 @@ function Profile() {
       <Heading>Profile</Heading>
       {user && (
         <>
-          <Text>Current user: {user.username}</Text>
+          <Avatar
+            src={`http://localhost:3000/api/user/avatar/${user.profile_picture}`}
+          />
+          <Text>{user.username}</Text>
+          <Text>{user.email}</Text>
+          <Text>{user.userId}</Text>
+          <Text>{user.profile_picture}</Text>
+          <Text>{user.status}</Text>
         </>
       )}
       {!user && (
