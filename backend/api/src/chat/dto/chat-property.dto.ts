@@ -8,4 +8,5 @@ export class CreateChatRoomDto {
 export class AddMessageDto {
 	message: string;
 	user: string;
+	timestamp: Date;
 }

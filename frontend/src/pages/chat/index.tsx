@@ -6,9 +6,28 @@ import ChatSideBar from '@components/chat-sidebar'
 
 const socket = io('http://localhost:3000')
 
-type chatRoomI = {
+type AddMessageDto = {
+  user: string
+  message: string
+  timestamp: Date
+}
+
+type MessageI = {
+  id: string
+  user: string
+  message: string
+  timestamp: Date
+}
+
+type ChatRoomI = {
   id: string
   name: string
+  members: string[]
+  owner: string
+  admins: string[]
+  is_private: boolean
+  logs: MessageI[]
+  password: string
 }
 
 const Chat = () => {
@@ -33,7 +52,12 @@ const Chat = () => {
   }, [])
 
   const onClickSubmit = useCallback(() => {
-    socket.emit('addMessage', inputText)
+    const message: AddMessageDto = {
+      user: 'tmp_user',
+      message: inputText,
+      timestamp: new Date(),
+    }
+    socket.emit('addMessage', message)
     setInputText('')
   }, [inputText])
 

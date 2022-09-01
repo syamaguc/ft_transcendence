@@ -36,7 +36,6 @@ export class ChatService {
 		const newMessage: MessageI = {
 			id: uuidv4(),
 			...addMessageDto,
-			timestamp: new Date(),
 		};
 		const room = this.charRooms.find((r) => r.id == roomId);
 		room.logs.push(newMessage);

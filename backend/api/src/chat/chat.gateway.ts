@@ -24,14 +24,9 @@ export class ChatGateway {
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
 	handleMessage(
-		// @MessageBody() addMessageDto: AddMessageDto,
-		@MessageBody() message: string,
+		@MessageBody() addMessageDto: AddMessageDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const addMessageDto: AddMessageDto = {
-			message: message,
-			user: 'none',
-		};
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`);
 		const room = [...socket.rooms].slice(0)[1];
 		const newMessage = this.chatService.addMessage(addMessageDto, room);
