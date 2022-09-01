@@ -11,50 +11,49 @@ import {
 } from '@chakra-ui/react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
-import { MessageObject } from 'src/types/chat'
+import { ChannelObject, MessageObject } from 'src/types/chat'
 import ChatCreationForm from './chat-creation-form'
 
 type Props = {
   socket: Socket
-  setCurrentRoom: (room: string) => void
+  currentRoom: ChannelObject
+  setCurrentRoom: (room: ChannelObject) => void
   setChatLog: (chatLog: MessageObject[]) => void
   setInputMessage: (input: string) => void
 }
 
-type ChatRoom = {
-  id: string
-  name: string
-}
-
 const SideBar = ({
   socket,
+  currentRoom,
   setCurrentRoom,
   setChatLog,
   setInputMessage,
 }: Props) => {
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
-  const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
+  const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
+  const [room, setRoom] = useState<ChannelObject>()
   const didLogRef = useRef(false)
 
-  const onClickChannel = (chatRoom: ChatRoom) => {
-    setCurrentRoom(chatRoom.name)
-    socket.emit('watchRoom', chatRoom.id)
-    socket.emit('getMessageLog', chatRoom.id)
-    setInputMessage('')
+  const onClickChannel = (chatRoom: ChannelObject) => {
+    if (currentRoom != chatRoom) {
+      setCurrentRoom(chatRoom)
+      socket.emit('watchRoom', chatRoom.id)
+      socket.emit('getMessageLog', chatRoom.id)
+      setInputMessage('')
+    }
   }
 
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      socket.on('updateNewRoom', ({ id, name }) => {
-        console.log('created : ', id)
-        setRoom({ id: id, name: name })
+      socket.on('updateNewRoom', (newChatRoom: ChannelObject) => {
+        console.log('created : ', newChatRoom)
+        setRoom(newChatRoom)
       })
       socket.on('getMessageLog', (messageLog: MessageObject[]) => {
         console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
       })
-      socket.on('getRooms', (rooms: ChatRoom[]) => {
+      socket.on('getRooms', (rooms: ChannelObject[]) => {
         setChatRooms(rooms)
       })
     }
@@ -67,7 +66,9 @@ const SideBar = ({
   }, [])
 
   useEffect(() => {
-    setChatRooms([...chatRooms, room])
+    if (room) {
+      setChatRooms([...chatRooms, room])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room])
 
@@ -80,7 +81,7 @@ const SideBar = ({
       </Box>
 
       <Stack width='sm'>
-        {chatRooms.map((chatRoom) => (
+        {chatRooms.map((chatRoom: ChannelObject) => (
           <Box
             as='button'
             borderRadius='4px'

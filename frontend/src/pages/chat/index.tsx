@@ -3,7 +3,7 @@ import { Box, Button, HStack, Input, Spacer, Stack } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
-import { MessageObject } from 'src/types/chat'
+import { ChannelObject, MessageObject } from 'src/types/chat'
 
 const socket = io('http://localhost:3000')
 
@@ -11,7 +11,16 @@ const Chat = () => {
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
-  const [currentRoom, setCurrentRoom] = useState('')
+  const [currentRoom, setCurrentRoom] = useState<ChannelObject>({
+    id: 'default-channel',
+    name: 'random',
+    members: [],
+    owner: 'none',
+    admins: [],
+    is_private: false,
+    logs: [],
+    password: '',
+  })
 
   const didLogRef = useRef(false)
 
@@ -52,12 +61,13 @@ const Chat = () => {
         <HStack>
           <ChatSideBar
             socket={socket}
+            currentRoom={currentRoom}
             setCurrentRoom={setCurrentRoom}
             setChatLog={setChatLog}
             setInputMessage={setInputText}
           />
           <Stack>
-            <Box>Current Channel:{currentRoom}</Box>
+            <Box>Current Channel:{currentRoom.name}</Box>
             <Spacer />
             {chatLog.length
               ? chatLog.map((message: MessageObject) => (
