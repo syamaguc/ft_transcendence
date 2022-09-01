@@ -24,7 +24,7 @@ import { RemoveScroll } from 'react-remove-scroll'
 import { Logo } from '@components/logo'
 import { mainNavLinks } from '@components/header'
 
-import useRouteChanged from '@hooks/use-route-changed'
+import useRouteChanged from 'src/lib/use-route-changed'
 
 type NavLinkProps = {
   href: string

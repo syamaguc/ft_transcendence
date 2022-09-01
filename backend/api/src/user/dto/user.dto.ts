@@ -49,7 +49,7 @@ export class CreateUserDto {
 export class SigInUserDto {
 	@IsNotEmpty()
 	@ApiProperty({ description: 'not empty' })
-	id: string;
+	username: string;
 
 	@IsNotEmpty()
 	@ApiProperty({
