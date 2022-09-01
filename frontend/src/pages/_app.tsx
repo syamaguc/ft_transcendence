@@ -18,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           value={{
             fetcher: fetchJson,
             onError: (err) => {
-              if (err.response.status === 401) {
+              if (err.response?.status === 401) {
                 return
               }
 
