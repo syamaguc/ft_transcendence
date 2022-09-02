@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from "typeorm"
 import { ChatRoom } from "./chat-room.entity"
 
 
@@ -16,6 +16,8 @@ export class Message {
 	@Column()
     timestamp: Date
 
-    @ManyToOne(() => ChatRoom, (room) => room.messages)
+    @ManyToOne(() => ChatRoom, (room) => room.messages, {
+		cascade: true,
+	})
     room: ChatRoom
 }

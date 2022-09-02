@@ -9,8 +9,6 @@ import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
-import { MessageI } from './interface/message.interface';
-import { ChatRoomI } from './interface/chat-room.interface';
 import { Message } from './entities/message.entity';
 
 @WebSocketGateway({ cors: { origin: '*' } })
@@ -35,10 +33,6 @@ export class ChatGateway {
 		};
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`);
 		const room = [...socket.rooms].slice(0)[1];
-		//when reloaded, room is empty
-		// console.log("room");
-		// console.log(room);
-
 		const newMessage = await this.chatService.addMessage(addMessageDto, room);
 		this.server.to(room).emit('updateNewMessage', newMessage.message);
 	}
@@ -74,10 +68,6 @@ export class ChatGateway {
 	) {
 		this.logger.log(`watchRoom: ${socket.id} watched ${roomId}`);
 		const rooms = [...socket.rooms].slice(0);
-		// console.log("rooms\n");
-		// console.log(socket.rooms);
-		// console.log("room id");
-		// console.log(roomId);
 		if (rooms.length == 2) socket.leave(rooms[1]);
 		socket.join(roomId);
 	}
@@ -104,12 +94,6 @@ export class ChatGateway {
 			channel_type: 'channel',
 		};
 		const newChatRoom = await this.chatService.createRoom(createChatRoomDto)
-			// .then(function(newChatRoom) {
-			// 	this.joinRoom(newChatRoom.id, socket);
-			// 	const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
-			// 	this.server.emit('updateNewRoom', chatRoom);
-			// });
-		console.log(newChatRoom);
 		this.joinRoom(newChatRoom.id, socket);
 		const chatRoom = { id: newChatRoom.id, name: newChatRoom.name };
 		this.server.emit('updateNewRoom', chatRoom);

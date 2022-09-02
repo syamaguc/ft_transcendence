@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
-import { MessageI } from "../interface/message.interface"
+// import { MessageI } from "../interface/message.interface"
 import { Message } from "./message.entity"
 
 @Entity()
@@ -22,14 +22,11 @@ export class ChatRoom {
     @Column('boolean', { default: false })
     is_private: boolean
 
-    @Column('simple-array', { default: [] })
-    logs: MessageI[]
+    // @Column('simple-array', { default: [] })
+    // logs: MessageI[]
 
     @OneToMany(() => Message, (msg) => msg.room)
     messages: Message[]
-
-    // @Column('text', { default: [] })
-    // string_logs: string[]
 
     @Column('text', { default: '' })
     password: string
