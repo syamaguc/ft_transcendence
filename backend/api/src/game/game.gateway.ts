@@ -6,9 +6,13 @@ import {
     ConnectedSocket,
     WsResponse,
 } from '@nestjs/websockets';
-import { Logger } from '@nestjs/common'
+import { Logger, UseGuards, NotFoundException } from '@nestjs/common'
+import { AuthGuard } from '@nestjs/passport';
 import { Server, Socket } from 'socket.io';
 import { v4 as uuidv4 } from 'uuid';
+import { UserAuth } from '../user/guards/userAuth.guard';
+import { User } from '../user/entities/user.entity';
+import { UsersRepository } from '../user/user.repository';
 import { GameRoom } from './game.lib'
 import { socketData, KeyStatus } from "./game.interface";
 
@@ -31,6 +35,15 @@ export class GameGateway {
     return -1;
   }
 
+  async currentUser(userId: string): Promise<Partial<User>> {
+		let userFound: User = undefined;
+		userFound = await UsersRepository.findOne({
+			where: { userId: userId },
+		});
+		if (!userFound) throw new NotFoundException('No user found');
+		const { password, ...res } = userFound;
+		return res;
+	}
 
   @SubscribeMessage('connectServer')
   handleConnect(@MessageBody() data: string, @ConnectedSocket() client: Socket): WsResponse<number> {
@@ -113,21 +126,28 @@ export class GameGateway {
   }
 
 
+  // @UseGuards(AuthGuard('jwt'), UserAuth)
   @SubscribeMessage('registerMatch')
-  handleRegisterMatch(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
-    this.disconnectMatchUserRemove();
-    const clientData: socketData = {client: client, role: -1}
-    if (this.matchUsers.length >= 1) {
-      const id = uuidv4();
-      this.gameRooms.push(new GameRoom(id, this.server));
-      this.server.to(client.id).emit("goGameRoom", id);
-      this.server.to(this.matchUsers[0].client.id).emit("goGameRoom", id);
-      this.matchUsers.splice(0, 1);
-    }
-    else {
-      this.matchUsers.push(clientData);
-    }
-    this.logger.log(this.matchUsers.length);
+  async handleRegisterMatch(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
+    const userId = data['userId'];
+    const user = this.currentUser(userId);
+    user.then((user) => {
+      const userId = user['userId'];
+      this.logger.log(userId);
+      this.disconnectMatchUserRemove();
+      const clientData: socketData = {client: client, role: -1, userId: userId}
+      if (this.matchUsers.length >= 1) {
+        const id = uuidv4();
+        this.gameRooms.push(new GameRoom(id, this.server));
+        this.server.to(client.id).emit("goGameRoom", id);
+        this.server.to(this.matchUsers[0].client.id).emit("goGameRoom", id);
+        this.matchUsers.splice(0, 1);
+      }
+      else {
+        this.matchUsers.push(clientData);
+      }
+      this.logger.log(this.matchUsers.length);
+    });
   }
 
 

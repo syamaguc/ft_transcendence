@@ -2,6 +2,9 @@ import Layout from '@components/layout'
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
+import { useUser } from '../../lib/use-user'
+
+const API_URL = 'http://localhost:3000'
 
 export default function GameMatching() {
   const [server, setServer] = useState()
@@ -9,6 +12,12 @@ export default function GameMatching() {
   const [cancelDisplay, setCancelDisplay] = useState('inline')
   const didLogRef = useRef(false)
   const router = useRouter()
+  const [userId, setUserId] = useState()
+  const user = useUser()
+
+  useEffect(() => {
+    if (user) setUserId(user['userId'])
+  }, [user])
 
   const matching = useCallback(() => {
     if (!server) return
@@ -20,8 +29,8 @@ export default function GameMatching() {
     matchButton.style.display = 'none'
     cancelButton.style.display = cancelDisplay
 
-    server.emit('registerMatch')
-  }, [server, cancelDisplay])
+    server.emit('registerMatch', { userId: userId})
+  }, [server, cancelDisplay, userId])
 
   const cancel = useCallback(() => {
     if (!server) return
@@ -39,7 +48,7 @@ export default function GameMatching() {
   useEffect(() => {
     if (!didLogRef.current) {
       didLogRef.current = true
-      setServer(io('http://localhost:3000'))
+      setServer(io(API_URL))
 
       const matchButton = document.getElementById('matchButton')
       const cancelButton = document.getElementById('cancelButton')

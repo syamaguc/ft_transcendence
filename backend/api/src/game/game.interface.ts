@@ -36,6 +36,7 @@ export interface GameObject {
 export interface socketData {
   role: number;
   client: Socket;
+  userId: string;
 }
 
 export interface KeyStatus {

@@ -186,12 +186,12 @@ export class GameRoom {
     let role: number = 2;
     if (this.socketDatas.length == 0) {
       role = 0;
-      this.socketDatas.push({client: client, role: 0});
+      this.socketDatas.push({client: client, role: 0, userId: ''});
     } else if (this.socketDatas.length == 1) {
       role = 1;
-      this.socketDatas.push({client: client, role: 1});
+      this.socketDatas.push({client: client, role: 1, userId: ''});
     } else {
-      this.socketDatas.push({client: client, role: 2});
+      this.socketDatas.push({client: client, role: 2, userId: ''});
     }
     this.logger.log(client.id);
     this.logger.log("client num:", this.socketDatas.length);
