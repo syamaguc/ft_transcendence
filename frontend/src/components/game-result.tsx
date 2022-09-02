@@ -58,6 +58,7 @@ const GameResult = ({
           className={style.startButton}
           id='endButton'
           onClick={playerRole == 0 ? start : nop}
+          disabled={playerRole != 0}
         >
           retry
         </button>

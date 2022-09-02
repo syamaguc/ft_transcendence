@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useWindowSize } from 'react-use'
 import { Position, GameObject } from 'src/types/game'
+import style from '../styles/game.module.css'
 
 type Props = {
   gameObject: GameObject
@@ -18,7 +19,11 @@ const ballBaseSize = 50
 const Pong = ({ gameObject }: Props) => {
   const { width: screenWidth, height: screenHeight } = useWindowSize()
 
-  const canvasRender = () => {
+  const canvasRender = (
+    gameObject: GameObject,
+    screenWidth: number,
+    screenHeight: number
+  ) => {
     const canvasElem = document.getElementById(
       'gameCanvas'
     ) as HTMLCanvasElement
@@ -121,7 +126,7 @@ const Pong = ({ gameObject }: Props) => {
     )
   }
 
-  const clearCanvas = () => {
+  const clearCanvas = (screenWidth: number, screenHeight: number) => {
     const canvasElem = document.getElementById(
       'gameCanvas'
     ) as HTMLCanvasElement
@@ -134,13 +139,21 @@ const Pong = ({ gameObject }: Props) => {
   }
 
   useEffect(() => {
-    if (gameObject.gameStatus == 1) canvasRender()
+    if (gameObject.gameStatus == 1)
+      canvasRender(gameObject, screenWidth, screenHeight)
     else {
-      clearCanvas()
+      clearCanvas(screenWidth, screenHeight)
     }
   }, [screenWidth, screenHeight, gameObject])
 
-  return <canvas id='gameCanvas'></canvas>
+  return (
+    <canvas
+      id='gameCanvas'
+      className={
+        gameObject.gameStatus == 1 ? style.canvasBox : style.boxNonActive
+      }
+    ></canvas>
+  )
 }
 
 export default Pong

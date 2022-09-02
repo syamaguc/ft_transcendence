@@ -9,8 +9,7 @@ import { Logger } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
-import { MessageI } from './interface/message.interface';
-import { ChatRoomI } from './interface/chat-room.interface';
+import { Message } from './entities/message.entity';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway {
@@ -23,30 +22,30 @@ export class ChatGateway {
 
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
-	handleMessage(
+	async handleMessage(
 		@MessageBody() addMessageDto: AddMessageDto,
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`);
 		const room = [...socket.rooms].slice(0)[1];
-		const newMessage = this.chatService.addMessage(addMessageDto, room);
+		const newMessage = await this.chatService.addMessage(addMessageDto, room);
 		this.server.to(room).emit('updateNewMessage', newMessage);
 	}
 
 	@SubscribeMessage('getMessageLog')
-	getMessageLog(
+	async getMessageLog(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`);
-		const messageLog: MessageI[] = this.chatService.getMessageLog(roomId);
+		const messageLog: MessageI[] = await this.chatService.getMessageLog(roomId);
 		socket.emit('getMessageLog', messageLog);
 	}
 
 	@SubscribeMessage('getRooms')
-	getRooms(@ConnectedSocket() socket: Socket) {
+	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`);
-		const rooms: ChatRoomI[] = this.chatService.getRooms();
+		const rooms = await this.chatService.getRooms();
 		//tmp
 		const roomsList = [];
 		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }));
@@ -75,11 +74,11 @@ export class ChatGateway {
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@SubscribeMessage('createRoom')
-	createRoom(
+	async createRoom(
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChatRoom = this.chatService.createRoom(createChatRoomDto);
+		const newChatRoom = await this.chatService.createRoom(createChatRoomDto);
 		this.joinRoom(newChatRoom.id, socket);
 		this.logger.log(newChatRoom);
 		this.server.emit('updateNewRoom', newChatRoom);
