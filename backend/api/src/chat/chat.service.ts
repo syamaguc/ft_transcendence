@@ -26,7 +26,6 @@ export class ChatService {
 		const newMessage: MessageI = {
 			id: uuidv4(),
 			...addMessageDto,
-			timestamp: new Date(),
 		};
 		const room : ChatRoom = await chatRepository.findId(roomId);
 		const message: Message = {
