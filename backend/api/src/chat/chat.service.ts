@@ -43,19 +43,38 @@ export class ChatService {
 
 
 
-	addMessage(addMessageDto: AddMessageDto, roomId: uuidv4): MessageI {
+	// addMessage(addMessageDto: AddMessageDto, roomId: uuidv4): MessageI {
+	// 	const newMessage: MessageI = {
+	// 		id: uuidv4(),
+	// 		...addMessageDto,
+	// 		timestamp: new Date(),
+	// 	};
+	// 	const room = this.charRooms.find((r) => r.id == roomId);
+	// 	room.logs.push(newMessage);
+	// 	return newMessage;
+	// }
+
+	async addMessage(addMessageDto: AddMessageDto, roomId: string): Promise<MessageI> {
 		const newMessage: MessageI = {
 			id: uuidv4(),
 			...addMessageDto,
 			timestamp: new Date(),
 		};
-		const room = this.charRooms.find((r) => r.id == roomId);
-		room.logs.push(newMessage);
-		return newMessage;
+		const msg = await chatRepository.addMessage(newMessage, roomId);
+		return msg;
 	}
 
-	getMessageLog(roomId: string): MessageI[] {
-		const room = this.charRooms.find((r) => r.id == roomId);
+	// getMessageLog(roomId: string): MessageI[] {
+	// 	const room = this.charRooms.find((r) => r.id == roomId);
+	// 	return room.logs;
+	// }
+
+	async getMessageLog(roomId: string): Promise<MessageI[]> {
+		const room : ChatRoom = await chatRepository.findId(roomId);
+		// console.log(room);
+		console.log("get message room:");
+
+		console.log(room.logs);
 		return room.logs;
 	}
 
@@ -63,14 +82,19 @@ export class ChatService {
 	// 	return this.charRooms;
 	// }
 
+	async findRoom(roomId: string): Promise<ChatRoom> {
+		const room : ChatRoom = await chatRepository.findId(roomId);
+		return room;
+	}
+
 	async getRooms(): Promise<ChatRoomI[]> {
-		const rooms = await chatRepository.findAll();
+		const rooms = await chatRepository.find();
 		return rooms;
 	}
 
 	joinRoom(roomId: string) {
 		const room = this.charRooms.find((r) => r.id == roomId);
 		// gets error when trying to access room.members
-		// room.members.push('user1');
+		room.members.push('user1');
 	}
 }
