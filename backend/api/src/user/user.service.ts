@@ -81,12 +81,14 @@ export class UserService {
 		userData: SigInUserDto,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ accessToken: string }> {
-		const { id, password } = userData;
+		const { username, password } = userData;
 		let user: User = undefined;
 
-		user = await UsersRepository.findOne({ where: { username: id } });
+		user = await UsersRepository.findOne({ where: { username: username } });
 		if (user === undefined) {
-			user = await UsersRepository.findOne({ where: { email: id } });
+			user = await UsersRepository.findOne({
+				where: { email: username },
+			});
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const username = user.username;
