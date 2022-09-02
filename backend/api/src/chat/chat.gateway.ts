@@ -38,7 +38,7 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`);
-		const messageLog: MessageI[] = await this.chatService.getMessageLog(roomId);
+		const messageLog: Message[] = await this.chatService.getMessageLog(roomId);
 		socket.emit('getMessageLog', messageLog);
 	}
 
