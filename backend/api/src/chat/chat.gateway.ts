@@ -11,6 +11,7 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
 import { MessageI } from './interface/message.interface';
 import { ChatRoomI } from './interface/chat-room.interface';
+import { Message } from './entities/message.entity';
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class ChatGateway {
@@ -35,8 +36,8 @@ export class ChatGateway {
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`);
 		const room = [...socket.rooms].slice(0)[1];
 		//when reloaded, room is empty
-		console.log("room");
-		console.log(room);
+		// console.log("room");
+		// console.log(room);
 
 		const newMessage = await this.chatService.addMessage(addMessageDto, room);
 		this.server.to(room).emit('updateNewMessage', newMessage.message);
@@ -48,7 +49,7 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`);
-		const messageLog: MessageI[] = await this.chatService.getMessageLog(roomId);
+		const messageLog: Message[] = await this.chatService.getMessageLog(roomId);
 		const messageStrings: string[] = [];
 		messageLog.map((log) => messageStrings.push(log.message));
 		messageLog.map((log) => console.log(log.message));
@@ -73,10 +74,10 @@ export class ChatGateway {
 	) {
 		this.logger.log(`watchRoom: ${socket.id} watched ${roomId}`);
 		const rooms = [...socket.rooms].slice(0);
-		console.log("rooms\n");
-		console.log(socket.rooms);
-		console.log("room id");
-		console.log(roomId);
+		// console.log("rooms\n");
+		// console.log(socket.rooms);
+		// console.log("room id");
+		// console.log(roomId);
 		if (rooms.length == 2) socket.leave(rooms[1]);
 		socket.join(roomId);
 	}

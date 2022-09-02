@@ -1,13 +1,23 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatRoomI } from './interface/chat-room.interface';
 import { MessageI } from './interface/message.interface';
+import { Message } from './entities/message.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { ChatRoom } from './entities/chat-room.entity';
 import { chatRepository } from './chat.repository';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
+	constructor (
+		@InjectRepository(ChatRoom)
+		private readonly chatRoomRepository: Repository<ChatRoom>,
+		@InjectRepository(Message)
+		private readonly messageRepository: Repository<Message>,
+	) {}
+
 	private charRooms: ChatRoomI[] = [
 		{
 			id: '1',
@@ -22,65 +32,50 @@ export class ChatService {
 		},
 	];
 
-
-	// createRoom(createChatRoomDto: CreateChatRoomDto): ChatRoomI {
-	// 	const newChatRoom: ChatRoomI = {
-	// 		id: uuidv4(),
-	// 		members: [],
-	// 		...createChatRoomDto,
-	// 		logs: [],
-	// 		admins: [],
-	// 		password:""
-	// 	};
-	// 	this.charRooms.push(newChatRoom);
-	// 	return newChatRoom;
-	// }
-
 	async createRoom(chatRoomData: CreateChatRoomDto): Promise<ChatRoom> {
 		const chat = await chatRepository.createChatRoom(chatRoomData);
 		return chat;
 	}
 
-
-
-	// addMessage(addMessageDto: AddMessageDto, roomId: uuidv4): MessageI {
-	// 	const newMessage: MessageI = {
-	// 		id: uuidv4(),
-	// 		...addMessageDto,
-	// 		timestamp: new Date(),
-	// 	};
-	// 	const room = this.charRooms.find((r) => r.id == roomId);
-	// 	room.logs.push(newMessage);
-	// 	return newMessage;
-	// }
-
-	async addMessage(addMessageDto: AddMessageDto, roomId: string): Promise<MessageI> {
+	async addMessage(addMessageDto: AddMessageDto, roomId: string): Promise<Message> {
 		const newMessage: MessageI = {
 			id: uuidv4(),
 			...addMessageDto,
 			timestamp: new Date(),
 		};
-		const msg = await chatRepository.addMessage(newMessage, roomId);
-		return msg;
+		const room : ChatRoom = await chatRepository.findId(roomId);
+		const message: Message = {
+			...newMessage,
+			room: room,
+		};
+		// console.log("roooooooom");
+		const savedMessage = await this.messageRepository.save(message);
+		// console.log("before push");
+
+		// const ret = room.messages.push(savedMessage);
+		// user.blockedUsers.splice(index, 1);
+		// room.messages.push(savedMessage);
+
+		// await this.chatRoomRepository.save(room);
+
+		// const msg = await chatRepository.addMessage(newMessage, roomId);
+
+		return savedMessage;
 	}
 
-	// getMessageLog(roomId: string): MessageI[] {
-	// 	const room = this.charRooms.find((r) => r.id == roomId);
-	// 	return room.logs;
-	// }
-
-	async getMessageLog(roomId: string): Promise<MessageI[]> {
+	async getMessageLog(roomId: string): Promise<Message[]> {
 		const room : ChatRoom = await chatRepository.findId(roomId);
 		// console.log(room);
-		console.log("get message room:");
+		// console.log("get message room:");
+		// console.log(JSON.parse(room.logs));
+		// const jsonObj =
 
-		console.log(room.logs);
-		return room.logs;
+
+		// console.log(room.logs);
+
+		// return room.logs;
+		return room.messages;
 	}
-
-	// getRooms(): ChatRoomI[] {
-	// 	return this.charRooms;
-	// }
 
 	async findRoom(roomId: string): Promise<ChatRoom> {
 		const room : ChatRoom = await chatRepository.findId(roomId);
@@ -92,9 +87,8 @@ export class ChatService {
 		return rooms;
 	}
 
-	joinRoom(roomId: string) {
-		const room = this.charRooms.find((r) => r.id == roomId);
-		// gets error when trying to access room.members
+	async joinRoom(roomId: string) {
+		const room = await chatRepository.findId(roomId);
 		room.members.push('user1');
 	}
 }
