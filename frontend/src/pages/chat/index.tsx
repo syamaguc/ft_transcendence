@@ -1,7 +1,7 @@
 import Layout from '@components/layout'
 import { Box, Button, HStack, Input, Spacer, Stack } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
 
 const socket = io('http://localhost:3000')
@@ -17,23 +17,25 @@ const Chat = () => {
   const [msg, setMsg] = useState('')
   const [currentRoom, setCurrentRoom] = useState('')
 
+  const didLogRef = useRef(false)
+
   useEffect(() => {
-    socket.on('connect', () => {
-      console.log('connection ID : ', socket.id)
-    })
+    if (didLogRef.current === false) {
+      didLogRef.current = true
+      socket.on('connect', () => {
+        console.log('connection ID : ', socket.id)
+      })
+      socket.on('updateNewMessage', (message: string) => {
+        console.log('recieved : ', message)
+        setMsg(message)
+      })
+    }
   }, [])
 
   const onClickSubmit = useCallback(() => {
     socket.emit('addMessage', inputText)
     setInputText('')
   }, [inputText])
-
-  useEffect(() => {
-    socket.on('updateNewMessage', (message: string) => {
-      console.log('recieved : ', message)
-      setMsg(message)
-    })
-  }, [])
 
   useEffect(() => {
     setChatLog([...chatLog, msg])

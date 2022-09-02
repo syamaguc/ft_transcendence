@@ -1,6 +1,17 @@
-import { Box, Stack, Button, Input, Radio, RadioGroup, FormControl, FormLabel, FormHelperText } from '@chakra-ui/react'
-import { useState, useCallback, useEffect } from 'react'
+import {
+  Box,
+  Stack,
+  Button,
+  Input,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+} from '@chakra-ui/react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import ChatCreationForm from './chat-creation-form'
 
 type Props = {
   socket: Socket
@@ -20,16 +31,9 @@ const SideBar = ({
   setChatLog,
   setInputMessage,
 }: Props) => {
-  const [inputText, setInputText] = useState('')
   const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
   const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
-
-  const onClickCreate = useCallback(() => {
-    console.log('onClickCreate called')
-    socket.emit('createRoom', inputText)
-    setInputText('')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputText])
+  const didLogRef = useRef(false)
 
   const onClickChannel = (chatRoom: ChatRoom) => {
     setCurrentRoom(chatRoom.name)
@@ -39,17 +43,20 @@ const SideBar = ({
   }
 
   useEffect(() => {
-    socket.on('updateNewRoom', ({ id, name }) => {
-      console.log('created : ', id)
-      setRoom({ id: id, name: name })
-    })
-    socket.on('getMessageLog', (messageLog: string[]) => {
-      console.log('messageLog loaded', messageLog)
-      setChatLog(messageLog)
-    })
-    socket.on('getRooms', (rooms: ChatRoom[]) => {
-      setChatRooms(rooms)
-    })
+    if (didLogRef.current === false) {
+      didLogRef.current = true
+      socket.on('updateNewRoom', ({ id, name }) => {
+        console.log('created : ', id)
+        setRoom({ id: id, name: name })
+      })
+      socket.on('getMessageLog', (messageLog: string[]) => {
+        console.log('messageLog loaded', messageLog)
+        setChatLog(messageLog)
+      })
+      socket.on('getRooms', (rooms: ChatRoom[]) => {
+        setChatRooms(rooms)
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -67,33 +74,8 @@ const SideBar = ({
     <Box>
       <Box>
         <Stack spacing='12px'>
-          <Input
-            type='text'
-            value={inputText}
-            onChange={(event) => {
-              setInputText(event.target.value)
-            }}
-          />
-          <RadioGroup defaultValue='2'>
-            <Stack spacing={5} direction='row'>
-              <Radio colorScheme='blue' value='1'>
-                public
-              </Radio>
-              <Radio colorScheme='blue' value='2'>
-                private
-              </Radio>
-            </Stack>
-          </RadioGroup>
-          <FormControl>
-            <FormLabel>Password</FormLabel>
-            <Input type='password' />
-            <FormHelperText>Please enter your password</FormHelperText>
-          </FormControl>
-          <Button onClick={onClickCreate} type='submit'>
-            Create New Channel
-          </Button>
+          <ChatCreationForm socket={socket} />
         </Stack>
-
       </Box>
 
       <Stack width='sm'>

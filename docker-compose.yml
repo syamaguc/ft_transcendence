@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 services:
   api:
     container_name: api
@@ -50,6 +50,17 @@ services:
       TZ: Asia/Tokyo
     ports:
       - 5432:5432
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    restart: always
+    depends_on:
+      - db
 
 volumes:
   # node_modules:

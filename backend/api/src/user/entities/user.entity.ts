@@ -1,4 +1,4 @@
-import { IsAlphanumeric, IsEmail } from 'class-validator';
+import { IsAlphanumeric, IsEmail } from 'class-validator'
 import {
 	Entity,
 	Column,
@@ -8,63 +8,71 @@ import {
 	OneToMany,
 	JoinColumn,
 	JoinTable,
-} from 'typeorm';
+} from 'typeorm'
+import { GameHistory } from '../../game/entities/gameHistory.entity'
 
 @Entity()
 export class User {
 	@PrimaryGeneratedColumn('uuid')
-	userId: string;
+	userId: string
 
 	@IsAlphanumeric()
 	@Column({ unique: true })
-	username: string;
+	username: string
 
 	@IsEmail()
 	@Column({ unique: true })
-	email: string;
+	email: string
 
 	@Column()
-	password: string;
+	password: string
 
 	@Column('text', { default: 'empty' })
-	profile_picture: string;
+	profile_picture: string
 
 	@Column('int', { default: 1000 })
-	elo: number;
+	elo: number
 
 	@Column('int', { default: 0 })
-	game_won: number;
+	game_won: number
 
 	@Column('int', { default: 0 })
-	lost_game: number;
+	lost_game: number
 
 	@Column('int', { default: 0 })
-	numberOfParty: number;
+	numberOfParty: number
 
 	@Column('int', { default: 0 })
-	ratio: number;
+	ratio: number
 
 	@Column('text', { default: 'Offline' })
-	status: UserStatus;
+	status: UserStatus
 
 	@Column('date', { default: () => '((CURRENT_DATE))' })
-	sign_up_date: Date;
+	sign_up_date: Date
 
 	@Column('simple-array')
-	friends: string[];
+	friends: string[]
 
 	@Column('text', { default: '' })
-	login42: string;
+	login42: string
 
 	@Column('boolean', { default: false })
-	twoFactorAuth: boolean;
+	twoFactorAuth: boolean
 
 	@Column('boolean', { default: false })
-	isBan: boolean;
+	isBan: boolean
 
 	@Column('boolean', { default: false })
-	isAdmin: boolean;
+	isAdmin: boolean
 
 	@Column('simple-array', { default: [] })
-	blockedUsers: string[];
+	blockedUsers: string[]
+
+	// for gameHistory
+	@ManyToMany(() => GameHistory, (gameHistory) => gameHistory.users, {
+		eager: true,
+	})
+	@JoinTable()
+	game_history: GameHistory[]
 }
