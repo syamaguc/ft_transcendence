@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Pull Images
         run: docker-compose pull
@@ -50,5 +52,5 @@ jobs:
       - name: Push
         if: steps.diff-check.outcome == 'failure'
         run: |
-          git commit -m "automated: test"
+          git commit --allow-empty -m "automated: test"
           git push
