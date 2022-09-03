@@ -35,14 +35,20 @@ jobs:
           make format_frontend
           make format_backend
 
+      - name: Check Diff
+        id: diff-check
+        run: |
+          git diff --name-only --exit-code
+        continue-on-error: true
+
       - name: Configure GitHub
-        if: steps.run-prettier.outputs.modified == 'true'
+        if: steps.diff-check.outcome == 'failure'
         run: |
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
       - name: Push
-        if: steps.run-prettier.outputs.modified == 'true'
+        if: steps.diff-check.outcome == 'failure'
         run: |
           git commit -m "automated: test"
           git push
