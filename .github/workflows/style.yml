@@ -49,8 +49,13 @@ jobs:
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
 
-      - name: Push
+      - name: Commit
         if: steps.diff-check.outcome == 'failure'
         run: |
           git commit --allow-empty -m "automated: test"
-          git push
+
+      - name: Push
+        if: steps.diff-check.outcome == 'failure'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
