@@ -1,0 +1,39 @@
+name: 'style'
+
+on: [pull_request]
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Restore Cache
+        uses: satackey/action-docker-layer-caching@v0.0.11
+        continue-on-error: true
+
+      - name: Build
+        run: docker-compose build
+
+      - name: Run Prettier
+        id: run-prettier
+        run: |
+          make format_frontend
+          make format_backend
+
+      - name: Configure GitHub
+        if: steps.run-prettier.outputs.modified == 'true'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Push
+        if: steps.run-prettier.outputs.modified == 'true'
+        run: |
+          git commit -m "automated: test"
+          git push
