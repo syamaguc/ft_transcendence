@@ -29,8 +29,8 @@ jobs:
       - name: Run Prettier
         id: run-prettier
         run: |
-          docker-compose exec -it frontend npm run format
-          docker-compose exec -it api npm run format
+          make format_frontend
+          make format_backend
 
       - name: Configure GitHub
         if: steps.run-prettier.outputs.modified == 'true'

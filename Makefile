@@ -11,16 +11,16 @@ restart:
 	docker-compose up
 
 format_frontend:
-	docker-compose exec frontend npm run format
+	docker-compose exec -T frontend npm run format
 
 lint_frontend:
-	docker-compose exec frontend npm run lint
+	docker-compose exec -T frontend npm run lint
 
 format_backend:
-	docker-compose exec api npm run format
+	docker-compose exec -T api npm run format
 
 lint_backend:
-	docker-compose exec api npm run lint
+	docker-compose exec -T api npm run lint
 
 down:
 	docker-compose down
