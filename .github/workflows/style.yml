@@ -18,7 +18,13 @@ jobs:
         continue-on-error: true
 
       - name: Build
-        run: make build
+        run: |
+          make setup-env
+          docker-compose build
+      
+      - name: Start docker-compose
+        run: |
+          docker-compose up -d
 
       - name: Run Prettier
         id: run-prettier
