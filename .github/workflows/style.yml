@@ -1,6 +1,8 @@
 name: 'style'
 
-on: [pull_request]
+on:
+  pull_request:
+    types: [labeled, synchronize]
 
 jobs:
   prettier:
@@ -8,6 +10,7 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+    if: github.event.action == 'synchronize'
 
     steps:
       - name: Checkout
@@ -15,27 +18,29 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
 
-      - name: Pull Images
-        run: docker-compose pull
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/api/package-lock.json
+            frontend/package-lock.json
 
-      - name: Restore Cache
-        uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
+      - name: Install Prettier - backend
+        working-directory: ./backend/api/
+        run: npm i prettier
 
-      - name: Build
-        run: |
-          make setup-env
-          docker-compose build
-      
-      - name: Start docker-compose
-        run: |
-          docker-compose up -d
+      - name: Install Prettier - frontend
+        working-directory: ./frontend
+        run: npm i prettier
 
-      - name: Run Prettier
-        id: run-prettier
-        run: |
-          make format_frontend
-          make format_backend
+      - name: Run Prettier - backend
+        working-directory: ./backend/api/
+        run: npm run format
+
+      - name: Run Prettier - frontend
+        working-directory: ./frontend
+        run: npm run format
 
       - name: Check Diff
         id: diff-check
@@ -52,7 +57,7 @@ jobs:
       - name: Commit
         if: steps.diff-check.outcome == 'failure'
         run: |
-          git commit --allow-empty -m "automated: test"
+          git commit -am "automated: run formatter"
 
       - name: Push
         if: steps.diff-check.outcome == 'failure'
@@ -60,3 +65,39 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.head_ref }}
+
+  reviewdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: prettier
+    if: ${{ ! failure() }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/api/package-lock.json
+            frontend/package-lock.json
+
+      - name: Run reviewdog - backend
+        uses: reviewdog/action-eslint@v1
+        with:
+          workdir: './backend/api'
+          filter_mode: ${{ github.event.pull_request.labels.*.name == 'run-reviewdog' && 'nofilter' || 'added'}}
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run reviewdog - frontend
+        uses: reviewdog/action-eslint@v1
+        with:
+          workdir: './frontend'
+          filter_mode: ${{ github.event.pull_request.labels.*.name == 'run-reviewdog' && 'nofilter' || 'added'}}
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
