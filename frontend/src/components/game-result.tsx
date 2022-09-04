@@ -34,7 +34,7 @@ const GameResult = ({
 
   const back = useCallback(() => {
     if (!router.isReady) return
-    router.back()
+    router.push('/game')
   }, [router])
 
   return (
