@@ -12,8 +12,8 @@ export class GameHistory {
 	@PrimaryGeneratedColumn('uuid')
 	gameId: string
 
-	@Column('simple-array')
-	score: string[]
+	//@Column('simple-array')
+	//score: string[]
 
 	@Column('text', { default: '' })
 	playerOne: string
@@ -21,11 +21,17 @@ export class GameHistory {
 	@Column('text', { default: '' })
 	playerTwo: string
 
-	@Column('text', { default: '' })
-	date: string
+	@Column('text', { default: 0 })
+	playerOneScore: number
 
-	@Column('int', { default: 0 })
-	gameDuration: number
+	@Column('text', { default: 0 })
+	playerTwoScore: number
+
+	//@Column('text', { default: '' })
+	//date: string
+
+	//@Column('int', { default: 0 })
+	//gameDuration: number
 
 	@Column('text', { default: '' })
 	playerWin: string
