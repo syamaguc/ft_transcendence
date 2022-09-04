@@ -4,22 +4,31 @@ import { GameRepository } from './game.repository'
 import { UsersRepository } from 'src/user/user.repository'
 import { GameHistory } from './entities/gameHistory.entity'
 import { gameInfo } from './game.interface'
+import { User } from '../user/entities/user.entity'
 
 @Injectable()
 export class GameService {
-	constructor() {}
+	//constructor() {}
 
 	async saveGameHistory(info: gameInfo) {
-		let gameHistory = await GameRepository.createGameHistory(info)
+		const gameHistory = await GameRepository.createGameHistory(info)
 
-		if (!info.userOne.game_history) info.userOne.game_history = []
-		if (!info.userTwo.game_history) info.userTwo.game_history = []
-		info.userOne.game_history.push(gameHistory)
-		info.userTwo.game_history.push(gameHistory)
+		const userOne = await UsersRepository.findOne({
+			where: { userId: info.player1 },
+		})
+		const userTwo = await UsersRepository.findOne({
+			where: { userId: info.player2 },
+		})
+
+
+		if (!userOne.game_history) userOne.game_history = []
+		if (!userTwo.game_history) userTwo.game_history = []
+		userOne.game_history.push(gameHistory)
+		userTwo.game_history.push(gameHistory)
 
 		try {
-			await UsersRepository.save(info.userOne)
-			await UsersRepository.save(info.userTwo)
+			await UsersRepository.save(userOne)
+			await UsersRepository.save(userTwo)
 		} catch (e) {
 			throw new InternalServerErrorException()
 		}
