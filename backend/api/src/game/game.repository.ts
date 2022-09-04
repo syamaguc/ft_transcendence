@@ -1,19 +1,11 @@
 import { InternalServerErrorException } from '@nestjs/common'
 import { GameHistory } from './entities/gameHistory.entity'
-import { UsersRepository } from '../user/user.repository'
 import { AppDataSource } from '../app/app.datasource'
 import { gameInfo } from './game.interface'
 
 export const GameRepository = AppDataSource.getRepository(GameHistory).extend({
 	async createGameHistory(info: gameInfo) {
 		const gameHistory: GameHistory = this.create()
-
-		const userOne = await UsersRepository.findOne({
-			where: { userId: info.player1 },
-		})
-		const userTwo = await UsersRepository.findOne({
-			where: { userId: info.player1 },
-		})
 
 		gameHistory.gameId = info.gameId
 		gameHistory.playerOne = info.player1
@@ -27,9 +19,6 @@ export const GameRepository = AppDataSource.getRepository(GameHistory).extend({
 			gameHistory.playerWin = info.player2
 			gameHistory.playerLoose = info.player1
 		}
-		//gameHistory.users = [userOne, userTwo]
-    //gameHistory.users.push(userOne)
-    //gameHistory.users.push(userTwo)
 
 		try {
 			await this.save(gameHistory)

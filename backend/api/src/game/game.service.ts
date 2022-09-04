@@ -11,15 +11,16 @@ export class GameService {
 	//constructor() {}
 
 	async saveGameHistory(info: gameInfo) {
-		const gameHistory = await GameRepository.createGameHistory(info)
+		const gameHistory: GameHistory = await GameRepository.createGameHistory(
+			info,
+		)
 
-		const userOne = await UsersRepository.findOne({
+		const userOne: User = await UsersRepository.findOne({
 			where: { userId: info.player1 },
 		})
 		const userTwo = await UsersRepository.findOne({
 			where: { userId: info.player2 },
 		})
-
 
 		if (!userOne.game_history) userOne.game_history = []
 		if (!userTwo.game_history) userTwo.game_history = []

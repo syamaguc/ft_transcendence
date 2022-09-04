@@ -220,9 +220,6 @@ export class GameRoom {
 			let player2
 			;[player1, player2] = this._get_player1_and_player2()
 
-			console.log(player1.userId)
-			console.log(player2.userId)
-
 			const info: gameInfo = {
 				gameId: this.id,
 				player1Score: this.gameObject.player1.point,
