@@ -102,6 +102,10 @@ export default function Game() {
       server.on('clientQuit', () => {
         router.push('/game')
       })
+
+      server.on('goNewGame', (data: string) => {
+        router.push('/game/' + data)
+      })
     })
   }, [server, router, userId])
 

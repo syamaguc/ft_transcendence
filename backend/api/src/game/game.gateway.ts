@@ -95,10 +95,24 @@ export class GameGateway {
   @SubscribeMessage('retry')
   handleRetry(@MessageBody() data: any) {
     const roomId = data["id"];
+    let gameObject
+    let player1
+    let player2
+    let socketDatas
     for (let i = 0; i < this.gameRooms.length; i++) {
       if (roomId == this.gameRooms[i].id) {
-        this.gameRooms[i].retry();
+        [gameObject, player1, player2] = this.gameRooms[i].retry();
+        socketDatas = this.gameRooms[i].socketDatas
+        this.gameRooms.splice(i, 1);
+        break
       }
+    }
+    const id = uuidv4();
+    let gameRoom = new GameRoom(id, this.server, player1, player2);
+    gameRoom.gameObject.gameSetting = gameObject.gameSetting
+    this.gameRooms.push(gameRoom);
+    for (let i = 0; i < socketDatas.length; i++) {
+      this.server.to(socketDatas[i].client.id).emit("goNewGame", id);
     }
   }
 

@@ -29,6 +29,23 @@ export class GameRoom {
   logger: Logger;
 
 
+  _get_player1_and_player2() {
+    let player1;
+    let player2;
+    for (let i = 0; i < this.socketDatas.length; i++) {
+      if (this.socketDatas[i].role == 0) {
+        player1 = this.socketDatas[i]
+      } else if (this.socketDatas[i].role == 1) {
+        player2 = this.socketDatas[i]
+      }
+      if (player1 && player2) {
+        break
+      }
+    }
+    return [player1, player2]
+  }
+
+
   gameObjectInit(point: number, speed: number, player1Name: string, player2Name: string) {
     this.gameObject = {
       bar1: {
@@ -161,16 +178,7 @@ export class GameRoom {
     else {
       let player1;
       let player2;
-      for (let i = 0; i < this.socketDatas.length; i++) {
-        if (this.socketDatas[i].role == 0) {
-          player1 = this.socketDatas[i]
-        } else if (this.socketDatas[i].role == 1) {
-          player2 = this.socketDatas[i]
-        }
-        if (player1 && player2) {
-          break
-        }
-      }
+      [player1, player2] = this._get_player1_and_player2()
       // ここでdbに結果を保存
       // player1.userId
       // player2.userId
@@ -227,8 +235,10 @@ export class GameRoom {
 
 
   retry() {
-    this.gameObject.gameStatus = 0;
-    this.server.to(this.id).emit('updateGameObject', this.gameObject);
+    let player1
+    let player2
+    [player1, player2] = this._get_player1_and_player2()
+    return [this.gameObject, player1, player2]
   }
 
 
