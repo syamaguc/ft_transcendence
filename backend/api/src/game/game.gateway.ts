@@ -103,6 +103,17 @@ export class GameGateway {
   }
 
 
+  @SubscribeMessage('quit')
+  handleQuit(@MessageBody() data: any) {
+    const roomId = data["id"];
+    for (let i = 0; i < this.gameRooms.length; i++) {
+      if (roomId == this.gameRooms[i].id) {
+        this.gameRooms[i].quit();
+      }
+    }
+  }
+
+
   @SubscribeMessage('move')
   handleMove(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
     const roomId = data["id"];

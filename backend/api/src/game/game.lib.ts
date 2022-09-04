@@ -232,6 +232,11 @@ export class GameRoom {
   }
 
 
+  quit() {
+    this.server.to(this.id).emit('clientQuit');
+  }
+
+
   settingChange(name: string, checked: boolean, value: number) {
     if (name == "point") {
       if (checked) {

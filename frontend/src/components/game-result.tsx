@@ -7,7 +7,6 @@ type Props = {
   playerRole: number
   roomId: string
   server
-  router
   player1Name: string
   player2Name: string
   gameObject: GameObject
@@ -18,7 +17,6 @@ const GameResult = ({
   playerRole,
   roomId,
   server,
-  router,
   player1Name,
   player2Name,
   gameObject,
@@ -33,9 +31,9 @@ const GameResult = ({
   }
 
   const back = useCallback(() => {
-    if (!router.isReady) return
-    router.push('/game')
-  }, [router])
+    if (!server || !roomId) return
+    server.emit('quit', { id: roomId })
+  }, [roomId, server])
 
   return (
     <div
@@ -53,7 +51,12 @@ const GameResult = ({
         <p>{player2Name}: {gameObject.player2.point}</p>
       </div>
       <div className={style.underButtonBox}>
-        <button className={style.startButton} id='quitButton' onClick={back}>
+        <button
+          className={style.startButton}
+          id='quitButton'
+          onClick={playerRole == 0 || playerRole == 1 ? back : nop}
+          disabled={playerRole != 0 && playerRole != 1}
+        >
           quit
         </button>
         <button

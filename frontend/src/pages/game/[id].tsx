@@ -98,6 +98,10 @@ export default function Game() {
         setGameObject(data)
         setGameStatus(data.gameStatus)
       })
+
+      server.on('clientQuit', () => {
+        router.push('/game')
+      })
     })
   }, [server, router, userId])
 
@@ -120,7 +124,6 @@ export default function Game() {
           playerRole={playerRole}
           roomId={router.query.id}
           server={server}
-          router={router}
           player1Name={gameObject.player1.name}
           player2Name={gameObject.player2.name}
           gameObject={gameObject}
