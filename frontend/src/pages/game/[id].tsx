@@ -21,8 +21,8 @@ export default function Game() {
     bar1: { top: 0, left: 0 },
     bar2: { top: 0, left: 0 },
     ball: { top: 0, left: 0 },
-    player1: { point: 0, name: "" },
-    player2: { point: 0, name: "" },
+    player1: { point: 0, name: '' },
+    player2: { point: 0, name: '' },
     gameStatus: 0,
     gameSetting: { point: 2, speed: 1 },
   })
@@ -78,7 +78,7 @@ export default function Game() {
   useEffect(() => {
     if (!server || !router.isReady || !userId) return
     const roomId = router.query.id
-    server.emit('connectServer', {roomId: roomId, userId: userId})
+    server.emit('connectServer', { roomId: roomId, userId: userId })
     server.on('connectClient', (data) => {
       const playerStatus = data['role']
       setGameObject(data['gameObject'])

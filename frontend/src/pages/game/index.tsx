@@ -29,7 +29,7 @@ export default function GameMatching() {
     matchButton.style.display = 'none'
     cancelButton.style.display = cancelDisplay
 
-    server.emit('registerMatch', { userId: userId})
+    server.emit('registerMatch', { userId: userId })
   }, [server, cancelDisplay, userId])
 
   const cancel = useCallback(() => {
@@ -52,7 +52,7 @@ export default function GameMatching() {
       // const cookie = document.cookie
       // console.log(cookie)
 
-      // var cookiesArray = cookie.split(';'); 
+      // var cookiesArray = cookie.split(';');
 
       // for(var c of cookiesArray){
       //     var cArray = c.split('=');

@@ -105,7 +105,19 @@ const GameSettingForm = ({
       id='startBox'
     >
       <div>
-        {playerRole == 0 ? <p><font size='+2'>{player1Name}</font> vs {player2Name}</p>: playerRole == 1 ? <p>{player1Name} vs <font size='+2'>{player2Name}</font></p> : <p>{player1Name} vs {player2Name}</p>}
+        {playerRole == 0 ? (
+          <p>
+            <font size='+2'>{player1Name}</font> vs {player2Name}
+          </p>
+        ) : playerRole == 1 ? (
+          <p>
+            {player1Name} vs <font size='+2'>{player2Name}</font>
+          </p>
+        ) : (
+          <p>
+            {player1Name} vs {player2Name}
+          </p>
+        )}
       </div>
       <div>
         <p>point</p>

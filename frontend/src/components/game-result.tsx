@@ -41,14 +41,19 @@ const GameResult = ({
       id='endBox'
     >
       <div>
-          {gameObject.player1.point > gameObject.player2.point
-            ? <p>{player1Name} WIN</p>
-            : <p>{player2Name} WIN</p>
-          }
+        {gameObject.player1.point > gameObject.player2.point ? (
+          <p>{player1Name} WIN</p>
+        ) : (
+          <p>{player2Name} WIN</p>
+        )}
       </div>
       <div>
-        <p>{player1Name}: {gameObject.player1.point}</p>
-        <p>{player2Name}: {gameObject.player2.point}</p>
+        <p>
+          {player1Name}: {gameObject.player1.point}
+        </p>
+        <p>
+          {player2Name}: {gameObject.player2.point}
+        </p>
       </div>
       <div className={style.underButtonBox}>
         <button
