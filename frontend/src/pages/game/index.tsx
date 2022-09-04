@@ -1,7 +1,7 @@
-import Layout from '@components/layout'
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
+import Layout from '@components/layout'
 import { useUser } from '../../lib/use-user'
 
 const API_URL = 'http://localhost:3000'
@@ -20,7 +20,7 @@ export default function GameMatching() {
   }, [user])
 
   const matching = useCallback(() => {
-    if (!server) return
+    if (!server || !userId) return
 
     const matchButton = document.getElementById('matchButton')
     const cancelButton = document.getElementById('cancelButton')
@@ -48,7 +48,23 @@ export default function GameMatching() {
   useEffect(() => {
     if (!didLogRef.current) {
       didLogRef.current = true
+
+      // const cookie = document.cookie
+      // console.log(cookie)
+
+      // var cookiesArray = cookie.split(';'); 
+
+      // for(var c of cookiesArray){
+      //     var cArray = c.split('=');
+      //     console.log(cArray);
+      // }
+
       setServer(io(API_URL))
+      // setServer(io(API_URL, {
+      //   extraHeaders: {
+      //     jwt: cookie
+      //   }
+      // }))
 
       const matchButton = document.getElementById('matchButton')
       const cancelButton = document.getElementById('cancelButton')

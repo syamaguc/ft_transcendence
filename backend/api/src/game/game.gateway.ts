@@ -46,18 +46,20 @@ export class GameGateway {
 	}
 
   @SubscribeMessage('connectServer')
-  handleConnect(@MessageBody() data: string, @ConnectedSocket() client: Socket): WsResponse<number> {
+  handleConnect(@MessageBody() data, @ConnectedSocket() client: Socket) {
     // debug
-    if (this.gameRooms.length == 0) {
-      this.gameRooms.push(new GameRoom('a', this.server));
-      this.gameRooms.push(new GameRoom('b', this.server));
-      this.gameRooms.push(new GameRoom('c', this.server));
-    }
+    // if (this.gameRooms.length == 0) {
+    //   this.gameRooms.push(new GameRoom('a', this.server));
+    //   this.gameRooms.push(new GameRoom('b', this.server));
+    //   this.gameRooms.push(new GameRoom('c', this.server));
+    // }
 
+    const roomId = data['roomId']
+    const userId = data['userId']
     for (let i = 0; i < this.gameRooms.length; i++) {
-      if (data == this.gameRooms[i].id) {
-        const role: number = this.gameRooms[i].connect(client);
-        return { event: 'connectClient', data: role};
+      if (roomId == this.gameRooms[i].id) {
+        const role: number = this.gameRooms[i].connect(client, userId);
+        this.server.to(client.id).emit('connectClient', {role: role, gameObject: this.gameRooms[i].gameObject})
       }
     }
   }
@@ -130,15 +132,20 @@ export class GameGateway {
   @SubscribeMessage('registerMatch')
   async handleRegisterMatch(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
     const userId = data['userId'];
+    // this.logger.log(client.handshake.headers['cookie']);
+    // this.logger.log(client.handshake);
     const user = this.currentUser(userId);
     user.then((user) => {
-      const userId = user['userId'];
+      const userName = user['username']
       this.logger.log(userId);
+      this.logger.log(userName);
       this.disconnectMatchUserRemove();
-      const clientData: socketData = {client: client, role: -1, userId: userId}
+      const clientData: socketData = {client: client, role: -1, userId: userId, userName: userName}
       if (this.matchUsers.length >= 1) {
         const id = uuidv4();
-        this.gameRooms.push(new GameRoom(id, this.server));
+        this.matchUsers[0].role = 0
+        clientData.role = 1
+        this.gameRooms.push(new GameRoom(id, this.server, this.matchUsers[0], clientData));
         this.server.to(client.id).emit("goGameRoom", id);
         this.server.to(this.matchUsers[0].client.id).emit("goGameRoom", id);
         this.matchUsers.splice(0, 1);

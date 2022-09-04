@@ -29,7 +29,7 @@ export class GameRoom {
   logger: Logger;
 
 
-  gameObjectInit(point: number, speed: number) {
+  gameObjectInit(point: number, speed: number, player1Name: string, player2Name: string) {
     this.gameObject = {
       bar1: {
         top: (heightBaseSize - barBaseHeight) / 2,
@@ -43,24 +43,24 @@ export class GameRoom {
         top: (heightBaseSize - ballBaseSize) / 2,
         left: (widthBaseSize - ballBaseSize) / 2
       },
-      player1: {role: 0, point: 0},
-      player2: {role: 1, point: 0},
+      player1: {point: 0, name: player1Name},
+      player2: {point: 0, name: player2Name},
       gameStatus: 0,
       gameSetting: {point: point, speed: speed}
     };
   }
 
 
-  constructor(id: string, server: Server) {
+  constructor(id: string, server: Server, player1: socketData, player2: socketData) {
     this.id = id;
     this.server = server;
-    this.gameObjectInit(2, 1);
+    this.gameObjectInit(2, 1, player1.userName, player2.userName);
     this.ballDirection = {
       ballRadian: 0,
       moveX: 0,
       moveY: 0,
     }
-    this.socketDatas = [];
+    this.socketDatas = [player1, player2];
     this.logger = new Logger('GameRoom Log');
   }
 
@@ -180,18 +180,21 @@ export class GameRoom {
   }
 
 
-  connect(client: Socket) {
+  connect(client: Socket, userId: string) {
     client.join(this.id);
     // roleの判定は変更予定
     let role: number = 2;
-    if (this.socketDatas.length == 0) {
-      role = 0;
-      this.socketDatas.push({client: client, role: 0, userId: ''});
-    } else if (this.socketDatas.length == 1) {
-      role = 1;
-      this.socketDatas.push({client: client, role: 1, userId: ''});
-    } else {
-      this.socketDatas.push({client: client, role: 2, userId: ''});
+    let joinedFlag = false
+    for (let i = 0; i < this.socketDatas.length; i++) {
+      if (this.socketDatas[i].userId == userId) {
+        role = this.socketDatas[i].role
+        this.socketDatas[i].client = client
+        joinedFlag = true
+        break
+      }
+    }
+    if (!joinedFlag) {
+      this.socketDatas.push({client: client, role: 2, userId: userId, userName: ""});
     }
     this.logger.log(client.id);
     this.logger.log("client num:", this.socketDatas.length);
@@ -200,7 +203,7 @@ export class GameRoom {
 
 
   start(point: number, speed: number) {
-    this.gameObjectInit(point, speed);
+    this.gameObjectInit(point, speed, this.gameObject.player1.name, this.gameObject.player2.name);
     this.play();
   }
 

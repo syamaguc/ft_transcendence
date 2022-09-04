@@ -14,8 +14,8 @@ export interface Position {
 }
 
 export interface Player {
-  role: number;
-  point: number;
+  point: number
+  name: string
 }
 
 export interface GameSetting{
@@ -34,9 +34,10 @@ export interface GameObject {
 }
 
 export interface socketData {
-  role: number;
-  client: Socket;
-  userId: string;
+  role: number
+  client: Socket
+  userId: string
+  userName: string
 }
 
 export interface KeyStatus {

@@ -8,6 +8,8 @@ type Props = {
   roomId: string
   server
   gameSetting: GameSetting
+  player1Name: string
+  player2Name: string
   gameObject: GameObject
 }
 
@@ -17,6 +19,8 @@ const GameSettingForm = ({
   roomId,
   server,
   gameSetting,
+  player1Name,
+  player2Name,
   gameObject,
 }: Props) => {
   const didLogRef = useRef(false)
@@ -101,11 +105,7 @@ const GameSettingForm = ({
       id='startBox'
     >
       <div>
-        <p>
-          {playerRole == 0 ? <font size='+2'>player1</font> : 'player1'}
-          {' vs '}
-          {playerRole == 1 ? <font size='+2'>player2</font> : 'player2'}
-        </p>
+        {playerRole == 0 ? <p><font size='+2'>{player1Name}</font> vs {player2Name}</p>: playerRole == 1 ? <p>{player1Name} vs <font size='+2'>{player2Name}</font></p> : <p>{player1Name} vs {player2Name}</p>}
       </div>
       <div>
         <p>point</p>

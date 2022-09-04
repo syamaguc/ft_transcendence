@@ -4,8 +4,8 @@ export interface Position {
 }
 
 interface Player {
-  num: number
   point: number
+  name: string
 }
 
 export interface GameSetting {
