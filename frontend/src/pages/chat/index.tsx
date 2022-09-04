@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 
-const socket = io('http://localhost:3000')
+const socket = io('http://localhost:3000/chat')
 
 const Chat = () => {
   const [inputText, setInputText] = useState('')

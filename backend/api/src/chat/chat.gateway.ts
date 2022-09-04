@@ -11,7 +11,10 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
 import { ChatService } from './chat.service';
 import { Message } from './entities/message.entity';
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({
+	namespace: '/chat',
+	cors: { origin: '*' },
+})
 export class ChatGateway {
 	@WebSocketServer()
 	server: Server;
