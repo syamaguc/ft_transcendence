@@ -4,12 +4,13 @@ on:
   pull_request:
     types: [labeled, synchronize]
 
+permissions:
+  contents: write
+
 jobs:
   prettier:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    permissions:
-      contents: write
     if: github.event.action == 'synchronize'
 
     steps:
