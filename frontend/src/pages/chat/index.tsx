@@ -9,6 +9,7 @@ import TopBar from '@components/chat/topbar'
 import MiddleBar from '@components/chat/middlebar'
 import BottomBar from '@components/chat/bottombar'
 import { FetchError } from 'src/lib/fetch-json'
+import SimpleSidebar from '@components/chat/simple-sidebar'
 
 const socket = io('http://localhost:3000')
 
@@ -78,24 +79,19 @@ const Chat = () => {
   return (
     <Layout>
       <Box>
-        <HStack>
-          <ChatSideBar
-            socket={socket}
-            currentRoom={currentRoom}
-            setCurrentRoom={setCurrentRoom}
-            setChatLog={setChatLog}
-            setInputMessage={setInputText}
-          />
-          <Stack>
+        <Flex>
+          <Flex bg="green.100" w="300px" h="100vh" borderEnd="1px solid" borderColor="gray">
+            {/* <SimpleSidebar/> */}
+            <ChatSideBar
+              socket={socket}
+              currentRoom={currentRoom}
+              setCurrentRoom={setCurrentRoom}
+              setChatLog={setChatLog}
+              setInputMessage={setInputText}
+            />
+          </Flex>
+          <Box h='100vh' p={2}>
             <Box>Current Channel:{currentRoom.name}</Box>
-            {/* <Spacer />
-            {chatLog.length
-              ? chatLog.map((message: MessageObject) => (
-                  <p key={message.id}>{message.message}</p>
-                ))
-              : null} */}
-
-
             <Flex direction="column" mx={5} overflowX="scroll">
               {chatLog.length
                   ? chatLog.map((message: MessageObject) => (
@@ -122,8 +118,8 @@ const Chat = () => {
             <Button onClick={onClickSubmit} type='submit'>
               Send Message
             </Button>
-          </Stack>
-        </HStack>
+          </Box>
+        </Flex>
       </Box>
     </Layout>
   )
