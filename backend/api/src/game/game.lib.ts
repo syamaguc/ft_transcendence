@@ -159,6 +159,24 @@ export class GameRoom {
       this.play();
     }
     else {
+      let player1;
+      let player2;
+      for (let i = 0; i < this.socketDatas.length; i++) {
+        if (this.socketDatas[i].role == 0) {
+          player1 = this.socketDatas[i]
+        } else if (this.socketDatas[i].role == 1) {
+          player2 = this.socketDatas[i]
+        }
+        if (player1 && player2) {
+          break
+        }
+      }
+      // ここでdbに結果を保存
+      // player1.userId
+      // player2.userId
+      // this.gameObject.player1.point
+      // this.gameObject.player2.point
+      // this.id (gameの部屋のid (uuid))
       this.gameObject.gameStatus = 2;
       this.server.to(this.id).emit('updateGameObject', this.gameObject);
     }
