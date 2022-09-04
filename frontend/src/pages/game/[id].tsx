@@ -83,6 +83,7 @@ export default function Game() {
       const playerStatus = data['role']
       setGameObject(data['gameObject'])
       setPlayerRole(playerStatus)
+      setGameStatus(data['gameObject'].gameStatus)
 
       server.on('clientMove', (data: GameObject) => {
         setGameObject(data)
