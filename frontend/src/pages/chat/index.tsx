@@ -80,7 +80,7 @@ const Chat = () => {
     <Layout>
       <Box>
         <Flex>
-          <Flex bg="green.100" w="300px" h="100vh" borderEnd="1px solid" borderColor="gray">
+          <Flex w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
             {/* <SimpleSidebar/> */}
             <ChatSideBar
               socket={socket}
@@ -90,9 +90,9 @@ const Chat = () => {
               setInputMessage={setInputText}
             />
           </Flex>
-          <Box h='100vh' p={2}>
-            <Box>Current Channel:{currentRoom.name}</Box>
-            <Flex direction="column" mx={5} overflowX="scroll">
+          <Flex h='90vh' w='100%' direction="column">
+            <Box borderBottom="1px solid" borderColor="gray.100" p={4}>Current Channel : {currentRoom.name}</Box>
+            <Flex direction="column" pt={4} mx={5} flex={1}  overflowX="scroll" sx={{scrollbarWidth: "none"}}>
               {chatLog.length
                   ? chatLog.map((message: MessageObject) => (
                     <Flex>
@@ -107,18 +107,19 @@ const Chat = () => {
                   ))
                 : null}
             </Flex>
-
-            <Input
-              type='text'
-              value={inputText}
-              onChange={(event) => {
-                setInputText(event.target.value)
-              }}
-            />
-            <Button onClick={onClickSubmit} type='submit'>
-              Send Message
-            </Button>
-          </Box>
+            <Flex p={4}>
+              <Input
+                type='text'
+                value={inputText}
+                onChange={(event) => {
+                  setInputText(event.target.value)
+                }}
+              />
+              <Button ml={3} onClick={onClickSubmit} type='submit'>
+                Send Message
+              </Button>
+            </Flex>
+          </Flex>
         </Flex>
       </Box>
     </Layout>
