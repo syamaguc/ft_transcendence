@@ -1,36 +1,36 @@
-import { Socket } from 'socket.io';
+import { Socket } from 'socket.io'
 
 export interface Position {
-  top: number;
-  left: number;
+	top: number
+	left: number
 }
 
 export interface Player {
-  role: number;
-  point: number;
+	role: number
+	point: number
 }
 
-export interface GameSetting{
-  point: number;
-  speed: number;
+export interface GameSetting {
+	point: number
+	speed: number
 }
 
 export interface GameObject {
-  bar1: Position;
-  bar2: Position;
-  ball: Position;
-  player1: Player;
-  player2: Player;
-  gameStatus: number;
-  gameSetting: GameSetting;
+	bar1: Position
+	bar2: Position
+	ball: Position
+	player1: Player
+	player2: Player
+	gameStatus: number
+	gameSetting: GameSetting
 }
 
 export interface socketData {
-  role: number;
-  client: Socket;
+	role: number
+	client: Socket
 }
 
 export interface KeyStatus {
-  upPressed: boolean;
-  downPressed: boolean;
+	upPressed: boolean
+	downPressed: boolean
 }

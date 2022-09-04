@@ -1,6 +1,6 @@
-import { DataSource } from 'typeorm';
-import { User } from '../user/entities/user.entity';
-import { GameHistory } from '../game/entities/gameHistory.entity';
+import { DataSource } from 'typeorm'
+import { User } from '../user/entities/user.entity'
+import { GameHistory } from '../game/entities/gameHistory.entity'
 
 export const AppDataSource = new DataSource({
 	type: 'postgres',
@@ -14,4 +14,4 @@ export const AppDataSource = new DataSource({
 	entities: [User, GameHistory],
 	subscribers: [],
 	migrations: [],
-});
+})
