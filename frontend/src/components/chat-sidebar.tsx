@@ -11,6 +11,7 @@ import {
 } from '@chakra-ui/react'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { useUser } from 'src/lib/use-user'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 import ChatCreationForm from './chat-creation-form'
 
@@ -32,11 +33,12 @@ const SideBar = ({
   const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
   const [room, setRoom] = useState<ChannelObject>()
   const didLogRef = useRef(false)
+  const user = useUser()
 
   const onClickChannel = (chatRoom: ChannelObject) => {
     if (currentRoom != chatRoom) {
       setCurrentRoom(chatRoom)
-      socket.emit('watchRoom', chatRoom.id)
+      socket.emit('watchRoom', { roomId: chatRoom.id, userId: user.userId })
       socket.emit('getMessageLog', chatRoom.id)
       setInputMessage('')
     }
