@@ -1,9 +1,16 @@
 import Layout from '@components/layout'
-import { Box, Button, HStack, Input, Spacer, Stack } from '@chakra-ui/react'
+// import { Flex } from "@chakra-ui/layout"
+import { Box, Button, HStack, Input, Spacer, Stack, Flex, Text } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
+<<<<<<< Updated upstream
 import { ChannelObject, MessageObject } from 'src/types/chat'
+=======
+import TopBar from '@components/chat/topbar'
+import MiddleBar from '@components/chat/middlebar'
+import BottomBar from '@components/chat/bottombar'
+>>>>>>> Stashed changes
 
 const socket = io('http://localhost:3000')
 
@@ -74,6 +81,14 @@ const Chat = () => {
                   <p key={message.id}>{message.message}</p>
                 ))
               : null}
+
+
+            {/* <Flex direction="column">
+              {chatLog.map((message) => (
+                <Text bg="blue.100">{message}</Text>
+              ))}
+            </Flex> */}
+
             <Input
               type='text'
               value={inputText}
