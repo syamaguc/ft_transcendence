@@ -109,6 +109,8 @@ export class GameGateway {
     for (let i = 0; i < this.gameRooms.length; i++) {
       if (roomId == this.gameRooms[i].id) {
         this.gameRooms[i].quit();
+        this.gameRooms.splice(i, 1);
+        break
       }
     }
   }
