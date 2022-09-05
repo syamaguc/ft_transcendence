@@ -65,9 +65,8 @@ const Chat = () => {
 
   return (
     <Layout>
-      <Box>
         <Flex>
-          <Flex w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
+          <Box w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
             <ChatSideBar
               socket={socket}
               currentRoom={currentRoom}
@@ -75,7 +74,7 @@ const Chat = () => {
               setChatLog={setChatLog}
               setInputMessage={setInputText}
             />
-          </Flex>
+          </Box>
           <Flex h='90vh' w='100%' direction="column">
             <TopBar currentRoom={currentRoom}/>
             <MiddleBar chatLog={chatLog}/>
@@ -94,7 +93,6 @@ const Chat = () => {
             </Flex>
           </Flex>
         </Flex>
-      </Box>
     </Layout>
   )
 }

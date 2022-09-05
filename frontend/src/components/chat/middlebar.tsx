@@ -1,5 +1,9 @@
-import { Text, Flex } from "@chakra-ui/layout"
+import { Text, Box, Flex} from "@chakra-ui/layout"
+import { Avatar } from "@chakra-ui/avatar"
 import { MessageObject } from "src/types/chat";
+import { useUser } from "src/lib/use-user";
+
+const API_URL = 'http://localhost:3000'
 
 const timestampToTime = (timestamp) => {
     const date = new Date(timestamp);
@@ -17,19 +21,18 @@ const timestampToTime = (timestamp) => {
 }
 
 const MiddleBar = ({chatLog}) => {
+	const user = useUser()
 	return (
 		<Flex direction="column" pt={4} mx={5} flex={1}  overflowX="scroll" sx={{scrollbarWidth: "none"}}>
 		{chatLog.length
 			? chatLog.map((message: MessageObject) => (
-			  <Flex>
-				<Flex bg="blue.100" w="fit-content" minWidth="100px" borderRadius="10px" p={3} m={1}>
+			  <Flex align="center">
+				<Avatar size='sm' src={`${API_URL}/api/user/avatar/${user.profile_picture}`} marginEnd={3}/>
+				<Box bg="blue.100" w="fit-content" minWidth="100px" borderRadius="10px" p={3} m={1}>
 				  <Text>{message.message}</Text>
-				</Flex>
-				<Flex>
-				  <Text>{timestampToTime(message.timestamp)}</Text>
-				</Flex>
+				</Box>
+				<Text>{timestampToTime(message.timestamp)}</Text>
 			  </Flex>
-
 			))
 		  : null}
 	  </Flex>
