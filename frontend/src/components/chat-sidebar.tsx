@@ -83,10 +83,7 @@ const SideBar = ({
         {chatRooms.map((chatRoom: ChannelObject) => (
           <Flex
             as='button'
-            // borderRadius='4px'
             p={4}
-            // shadow='sm'
-            // borderWidth='1px'
             _hover={{ bgColor: '#00BABC' }}
             onClick={() => {
               onClickChannel(chatRoom)
