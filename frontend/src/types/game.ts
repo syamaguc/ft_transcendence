@@ -22,3 +22,14 @@ export interface GameObject {
   gameStatus: number
   gameSetting: GameSetting
 }
+
+export interface GamePlayer {
+  id: string
+  name: string
+}
+
+export interface GameRoom {
+  id: string
+  player1: GamePlayer
+  player2: GamePlayer
+}

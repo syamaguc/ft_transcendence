@@ -2,7 +2,9 @@ import React, { useCallback, useState, useRef, useEffect } from 'react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
 import Layout from '@components/layout'
+import GameMatchList from '@components/game-matchlist'
 import { useUser } from '../../lib/use-user'
+import { GameRoom, GamePlayer } from '../../types/game'
 
 const API_URL = 'http://localhost:3000'
 
@@ -14,6 +16,11 @@ export default function GameMatching() {
   const router = useRouter()
   const [userId, setUserId] = useState()
   const user = useUser()
+  // debug
+  const gameRooms: GameRoom[] = [
+    {id: '1', player1: {id: 'a', name: 'user1'}, player2: {id: 'b', name: 'user2'}},
+    {id: '2', player1: {id: 'c', name: 'user3'}, player2: {id: 'd', name: 'user4'}},
+  ]
 
   useEffect(() => {
     if (user) setUserId(user['userId'])
@@ -97,6 +104,9 @@ export default function GameMatching() {
           Cancel
         </button>
       </div>
+      <GameMatchList
+        gameRooms={gameRooms}
+      />
     </Layout>
   )
 }
