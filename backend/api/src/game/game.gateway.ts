@@ -60,8 +60,10 @@ export class GameGateway {
       if (roomId == this.gameRooms[i].id) {
         const role: number = this.gameRooms[i].connect(client, userId);
         this.server.to(client.id).emit('connectClient', {role: role, gameObject: this.gameRooms[i].gameObject})
+        return
       }
     }
+    this.server.to(client.id).emit('noRoom')
   }
 
 

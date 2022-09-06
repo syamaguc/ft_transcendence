@@ -23,14 +23,14 @@ export default function Game() {
     ball: { top: 0, left: 0 },
     player1: { point: 0, name: '' },
     player2: { point: 0, name: '' },
-    gameStatus: 0,
+    gameStatus: -1,
     gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
   const keyStatus = useRef({ upPressed: false, downPressed: false })
   const router = useRouter()
-  const [gameStatus, setGameStatus] = useState<number>(0)
+  const [gameStatus, setGameStatus] = useState<number>(-1)
   const [server, setServer] = useState()
   const [playerRole, setPlayerRole] = useState(-1)
   const [userId, setUserId] = useState()
@@ -79,6 +79,11 @@ export default function Game() {
     if (!server || !router.isReady || !userId) return
     const roomId = router.query.id
     server.emit('connectServer', { roomId: roomId, userId: userId })
+
+    server.on('noRoom', () => {
+      router.push('/404')
+    })
+
     server.on('connectClient', (data) => {
       const playerStatus = data['role']
       setGameObject(data['gameObject'])
