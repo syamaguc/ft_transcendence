@@ -7,6 +7,12 @@ export interface ChatRoomI {
 	owner: string;
 	admins: string[];
 	is_private: boolean;
-	channel_type: string;
+	logs: MessageI[];
+	password: string;//cryto
+}
+
+export interface DMRoomI {
+	id: string;
+	members: string[];
 	logs: MessageI[];
 }

@@ -1,55 +1,62 @@
-import { Box, Stack, Button, Input } from '@chakra-ui/react'
-import { useState, useCallback, useEffect } from 'react'
+import {
+  Box,
+  Stack,
+  Button,
+  Input,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormLabel,
+  FormHelperText,
+} from '@chakra-ui/react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { ChannelObject, MessageObject } from 'src/types/chat'
+import ChatCreationForm from './chat-creation-form'
 
 type Props = {
   socket: Socket
-  setCurrentRoom: (room: string) => void
-  setChatLog: (chatLog: string[]) => void
+  currentRoom: ChannelObject
+  setCurrentRoom: (room: ChannelObject) => void
+  setChatLog: (chatLog: MessageObject[]) => void
   setInputMessage: (input: string) => void
-}
-
-type ChatRoom = {
-  id: string
-  name: string
 }
 
 const SideBar = ({
   socket,
+  currentRoom,
   setCurrentRoom,
   setChatLog,
   setInputMessage,
 }: Props) => {
-  const [inputText, setInputText] = useState('')
-  const [chatRooms, setChatRooms] = useState<ChatRoom[]>([])
-  const [room, setRoom] = useState<ChatRoom>({ id: '1', name: 'random' })
+  const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
+  const [room, setRoom] = useState<ChannelObject>()
+  const didLogRef = useRef(false)
 
-  const onClickCreate = useCallback(() => {
-    console.log('onClickCreate called')
-    socket.emit('createRoom', inputText)
-    setInputText('')
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inputText])
-
-  const onClickChannel = (chatRoom: ChatRoom) => {
-    setCurrentRoom(chatRoom.name)
-    socket.emit('watchRoom', chatRoom.id)
-    socket.emit('getMessageLog', chatRoom.id)
-    setInputMessage('')
+  const onClickChannel = (chatRoom: ChannelObject) => {
+    if (currentRoom != chatRoom) {
+      setCurrentRoom(chatRoom)
+      socket.emit('watchRoom', chatRoom.id)
+      socket.emit('getMessageLog', chatRoom.id)
+      setInputMessage('')
+    }
   }
 
   useEffect(() => {
-    socket.on('updateNewRoom', ({ id, name }) => {
-      console.log('created : ', id)
-      setRoom({ id: id, name: name })
-    })
-    socket.on('getMessageLog', (messageLog: string[]) => {
-      console.log('messageLog loaded', messageLog)
-      setChatLog(messageLog)
-    })
-    socket.on('getRooms', (rooms: ChatRoom[]) => {
-      setChatRooms(rooms)
-    })
+    if (didLogRef.current === false) {
+      didLogRef.current = true
+      socket.on('updateNewRoom', (newChatRoom: ChannelObject) => {
+        console.log('created : ', newChatRoom)
+        setRoom(newChatRoom)
+      })
+      socket.on('getMessageLog', (messageLog: MessageObject[]) => {
+        console.log('messageLog loaded', messageLog)
+        setChatLog(messageLog)
+      })
+      socket.on('getRooms', (rooms: ChannelObject[]) => {
+        setChatRooms(rooms)
+      })
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -59,26 +66,22 @@ const SideBar = ({
   }, [])
 
   useEffect(() => {
-    setChatRooms([...chatRooms, room])
+    if (room) {
+      setChatRooms([...chatRooms, room])
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room])
 
   return (
     <Box>
       <Box>
-        <Input
-          type='text'
-          value={inputText}
-          onChange={(event) => {
-            setInputText(event.target.value)
-          }}
-        />
-        <Button onClick={onClickCreate} type='submit'>
-          Create New Channel
-        </Button>
+        <Stack spacing='12px'>
+          <ChatCreationForm socket={socket} />
+        </Stack>
       </Box>
+
       <Stack width='sm'>
-        {chatRooms.map((chatRoom) => (
+        {chatRooms.map((chatRoom: ChannelObject) => (
           <Box
             as='button'
             borderRadius='4px'
