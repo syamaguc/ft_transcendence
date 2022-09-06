@@ -10,10 +10,13 @@ import MiddleBar from '@components/chat/middlebar'
 import BottomBar from '@components/chat/bottombar'
 import { FetchError } from 'src/lib/fetch-json'
 import SimpleSidebar from '@components/chat/simple-sidebar'
+import { useUser } from 'src/lib/use-user'
 
 const socket = io('http://localhost:3000')
+const API_URL = 'http://localhost:3000'
 
 const Chat = () => {
+  const user = useUser()
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
@@ -43,9 +46,9 @@ const Chat = () => {
     }
   }, [])
 
-  const onClickSubmit = useCallback(() => {
+  const onClickSubmit = useCallback( () => {
     const message = {
-      user: 'tmp_user',
+      user: user.username,
       message: inputText,
       timestamp: new Date(),
     }
@@ -66,7 +69,7 @@ const Chat = () => {
   return (
     <Layout>
         <Flex>
-          <Box w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
+          <Flex w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
             <ChatSideBar
               socket={socket}
               currentRoom={currentRoom}
@@ -74,7 +77,7 @@ const Chat = () => {
               setChatLog={setChatLog}
               setInputMessage={setInputText}
             />
-          </Box>
+          </Flex>
           <Flex h='90vh' w='100%' direction="column">
             <TopBar currentRoom={currentRoom}/>
             <MiddleBar chatLog={chatLog}/>
