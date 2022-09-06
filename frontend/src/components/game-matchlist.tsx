@@ -5,9 +5,7 @@ type Props = {
   gameRooms: GameRoom[]
 }
 
-const GameMatchList = ({
-  gameRooms,
-}: Props) => {
+const GameMatchList = ({ gameRooms }: Props) => {
   return (
     <div>
       <ul>

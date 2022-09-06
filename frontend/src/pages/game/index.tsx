@@ -18,8 +18,16 @@ export default function GameMatching() {
   const user = useUser()
   // debug
   const gameRooms: GameRoom[] = [
-    {id: '1', player1: {id: 'a', name: 'user1'}, player2: {id: 'b', name: 'user2'}},
-    {id: '2', player1: {id: 'c', name: 'user3'}, player2: {id: 'd', name: 'user4'}},
+    {
+      id: '1',
+      player1: { id: 'a', name: 'user1' },
+      player2: { id: 'b', name: 'user2' },
+    },
+    {
+      id: '2',
+      player1: { id: 'c', name: 'user3' },
+      player2: { id: 'd', name: 'user4' },
+    },
   ]
 
   useEffect(() => {
@@ -104,9 +112,7 @@ export default function GameMatching() {
           Cancel
         </button>
       </div>
-      <GameMatchList
-        gameRooms={gameRooms}
-      />
+      <GameMatchList gameRooms={gameRooms} />
     </Layout>
   )
 }
