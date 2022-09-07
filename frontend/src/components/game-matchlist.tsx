@@ -8,14 +8,6 @@ type Props = {
 }
 
 const GameMatchList = ({ gameRooms }: Props) => {
-  // const [gameRooms, setGameRooms] = useState<GameRoom[]>([])
-  // const gameRooms: GameRoom[] = gameRoomsRef.current
-
-  // useEffect(() => {
-  //   setGameRooms(gameRoomsRef.current)
-  //   console.log('update')
-  // }, [gameRoomsRef.current])
-
   return (
     <div>
       <ul>
