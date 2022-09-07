@@ -1,6 +1,4 @@
-import {
-  Box,
-} from '@chakra-ui/react'
+import { Box } from '@chakra-ui/react'
 import React, { useState, useEffect } from 'react'
 import NextLink from 'next/link'
 import { GameRoom, GamePlayer } from '../types/game'
@@ -24,13 +22,12 @@ const GameMatchList = ({ gameRooms }: Props) => {
         {gameRooms.map((value, index) => (
           <li key={index}>
             <NextLink href={'/game/' + value.id}>
-              <Box
-                as='button'>
+              <Box as='button'>
                 {value.player1.name}
                 {' vs '}
                 {value.player2.name}
               </Box>
-          </NextLink>
+            </NextLink>
           </li>
         ))}
       </ul>
