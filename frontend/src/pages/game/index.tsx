@@ -16,19 +16,9 @@ export default function GameMatching() {
   const router = useRouter()
   const [userId, setUserId] = useState()
   const user = useUser()
-  // debug
-  const gameRooms: GameRoom[] = [
-    {
-      id: '1',
-      player1: { id: 'a', name: 'user1' },
-      player2: { id: 'b', name: 'user2' },
-    },
-    {
-      id: '2',
-      player1: { id: 'c', name: 'user3' },
-      player2: { id: 'd', name: 'user4' },
-    },
-  ]
+  const gameRoomsRef = useRef<GameRoom[]>([])
+  const [gameRooms, setGameRooms] = useState<GameRoom[]>([])
+  const [gameRoomsLog, setGameRoomsLog] = useState(false)
 
   useEffect(() => {
     if (user) setUserId(user['userId'])
@@ -96,11 +86,54 @@ export default function GameMatching() {
   }, [])
 
   useEffect(() => {
-    if (!server || !router.isReady) return
+    if (!server || !router.isReady || gameRoomsLog) return
     server.on('goGameRoom', (data: string) => {
       router.push('/game/' + data)
     })
-  }, [server, router])
+
+    server.on('setFirstGameRooms', (data) => {
+      for (let gameRoom of data['gameRooms']) {
+        gameRoomsRef.current.push(gameRoom)
+      }
+      setGameRooms(gameRoomsRef.current)
+      setGameRoomsLog(true)
+    })
+
+    server.emit('readyGameIndex')
+  }, [gameRoomsLog, server, router])
+
+  useEffect(() => {
+    if (!gameRoomsLog) return
+
+    server.on('addGameRoom', (data) => {
+      let addFlag = true
+      const addRoom: GameRoom = data['gameRoom']
+      for (let gameRoom of gameRoomsRef.current) {
+        if (addRoom.id == gameRoom.id) {
+          addFlag = false
+          break
+        }
+      }
+      if (addFlag) {
+        gameRoomsRef.current.push(addRoom)
+        const newGameRooms = gameRoomsRef.current.slice(0)
+        setGameRooms(newGameRooms)
+      }
+    })
+
+    server.on('deleteGameRoom', (data) => {
+      console.log('delete')
+      const deleteRoomId: string = data['gameRoomId']
+      for (let i = 0; i < gameRoomsRef.current.length; i++) {
+        if (deleteRoomId == gameRoomsRef.current[i].id) {
+          gameRoomsRef.current.splice(i, 1)
+          const newGameRooms = gameRoomsRef.current.slice(0)
+          setGameRooms(newGameRooms)
+          break
+        }
+      }
+    })
+  }, [gameRoomsLog, server, router])
 
   return (
     <Layout>

@@ -45,3 +45,14 @@ export interface KeyStatus {
 	upPressed: boolean
 	downPressed: boolean
 }
+
+export interface GamePlayer {
+	id: string
+	name: string
+}
+
+export interface GameRoomInfo {
+	id: string
+	player1: GamePlayer
+	player2: GamePlayer
+}
