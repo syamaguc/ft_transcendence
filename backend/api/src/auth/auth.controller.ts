@@ -6,15 +6,15 @@ import {
 	Res,
 	UseGuards,
 	Req,
-} from '@nestjs/common';
-import { Response, Request } from 'express';
-import { IntraAuthGuard } from './guards/auth.guard';
-import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { HttpService } from '@nestjs/axios';
-import { JwtPayload } from '../user/interfaces/jwt-payload.interface';
-import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
-import { User } from 'src/user/entities/user.entity';
+} from '@nestjs/common'
+import { Response, Request } from 'express'
+import { IntraAuthGuard } from './guards/auth.guard'
+import { ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger'
+import { HttpService } from '@nestjs/axios'
+import { JwtPayload } from '../user/interfaces/jwt-payload.interface'
+import { JwtService } from '@nestjs/jwt'
+import { AuthGuard } from '@nestjs/passport'
+import { User } from 'src/user/entities/user.entity'
 
 @ApiTags('42 authentication')
 @Controller('api/auth/')
@@ -28,7 +28,7 @@ export class AuthController {
 	@Get('42/login')
 	@UseGuards(IntraAuthGuard)
 	login() {
-		return 'login';
+		return 'login'
 	}
 
 	@ApiOperation({
@@ -40,12 +40,12 @@ export class AuthController {
 		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
 	) {
-		const username = req.user['username'];
-		const auth = false;
-		const payload: JwtPayload = { username, auth };
-		const accessToken: string = await this.jwtService.sign(payload);
-		res.cookie('jwt', accessToken, { httpOnly: true });
-		res.redirect(process.env.IP_FRONTEND);
+		const username = req.user['username']
+		const auth = false
+		const payload: JwtPayload = { username, auth }
+		const accessToken: string = await this.jwtService.sign(payload)
+		res.cookie('jwt', accessToken, { httpOnly: true })
+		res.redirect(process.env.IP_FRONTEND)
 	}
 
 	// two factor authentication
@@ -53,13 +53,13 @@ export class AuthController {
 	@UseGuards(AuthGuard('jwt'))
 	@Get('2fa')
 	async getQrcode(@Req() req) {
-		const user: User = req.user;
+		const user: User = req.user
 		const resp = await this.httpService
 			.get(
 				`https://www.authenticatorApi.com/pair.aspx?AppName=${process.env.TWO_FACTOR_AUTH_APP_NAME}&AppInfo=${user.username}&SecretCode=${user.userId}`,
 			)
-			.toPromise();
-		return resp.data;
+			.toPromise()
+		return resp.data
 	}
 
 	@ApiOperation({ summary: 'Code authentication - Secret' })
@@ -75,19 +75,19 @@ export class AuthController {
 		@Req() req,
 		@Res({ passthrough: true }) res: Response,
 	) {
-		const user: User = req.user;
+		const user: User = req.user
 		const resp = await this.httpService
 			.get(
 				`https://www.authenticatorApi.com/Validate.aspx?Pin=${secret}&SecretCode=${user.userId}`,
 			)
-			.toPromise();
+			.toPromise()
 		if (resp.data === 'True') {
-			const username = user.username;
-			const auth = true;
-			const payload: JwtPayload = { username, auth };
-			const accessToken: string = await this.jwtService.sign(payload);
-			res.cookie('jwt', accessToken, { httpOnly: true });
+			const username = user.username
+			const auth = true
+			const payload: JwtPayload = { username, auth }
+			const accessToken: string = await this.jwtService.sign(payload)
+			res.cookie('jwt', accessToken, { httpOnly: true })
 		}
-		return resp.data;
+		return resp.data
 	}
 }

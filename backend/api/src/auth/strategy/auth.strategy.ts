@@ -1,8 +1,8 @@
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
-import { Strategy, Profile } from 'passport-42';
-import { AuthService } from '../auth.service';
-import { User } from '../../user/entities/user.entity';
+import { PassportStrategy } from '@nestjs/passport'
+import { Injectable } from '@nestjs/common'
+import { Strategy, Profile } from 'passport-42'
+import { AuthService } from '../auth.service'
+import { User } from '../../user/entities/user.entity'
 
 @Injectable()
 export class IntraStrategy extends PassportStrategy(Strategy, '42') {
@@ -12,7 +12,7 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
 			clientSecret: process.env.SECRET,
 			callbackURL: process.env.IP_REDIRECT,
 			scope: ['public'],
-		});
+		})
 	}
 
 	async validate(
@@ -20,13 +20,13 @@ export class IntraStrategy extends PassportStrategy(Strategy, '42') {
 		refreshToken: string,
 		profile: Profile,
 	): Promise<User> {
-		const { username } = profile;
+		const { username } = profile
 		const user = {
 			username: username,
 			email: profile['emails'][0]['value'],
 			password: username,
 			login42: username,
-		};
-		return this.authService.validateUser(user);
+		}
+		return this.authService.validateUser(user)
 	}
 }

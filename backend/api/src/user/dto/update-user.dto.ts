@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger'
 import {
 	IsAlphanumeric,
 	IsEmail,
@@ -6,7 +6,7 @@ import {
 	Matches,
 	MaxLength,
 	MinLength,
-} from 'class-validator';
+} from 'class-validator'
 
 export class UpdateUserDto {
 	@IsOptional()
@@ -14,12 +14,12 @@ export class UpdateUserDto {
 	@MaxLength(15)
 	@ApiProperty()
 	@IsAlphanumeric()
-	username: string;
+	username: string
 
 	@IsOptional()
 	@IsEmail()
 	@ApiProperty()
-	email: string;
+	email: string
 
 	@IsOptional()
 	@MinLength(8)
@@ -29,5 +29,5 @@ export class UpdateUserDto {
 			'password is too weak, uppercase, lowercase, number and special character',
 	})
 	@ApiProperty()
-	password: string;
+	password: string
 }
