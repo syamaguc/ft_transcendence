@@ -16,8 +16,8 @@ async function fetchUser(url: string): Promise<{ user: User | null }> {
   if (res.ok) {
     return { user: data }
   } else {
-    // Authorization error
-    console.log('fetchUser error:', res.status, res.statusText)
+    // This is just authorization error
+    // console.log('fetchUser error:', res.status, res.statusText)
     return { user: null }
   }
 }
