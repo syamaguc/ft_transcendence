@@ -63,12 +63,10 @@ export class GameGateway {
 		for (let i = 0; i < this.gameRooms.length; i++) {
 			if (roomId == this.gameRooms[i].id) {
 				const role: number = this.gameRooms[i].connect(client, userId)
-				this.server
-					.to(client.id)
-					.emit('connectClient', {
-						role: role,
-						gameObject: this.gameRooms[i].gameObject,
-					})
+				this.server.to(client.id).emit('connectClient', {
+					role: role,
+					gameObject: this.gameRooms[i].gameObject,
+				})
 				return
 			}
 		}
