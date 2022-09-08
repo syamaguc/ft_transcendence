@@ -176,7 +176,7 @@ export class GameGateway {
 	}
 
 	disconnectMatchUserRemove() {
-		let removeArray = []
+		const removeArray = []
 		for (let i = 0; i < this.matchUsers.length; i++) {
 			if (!this.matchUsers[i].client.connected) {
 				removeArray.push(i)
