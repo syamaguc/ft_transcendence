@@ -5,7 +5,11 @@ import Chakra from '../chakra'
 import { SWRConfig } from 'swr'
 import fetchJson from 'src/lib/fetch-json'
 
-function MyApp({ Component, pageProps }: AppProps) {
+import { Box, Spinner } from '@chakra-ui/react'
+
+import { useUser } from 'src/lib/use-user'
+
+function MyApp({ Component, pageProps }) {
   return (
     <>
       <Head>
@@ -18,19 +22,50 @@ function MyApp({ Component, pageProps }: AppProps) {
           value={{
             fetcher: fetchJson,
             onError: (err) => {
-              if (err.response?.status === 401) {
-                return
-              }
-
+              console.log('Error caught on global swr fetcher')
               console.error(err)
             },
           }}
         >
-          <Component {...pageProps} />
+          {Component.displayName === 'Login' ? (
+            <Component {...pageProps} />
+          ) : (
+            <Auth>
+              <Component {...pageProps} />
+            </Auth>
+          )}
         </SWRConfig>
       </Chakra>
     </>
   )
+}
+
+function Auth({ children }) {
+  const { status } = useUser({ redirectTo: '/login' })
+
+  if (status === 'loading') {
+    console.log('loading in Auth')
+    return (
+      <Box w='100%' h='100vh'>
+        <Box
+          w='full'
+          h='full'
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <Spinner />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    console.log('unauthenticated in Auth')
+    return <div>Unauthenticated</div>
+  }
+
+  return children
 }
 
 export default MyApp

@@ -60,9 +60,9 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
     user: error ? null : user,
     mutateUser: mutate,
     isLoading: !error && !data,
-    isError: error,
-    isAuthenticated: true,
-    isUnauthenticated: false,
+    // isError: error,
+    // isAuthenticated: true,
+    // isUnauthenticated: false,
     status:
       !error && !data ? 'loading' : user ? 'authenticated' : 'unauthenticated',
   }
