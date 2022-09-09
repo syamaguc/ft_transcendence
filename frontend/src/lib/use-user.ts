@@ -1,35 +1,46 @@
 import { useEffect } from 'react'
 import Router from 'next/router'
-import useSWR from 'swr'
+import useSWR, { KeyedMutator } from 'swr'
 
 import { User } from 'src/types/user'
 
-const API_URL = 'http://localhost:3000'
-
-async function fetchUser(url: string): Promise<{ user: User | null }> {
+async function fetchUser(url: string): Promise<{ user: User }> {
   const res = await fetch(url, { credentials: 'include' })
-
   const data = await res.json()
 
-  // console.log('fetchUser data:', data)
+  console.log('fetchUser data:', data)
 
   if (res.ok) {
-    return { user: data }
-  } else {
-    // This is just authorization error
-    // console.log('fetchUser error:', res.status, res.statusText)
-    return { user: null }
+    return { user: data?.user || null }
   }
+
+  // TODO: throw
+  return { user: null }
 }
 
 export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
-  const { data, error } = useSWR(`${API_URL}/api/user/currentUser`, fetchUser)
+  const { data, mutate, error } = useSWR('/api/users/current', fetchUser)
   const user = data?.user
+
+  const isLoading = !error && !data
   const finished = Boolean(data)
   const hasUser = Boolean(user)
 
+  console.log('useUser data: ', data)
+  console.log('useUser user: ', user)
+
+  if (isLoading) {
+    console.log('useUser isLoading...')
+  } else {
+    console.log('useUser !isLoading...')
+  }
+
   useEffect(() => {
-    console.log('useEffect')
+    if (!finished) {
+      console.log('useUser useEffect !finished...')
+    } else {
+      console.log('useUser useEffect finished...')
+    }
     // if no redirect needed, just return (example: already on /dashboard)
     // if user data not yet there (fetch in progress, logged in or not) then don't do anything yet
     if (!redirectTo || !finished) return
@@ -45,5 +56,14 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
     }
   }, [redirectTo, redirectIfFound, finished, hasUser])
 
-  return error ? null : user
+  return {
+    user: error ? null : user,
+    mutateUser: mutate,
+    isLoading: !error && !data,
+    isError: error,
+    isAuthenticated: true,
+    isUnauthenticated: false,
+    status:
+      !error && !data ? 'loading' : user ? 'authenticated' : 'unauthenticated',
+  }
 }
