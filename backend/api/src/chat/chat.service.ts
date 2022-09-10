@@ -10,8 +10,6 @@ import { JwtService } from '@nestjs/jwt'
 import { Socket } from 'socket.io'
 import { JwtPayload } from 'src/user/interfaces/jwt-payload.interface'
 import { parse } from 'cookie'
-import { UserService } from 'src/user/user.service'
-import { User } from 'src/user/entities/user.entity'
 
 @Injectable()
 export class ChatService {
@@ -21,10 +19,9 @@ export class ChatService {
 		@InjectRepository(Message)
 		private readonly messageRepository: Repository<Message>,
 		private jwtService: JwtService,
-		private readonly userService: UserService,
 	) {}
 
-	async connectSocketToUser(socket: Socket) {
+	getUsernameFromSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
 		console.log(cookie)
 		const { jwt: token } = parse(cookie)
@@ -33,8 +30,7 @@ export class ChatService {
 			secret: 'superSecret2022',
 		})
 		const { username } = payload
-		const user: Partial<User> = await this.userService.userInfo(username)
-		socket.data.userId = user.userId
+		return username
 	}
 
 	async createRoom(
