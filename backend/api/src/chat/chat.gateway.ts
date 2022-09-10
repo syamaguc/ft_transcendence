@@ -31,13 +31,14 @@ export class ChatGateway {
 		@MessageBody() addMessageDto: AddMessageDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		//TODO[front]: addMessageDto.user 使わないので消す
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`)
 		const room = [...socket.rooms].slice(0)[1]
 		const newMessage = await this.chatService.addMessage(
 			addMessageDto,
+			socket.data.userId,
 			room,
 		)
+		console.log(socket.data.userId)
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
@@ -79,7 +80,7 @@ export class ChatGateway {
 	@SubscribeMessage('joinRoom')
 	joinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
 		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
-		this.chatService.joinRoom(roomId)
+		this.chatService.joinRoom(socket.data.userId, roomId)
 		this.watchOrSwitchRoom(roomId, socket)
 	}
 
@@ -89,7 +90,10 @@ export class ChatGateway {
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChatRoom = await this.chatService.createRoom(createChatRoomDto)
+		const newChatRoom = await this.chatService.createRoom(
+			createChatRoomDto,
+			socket.data.userId,
+		)
 		this.joinRoom(newChatRoom.id, socket)
 		this.logger.log(newChatRoom)
 		this.server.emit('updateNewRoom', newChatRoom)

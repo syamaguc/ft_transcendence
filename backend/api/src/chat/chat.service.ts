@@ -37,18 +37,28 @@ export class ChatService {
 		socket.data.userId = user.userId
 	}
 
-	async createRoom(chatRoomData: CreateChatRoomDto): Promise<ChatRoom> {
-		const chat = await chatRepository.createChatRoom(chatRoomData)
+	async createRoom(
+		chatRoomData: CreateChatRoomDto,
+		userId: string,
+	): Promise<ChatRoom> {
+		const newChatRoom = {
+			...chatRoomData,
+			id: uuidv4(),
+			owner: userId,
+		}
+		const chat = await this.chatRoomRepository.save(newChatRoom)
 		return chat
 	}
 
 	async addMessage(
 		addMessageDto: AddMessageDto,
+		userId: uuidv4,
 		roomId: string,
 	): Promise<Message> {
 		const room: ChatRoom = await chatRepository.findId(roomId)
 		const message: Message = {
 			id: uuidv4(),
+			user: userId,
 			...addMessageDto,
 			room: room,
 		}
@@ -71,8 +81,8 @@ export class ChatService {
 		return rooms
 	}
 
-	async joinRoom(roomId: string) {
+	async joinRoom(userId: uuidv4, roomId: string) {
 		const room = await chatRepository.findId(roomId)
-		room.members.push('user1')
+		room.members.push(userId)
 	}
 }
