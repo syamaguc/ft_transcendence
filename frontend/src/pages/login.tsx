@@ -18,7 +18,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, ReactNode } from 'react'
 import { useSWRConfig } from 'swr'
 
 import { useUser } from 'src/lib/use-user'
@@ -26,10 +26,45 @@ import PasswordField from '@components/password-field'
 
 const API_URL = 'http://localhost:3000'
 
-const providers = [
-  { name: '42', icon: null },
-  { name: 'admin', icon: null },
-]
+type AuthFormProps = {
+  children?: ReactNode
+  title: string
+}
+
+function AuthForm({ children, title = '' }: AuthFormProps) {
+  return (
+    <Container
+      maxW='lg'
+      py={{ base: '12', md: '24' }}
+      px={{ base: '0', sm: '8' }}
+    >
+      <Stack spacing='8'>
+        <Stack spacing='6'>
+          <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
+            <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
+              {title}
+            </Heading>
+          </Stack>
+        </Stack>
+        <Box
+          py={{ base: '0', sm: '8' }}
+          px={{ base: '4', sm: '10' }}
+          bg={useBreakpointValue({
+            base: 'transparent',
+            sm: 'inherit',
+          })}
+          boxShadow={{
+            base: 'none',
+            sm: useColorModeValue('base', 'md-dark'),
+          }}
+          borderRadius={{ base: 'none', sm: 'xl' }}
+        >
+          <Stack spacing='6'>{children}</Stack>
+        </Box>
+      </Stack>
+    </Container>
+  )
+}
 
 type Login42Props = {
   onSubmit?: () => void
@@ -44,47 +79,18 @@ function Login42(props: Login42Props) {
   }
 
   return (
-    <Container
-      maxW='lg'
-      py={{ base: '12', md: '24' }}
-      px={{ base: '0', sm: '8' }}
-    >
-      <Stack spacing='8'>
-        <Stack spacing='6'>
-          <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
-            <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
-              ft_transcendence
-            </Heading>
-          </Stack>
-        </Stack>
-        <Box
-          py={{ base: '0', sm: '8' }}
-          px={{ base: '4', sm: '10' }}
-          bg={useBreakpointValue({
-            base: 'transparent',
-            sm: 'white',
-          })}
-          boxShadow={{
-            base: 'none',
-            sm: useColorModeValue('base', 'md-dark'),
-          }}
-          borderRadius={{ base: 'none', sm: 'xl' }}
-        >
-          <Stack spacing='6'>
-            <Stack spacing={4} direction='column' align='center'>
-              <Button variant='outline' width='full' onClick={onSubmit}>
-                <VisuallyHidden>Sign in with 42</VisuallyHidden>
-                Sign in with 42
-              </Button>
-              <Button variant='outline' width='full' onClick={onOpen}>
-                <VisuallyHidden>Sign in with admin</VisuallyHidden>
-                Sign in as admin
-              </Button>
-            </Stack>
-          </Stack>
-        </Box>
+    <AuthForm title='ft_transcendence'>
+      <Stack spacing={4} direction='column' align='center'>
+        <Button variant='outline' width='full' onClick={onSubmit}>
+          <VisuallyHidden>Sign in with 42</VisuallyHidden>
+          Sign in with 42
+        </Button>
+        <Button variant='outline' width='full' onClick={onOpen}>
+          <VisuallyHidden>Sign in with admin</VisuallyHidden>
+          Sign in as admin
+        </Button>
       </Stack>
-    </Container>
+    </AuthForm>
   )
 }
 
@@ -99,16 +105,16 @@ function LoginAdmin(props: LoginAdminProps) {
   return (
     <>
       <Stack direction={['column', 'row']} spacing='8px'>
-        <Signup />
-        <Login />
+        <SignupForm />
+        <LoginForm />
       </Stack>
       <Button onClick={onClose}>Back</Button>
     </>
   )
 }
 
-function Signup() {
-  const { mutate } = useSWRConfig()
+function SignupForm() {
+  const { mutateUser } = useUser()
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -135,19 +141,10 @@ function Signup() {
 
     const { accessToken } = await res.json()
 
-    console.log(accessToken)
+    console.log('accessToken: ', accessToken)
 
-    res = await fetch(`${API_URL}/api/user/currentUser`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    mutateUser()
 
-    console.log(await res.json())
-
-    mutate(`${API_URL}/api/user/currentUser`)
     setUsername('')
     setEmail('')
     setPassword('')
@@ -155,76 +152,81 @@ function Signup() {
 
   return (
     <>
-      <Container
-        maxW='lg'
-        py={{ base: '12', md: '24' }}
-        px={{ base: '0', sm: '8' }}
-      >
-        <Stack spacing='8'>
-          <Stack spacing='6'>
-            <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
-              <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
-                Sign up
-              </Heading>
-            </Stack>
-          </Stack>
-          <Box
-            py={{ base: '0', sm: '8' }}
-            px={{ base: '4', sm: '10' }}
-            bg={useBreakpointValue({ base: 'transparent', sm: 'bg-surface' })}
-            boxShadow={{
-              base: 'none',
-              sm: useColorModeValue('base', 'md-dark'),
-            }}
-            borderRadius={{ base: 'none', sm: 'xl' }}
-          >
-            <Stack spacing='6'>
-              <Stack spacing='5'>
-                <FormControl>
-                  <FormLabel htmlFor='username'>Username</FormLabel>
-                  <Input
-                    id='username'
-                    type='username'
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor='email'>Email</FormLabel>
-                  <Input
-                    id='email'
-                    type='email'
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
-                </FormControl>
-                <PasswordField
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Stack>
-              <Stack spacing='6'>
-                <Button colorScheme='blue' onClick={handleSubmit}>
-                  Sign up
-                </Button>
-              </Stack>
-            </Stack>
-          </Box>
+      <AuthForm title='Sign up'>
+        <Stack spacing='5'>
+          <FormControl>
+            <FormLabel htmlFor='username'>Username</FormLabel>
+            <Input
+              id='username'
+              type='username'
+              value={username}
+              onChange={(e) => {
+                setUsername(e.target.value)
+                setEmail(
+                  e.target.value + (e.target.value ? '@example.com' : '')
+                )
+              }}
+            />
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor='email'>Email</FormLabel>
+            <Input
+              id='email'
+              type='email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </FormControl>
+          <PasswordField
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </Stack>
-      </Container>
+        <Stack spacing='6'>
+          <Button colorScheme='blue' onClick={handleSubmit}>
+            Sign up
+          </Button>
+        </Stack>
+      </AuthForm>
     </>
   )
 }
 
-function Login() {
-  const { mutate } = useSWRConfig()
+function LoginForm() {
+  const { mutateUser } = useUser()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+
+  const checkIsLoggedIn = async () => {
+    const res = await fetch(`${API_URL}/api/user/isLogin`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    if (res.ok) {
+      const data = await res.json()
+      console.log(data)
+      if (data) {
+        return true
+      }
+    }
+    return false
+  }
 
   const handleSubmit = async () => {
     console.log('Login...')
     console.log('username: ', username)
     console.log('password: ', password)
+
+    const isLoggedIn = await checkIsLoggedIn()
+
+    if (isLoggedIn) {
+      console.log('You are already logged in!')
+      return
+    }
 
     let res = await fetch(`${API_URL}/api/user/signin`, {
       method: 'POST',
@@ -242,72 +244,35 @@ function Login() {
 
     console.log(accessToken)
 
-    res = await fetch(`${API_URL}/api/user/currentUser`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        // Cookie: `jwt=${accessToken}`,
-      },
-    })
-
-    console.log(await res.json())
-
-    mutate(`${API_URL}/api/user/currentUser`)
+    mutateUser()
     setUsername('')
     setPassword('')
   }
 
   return (
     <>
-      <Container
-        maxW='lg'
-        py={{ base: '12', md: '24' }}
-        px={{ base: '0', sm: '8' }}
-      >
-        <Stack spacing='8'>
-          <Stack spacing='6'>
-            <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
-              <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
-                Login
-              </Heading>
-            </Stack>
-          </Stack>
-          <Box
-            py={{ base: '0', sm: '8' }}
-            px={{ base: '4', sm: '10' }}
-            bg={useBreakpointValue({ base: 'transparent', sm: 'bg-surface' })}
-            boxShadow={{
-              base: 'none',
-              sm: useColorModeValue('base', 'md-dark'),
-            }}
-            borderRadius={{ base: 'none', sm: 'xl' }}
-          >
-            <Stack spacing='6'>
-              <Stack spacing='5'>
-                <FormControl>
-                  <FormLabel htmlFor='username'>Username</FormLabel>
-                  <Input
-                    id='username'
-                    type='username'
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                  />
-                </FormControl>
-                <PasswordField
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Stack>
-              <Stack spacing='6'>
-                <Button colorScheme='blue' onClick={handleSubmit}>
-                  Login
-                </Button>
-              </Stack>
-            </Stack>
-          </Box>
+      <AuthForm title='Login'>
+        <Stack spacing='5'>
+          <FormControl>
+            <FormLabel htmlFor='username'>Username</FormLabel>
+            <Input
+              id='username'
+              type='username'
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </FormControl>
+          <PasswordField
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
         </Stack>
-      </Container>
+        <Stack spacing='6'>
+          <Button colorScheme='blue' onClick={handleSubmit}>
+            Login
+          </Button>
+        </Stack>
+      </AuthForm>
     </>
   )
 }
@@ -317,13 +282,14 @@ function LoginPage() {
   useUser({ redirectTo: '/', redirectIfFound: true })
 
   const admin = useDisclosure()
+  const bgColor = useColorModeValue('gray.50', 'inherit')
 
   return (
     <>
       <Head>
         <title>Login</title>
       </Head>
-      <Box as='main' w='full' h='100vh' bg='gray.50'>
+      <Box as='main' w='full' h='100vh' bg={bgColor}>
         <Box maxW='8xl' mx='auto' minH='76vh'>
           <Flex
             direction='column'
@@ -332,6 +298,7 @@ function LoginPage() {
             px='4'
             gap='4'
             w='full'
+            h='full'
           >
             {admin.isOpen ? (
               <LoginAdmin onClose={admin.onClose} />
@@ -346,3 +313,5 @@ function LoginPage() {
 }
 
 export default LoginPage
+
+LoginPage.displayName = 'Login'

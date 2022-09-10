@@ -1,7 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { User } from 'src/types/user'
 
-const API_ENDPOINT = 'http://api:3000'
+const API_URL = 'http://api:3000'
 
 function setHeaders(req: NextApiRequest, res: NextApiResponse): boolean {
   // set SPR/CORS headers
@@ -49,7 +49,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       return
     }
 
-    const apiResponse = await fetch(`${API_ENDPOINT}/api/user/currentUser`, {
+    const apiResponse = await fetch(`${API_URL}/api/user/currentUser`, {
       method: 'GET',
       headers: {
         'content-type': 'application/json',
