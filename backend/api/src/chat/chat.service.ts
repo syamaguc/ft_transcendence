@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto';
-import { Message } from './entities/message.entity';
-import { v4 as uuidv4 } from 'uuid';
-import { ChatRoom } from './entities/chat-room.entity';
-import { chatRepository } from './chat.repository';
-import { Repository } from 'typeorm';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
+import { Message } from './entities/message.entity'
+import { v4 as uuidv4 } from 'uuid'
+import { ChatRoom } from './entities/chat-room.entity'
+import { chatRepository } from './chat.repository'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class ChatService {
@@ -25,7 +25,7 @@ export class ChatService {
 		addMessageDto: AddMessageDto,
 		roomId: string,
 	): Promise<Message> {
-		const room: ChatRoom = await chatRepository.findId(roomId);
+		const room: ChatRoom = await chatRepository.findId(roomId)
 		const message: Message = {
 			id: uuidv4(),
 			...addMessageDto,

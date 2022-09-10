@@ -82,8 +82,8 @@ export class ChatGateway {
 	// join room to be a member
 	@SubscribeMessage('joinRoom')
 	joinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
-		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`);
-		this.chatService.joinRoom(roomId);
+		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
+		this.chatService.joinRoom(roomId)
 		this.watchOrSwitchRoom({ roomId, userId: '' }, socket)
 	}
 
