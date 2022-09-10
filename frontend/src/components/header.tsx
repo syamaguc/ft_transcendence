@@ -24,6 +24,7 @@ import {
   useUpdateEffect,
 } from '@chakra-ui/react'
 import { useScroll } from 'framer-motion'
+import { useSWRConfig } from 'swr'
 
 import { MobileNavButton, MobileNavContent } from '@components/mobile-nav'
 import { Logo } from '@components/logo'
@@ -75,7 +76,8 @@ const NavLink = ({ href, children }: NavLinkProps) => (
 )
 
 const HeaderContent = () => {
-  const user = useUser()
+  const user = useUser({ redirectTo: '/login' })
+  const { mutate } = useSWRConfig()
 
   const { toggleColorMode: toggleMode } = useColorMode()
   const mobileNav = useDisclosure()
@@ -87,6 +89,20 @@ const HeaderContent = () => {
   useUpdateEffect(() => {
     mobileNavBtnRef.current?.focus()
   }, [mobileNav.isOpen])
+
+  const handleLogout = async () => {
+    let res = await fetch(`${API_URL}/api/user/logout`, {
+      method: 'DELETE',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    console.log(res)
+
+    mutate(`${API_URL}/api/user/currentUser`)
+  }
 
   return (
     <>
@@ -152,16 +168,6 @@ const HeaderContent = () => {
               aria-label='Open menu'
               onClick={mobileNav.onOpen}
             />
-            {/* <IconButton */}
-            {/* size='md' */}
-            {/* fontSize='lg' */}
-            {/* aria-label='Open menu' */}
-            {/* variant='ghost' */}
-            {/* color='current' */}
-            {/* display={{ md: 'none' }} */}
-            {/* onClick={mobileNav.isOpen ? mobileNav.onClose : mobileNav.onOpen} */}
-            {/* icon={mobileNav.isOpen ? <CloseIcon /> : <HamburgerIcon />} */}
-            {/* /> */}
             {user && (
               <Flex alignItems='center' display={{ base: 'none', md: 'flex' }}>
                 <Menu>
@@ -182,14 +188,15 @@ const HeaderContent = () => {
                       <MenuItem as='a'>Profile</MenuItem>
                     </NextLink>
                     <MenuItem>Link 1</MenuItem>
-                    <MenuDivider />
                     <MenuItem>Link 2</MenuItem>
+                    <MenuDivider />
+                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
                   </MenuList>
                 </Menu>
               </Flex>
             )}
             {!user && (
-              <NextLink href='/users' passHref>
+              <NextLink href='/login' passHref>
                 <Button as='a'>Login</Button>
               </NextLink>
             )}

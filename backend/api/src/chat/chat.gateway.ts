@@ -22,11 +22,11 @@ type Tmp = {
 })
 export class ChatGateway {
 	@WebSocketServer()
-	server: Server;
+	server: Server
 
 	constructor(private readonly chatService: ChatService) {}
 
-	private logger: Logger = new Logger('ChatGateway');
+	private logger: Logger = new Logger('ChatGateway')
 
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
@@ -49,19 +49,21 @@ export class ChatGateway {
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`getMessageLog: for ${roomId}`);
-		const messageLog: Message[] = await this.chatService.getMessageLog(roomId);
-		socket.emit('getMessageLog', messageLog);
+		this.logger.log(`getMessageLog: for ${roomId}`)
+		const messageLog: Message[] = await this.chatService.getMessageLog(
+			roomId,
+		)
+		socket.emit('getMessageLog', messageLog)
 	}
 
 	@SubscribeMessage('getRooms')
 	async getRooms(@ConnectedSocket() socket: Socket) {
-		this.logger.log(`getRooms: for ${socket.id}`);
-		const rooms = await this.chatService.getRooms();
+		this.logger.log(`getRooms: for ${socket.id}`)
+		const rooms = await this.chatService.getRooms()
 		//tmp
-		const roomsList = [];
-		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }));
-		socket.emit('getRooms', roomsList);
+		const roomsList = []
+		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }))
+		socket.emit('getRooms', roomsList)
 	}
 
 	// room which user is watching
@@ -91,10 +93,10 @@ export class ChatGateway {
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChatRoom = await this.chatService.createRoom(createChatRoomDto);
-		this.joinRoom(newChatRoom.id, socket);
-		this.logger.log(newChatRoom);
-		this.server.emit('updateNewRoom', newChatRoom);
+		const newChatRoom = await this.chatService.createRoom(createChatRoomDto)
+		this.joinRoom(newChatRoom.id, socket)
+		this.logger.log(newChatRoom)
+		this.server.emit('updateNewRoom', newChatRoom)
 	}
 }
 

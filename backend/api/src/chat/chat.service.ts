@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
-	constructor (
+	constructor(
 		@InjectRepository(ChatRoom)
 		private readonly chatRoomRepository: Repository<ChatRoom>,
 		@InjectRepository(Message)
@@ -17,8 +17,8 @@ export class ChatService {
 	) {}
 
 	async createRoom(chatRoomData: CreateChatRoomDto): Promise<ChatRoom> {
-		const chat = await chatRepository.createChatRoom(chatRoomData);
-		return chat;
+		const chat = await chatRepository.createChatRoom(chatRoomData)
+		return chat
 	}
 
 	async addMessage(
@@ -30,28 +30,28 @@ export class ChatService {
 			id: uuidv4(),
 			...addMessageDto,
 			room: room,
-		};
-		const savedMessage = await this.messageRepository.save(message);
-		return savedMessage;
+		}
+		const savedMessage = await this.messageRepository.save(message)
+		return savedMessage
 	}
 
 	async getMessageLog(roomId: string): Promise<Message[]> {
-		const room : ChatRoom = await chatRepository.findId(roomId);
-		return room.messages;
+		const room: ChatRoom = await chatRepository.findId(roomId)
+		return room.messages
 	}
 
 	async findRoom(roomId: string): Promise<ChatRoom> {
-		const room : ChatRoom = await chatRepository.findId(roomId);
-		return room;
+		const room: ChatRoom = await chatRepository.findId(roomId)
+		return room
 	}
 
 	async getRooms(): Promise<ChatRoom[]> {
-		const rooms = await chatRepository.find();
-		return rooms;
+		const rooms = await chatRepository.find()
+		return rooms
 	}
 
 	async joinRoom(roomId: string) {
-		const room = await chatRepository.findId(roomId);
-		room.members.push('user1');
+		const room = await chatRepository.findId(roomId)
+		room.members.push('user1')
 	}
 }

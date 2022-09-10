@@ -8,9 +8,9 @@ import {
 	IsOptional,
 	Equals,
 	IsAlphanumeric,
-} from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Match } from './match.decorator';
+} from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
+import { Match } from './match.decorator'
 
 export class CreateUserDto {
 	@IsNotEmpty()
@@ -18,12 +18,12 @@ export class CreateUserDto {
 	@MaxLength(15)
 	@IsAlphanumeric()
 	@ApiProperty({ description: 'not empty' })
-	username: string;
+	username: string
 
 	@IsNotEmpty()
 	@IsEmail()
 	@ApiProperty({ description: 'not empty' })
-	email: string;
+	email: string
 
 	@IsNotEmpty()
 	@MinLength(8)
@@ -36,25 +36,25 @@ export class CreateUserDto {
 		description:
 			'not empty with : uppercase, lowercase, number and special character',
 	})
-	password: string;
+	password: string
 
 	@IsNotEmpty()
 	@Match('password', {
 		message: 'the passwords entered are not identical',
 	})
 	@ApiProperty({ description: 'not empty' })
-	passwordConfirm: string;
+	passwordConfirm: string
 }
 
 export class SigInUserDto {
 	@IsNotEmpty()
 	@ApiProperty({ description: 'not empty' })
-	username: string;
+	username: string
 
 	@IsNotEmpty()
 	@ApiProperty({
 		description:
 			'not empty with : uppercase, lowercase, number and special character',
 	})
-	password: string;
+	password: string
 }

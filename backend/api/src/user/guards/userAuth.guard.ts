@@ -6,11 +6,11 @@ import {
 	Inject,
 	forwardRef,
 	ForbiddenException,
-} from '@nestjs/common';
-import { Observable } from 'rxjs';
-import { User } from '../entities/user.entity';
-import { UserService } from '../user.service';
-import jwt_decode from 'jwt-decode';
+} from '@nestjs/common'
+import { Observable } from 'rxjs'
+import { User } from '../entities/user.entity'
+import { UserService } from '../user.service'
+import jwt_decode from 'jwt-decode'
 
 @Injectable()
 export class UserAuth implements CanActivate {
@@ -20,19 +20,19 @@ export class UserAuth implements CanActivate {
 	) {}
 
 	canActivate(context: ExecutionContext): boolean {
-		const request = context.switchToHttp().getRequest();
-		const user: User = request.user;
+		const request = context.switchToHttp().getRequest()
+		const user: User = request.user
 
 		if (user.isBan === true) {
 			throw new ForbiddenException(
 				'You are banned, you no longer have access to our site',
-			);
+			)
 		}
 
-		const decode = jwt_decode(request.cookies.jwt);
+		const decode = jwt_decode(request.cookies.jwt)
 		if (decode['auth'] === false && user.twoFactorAuth === true) {
-			throw new ForbiddenException('need 2FA');
+			throw new ForbiddenException('need 2FA')
 		}
-		return true;
+		return true
 	}
 }

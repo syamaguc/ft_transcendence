@@ -8,21 +8,21 @@ import {
 	//Req,
 	//ConsoleLogger,
 	//ForbiddenException,
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+} from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 // import { Repository } from 'typeorm';
-import { User } from './entities/user.entity';
-import { CreateUserDto, SigInUserDto } from './dto/user.dto';
-import * as bcrypt from 'bcrypt';
-import { UsersRepository } from './user.repository';
-import { JwtService } from '@nestjs/jwt';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
-import { GetUserFilterDto } from './dto/get-user-filter.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { Observable, of } from 'rxjs';
-import { join } from 'path';
-import { User42Dto } from './dto/user42.dto';
-import { Response, Request } from 'express';
+import { User } from './entities/user.entity'
+import { CreateUserDto, SigInUserDto } from './dto/user.dto'
+import * as bcrypt from 'bcrypt'
+import { UsersRepository } from './user.repository'
+import { JwtService } from '@nestjs/jwt'
+import { JwtPayload } from './interfaces/jwt-payload.interface'
+import { GetUserFilterDto } from './dto/get-user-filter.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { Observable, of } from 'rxjs'
+import { join } from 'path'
+import { User42Dto } from './dto/user42.dto'
+import { Response, Request } from 'express'
 // import { UserModule } from './user.module';
 
 @Injectable()
@@ -37,108 +37,108 @@ export class UserService {
 		userData: CreateUserDto,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ accessToken: string }> {
-		const { username, password } = userData;
-		const user: Promise<User> = UsersRepository.createUser(userData);
+		const { username, password } = userData
+		const user: Promise<User> = UsersRepository.createUser(userData)
 		if (await bcrypt.compare(password, (await user).password)) {
-			const auth = false;
-			const payload: JwtPayload = { username, auth };
-			const accessToken: string = await this.jwtService.sign(payload);
-			res.cookie('jwt', accessToken, { httpOnly: true });
-			return { accessToken };
+			const auth = false
+			const payload: JwtPayload = { username, auth }
+			const accessToken: string = await this.jwtService.sign(payload)
+			res.cookie('jwt', accessToken, { httpOnly: true })
+			return { accessToken }
 		} else {
 			throw new InternalServerErrorException(
 				'access token creation error',
-			);
+			)
 		}
 	}
 
 	async validateUser42(userData: User42Dto): Promise<User> {
-		let user: User = undefined;
+		let user: User = undefined
 
-		const { login42 } = userData;
+		const { login42 } = userData
 		user = await UsersRepository.findOne({
 			where: { login42: login42 },
-		});
-		if (user) return user;
-		let { username } = userData;
+		})
+		if (user) return user
+		let { username } = userData
 		user = await UsersRepository.findOne({
 			where: { username: username },
-		});
+		})
 		if (user) {
-			const rand = Math.random().toString(16).substr(2, 5);
-			username = username + '-' + rand;
-			userData.username = username;
+			const rand = Math.random().toString(16).substr(2, 5)
+			username = username + '-' + rand
+			userData.username = username
 		}
-		const newUser: User = await this.createUser42(userData);
-		return newUser;
+		const newUser: User = await this.createUser42(userData)
+		return newUser
 	}
 
 	createUser42(userData: User42Dto): Promise<User> {
-		return UsersRepository.createUser42(userData);
+		return UsersRepository.createUser42(userData)
 	}
 
 	async signIn(
 		userData: SigInUserDto,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<{ accessToken: string }> {
-		const { username, password } = userData;
-		let user: User = undefined;
+		const { username, password } = userData
+		let user: User = undefined
 
-		user = await UsersRepository.findOne({ where: { username: username } });
+		user = await UsersRepository.findOne({ where: { username: username } })
 		if (user === undefined) {
 			user = await UsersRepository.findOne({
 				where: { email: username },
-			});
+			})
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
-			const username = user.username;
-			const auth = false;
-			const payload: JwtPayload = { username, auth };
-			const accessToken: string = await this.jwtService.sign(payload);
-			res.cookie('jwt', accessToken, { httpOnly: true });
-			return { accessToken };
+			const username = user.username
+			const auth = false
+			const payload: JwtPayload = { username, auth }
+			const accessToken: string = await this.jwtService.sign(payload)
+			res.cookie('jwt', accessToken, { httpOnly: true })
+			return { accessToken }
 		} else {
 			throw new UnauthorizedException(
 				'Please check your login credentials',
-			);
+			)
 		}
 	}
 
 	async currentUser(user: User): Promise<Partial<User>> {
-		let userFound: User = undefined;
+		let userFound: User = undefined
 		userFound = await UsersRepository.findOne({
 			where: { userId: user.userId },
-		});
-		if (!userFound) throw new NotFoundException('No user found');
-		const { password, ...res } = user;
-		return res;
+		})
+		if (!userFound) throw new NotFoundException('No user found')
+		const { password, ...res } = user
+		return res
 	}
 
 	async userInfo(username: string): Promise<Partial<User>> {
-		let user: User = undefined;
+		let user: User = undefined
 		user = await UsersRepository.findOne({
 			where: { username: username },
-		});
-		if (!user) throw new NotFoundException('No user found');
-		const { password, ...res } = user;
-		return res;
+		})
+		if (!user) throw new NotFoundException('No user found')
+		const { password, ...res } = user
+		return res
 	}
 
 	async getPartialUserInfo(id: string): Promise<Partial<User>> {
-		let user: User = undefined;
+		let user: User = undefined
 
-		user = await UsersRepository.findOne({ where: { userId: id } });
-		if (!user) return user;
+		user = await UsersRepository.findOne({ where: { userId: id } })
+		if (!user) return user
 		return {
 			userId: user.userId,
 			username: user.username,
 			elo: user.elo,
 			profile_picture: user.profile_picture,
-		};
+		}
 	}
 
 	getUserWithFilters(filterDto: GetUserFilterDto): Promise<Partial<User[]>> {
-		return UsersRepository.getUsersWithFilters(filterDto);
+		return UsersRepository.getUsersWithFilters(filterDto)
 	}
 
 	async updateUser(
@@ -146,17 +146,17 @@ export class UserService {
 		user: User,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
-		const { username } = updateUser;
+		const { username } = updateUser
 
 		const updated: boolean = await UsersRepository.updateUser(
 			updateUser,
 			user,
-		);
+		)
 		if (updated === true && username !== undefined) {
-			const auth = true;
-			const payload: JwtPayload = { username, auth };
-			const accessToken: string = await this.jwtService.sign(payload);
-			res.cookie('jwt', accessToken, { httpOnly: true });
+			const auth = true
+			const payload: JwtPayload = { username, auth }
+			const accessToken: string = await this.jwtService.sign(payload)
+			res.cookie('jwt', accessToken, { httpOnly: true })
 		}
 	}
 
@@ -164,67 +164,65 @@ export class UserService {
 		id: string,
 		@Res({ passthrough: true }) res: Response,
 	): Promise<void> {
-		const query = await UsersRepository.createQueryBuilder(
-			'user',
-		).getMany();
+		const query = await UsersRepository.createQueryBuilder('user').getMany()
 
 		for (const user of query) {
 			if (user.friends.indexOf(id) > -1) {
-				this.deleteFriend(id, user);
+				this.deleteFriend(id, user)
 			}
 		}
-		res.clearCookie('jwt');
-		const result = await UsersRepository.delete(id);
+		res.clearCookie('jwt')
+		const result = await UsersRepository.delete(id)
 	}
 
 	uploadImage(@UploadedFile() file, user: User): Promise<string> {
-		return UsersRepository.saveImage(file, user);
+		return UsersRepository.saveImage(file, user)
 	}
 
 	async getProfilePicture(
 		@Res() res,
 		profilePicture: string,
 	): Promise<Observable<object>> {
-		const fs = require('fs');
-		const files = fs.readdirSync('../upload/image/');
+		const fs = require('fs')
+		const files = fs.readdirSync('../upload/image/')
 		if (Object.values(files).indexOf(profilePicture) === -1) {
 			return of(
 				res.sendFile(
 					join(process.cwd(), process.env.DEFAULT_PROFILE_PICTURE),
 				),
-			);
+			)
 		}
 		return of(
 			res.sendFile(
 				join(process.cwd(), '../upload/image/' + profilePicture),
 			),
-		);
+		)
 	}
 
 	addFriend(friend: string, user: User): Promise<void> {
-		return UsersRepository.addFriend(friend, user);
+		return UsersRepository.addFriend(friend, user)
 	}
 
 	deleteFriend(friend: string, user: User): Promise<void> {
-		return UsersRepository.deleteFriend(friend, user);
+		return UsersRepository.deleteFriend(friend, user)
 	}
 
 	async getFriendList(user: User): Promise<object> {
-		let i = 0;
-		const friendList = [];
+		let i = 0
+		const friendList = []
 		while (user.friends[i]) {
 			await this.getPartialUserInfo(user.friends[i]).then(function (
 				result,
 			) {
-				friendList.push(result);
-				i++;
-			});
+				friendList.push(result)
+				i++
+			})
 		}
-		return friendList;
+		return friendList
 	}
 
 	getTwoFactorAuth(user: User): boolean {
-		return user.twoFactorAuth;
+		return user.twoFactorAuth
 	}
 
 	async updateTwoFactorAuth(
@@ -232,30 +230,30 @@ export class UserService {
 		user: User,
 		res: Response,
 	): Promise<void> {
-		user.twoFactorAuth = bool;
-		const username = user.username;
+		user.twoFactorAuth = bool
+		const username = user.username
 		try {
-			await UsersRepository.save(user);
-			const auth = true;
-			const payload: JwtPayload = { username, auth };
-			const accessToken: string = await this.jwtService.sign(payload);
-			res.cookie('jwt', accessToken, { httpOnly: true });
+			await UsersRepository.save(user)
+			const auth = true
+			const payload: JwtPayload = { username, auth }
+			const accessToken: string = await this.jwtService.sign(payload)
+			res.cookie('jwt', accessToken, { httpOnly: true })
 		} catch (e) {
-			console.log(e);
-			throw new InternalServerErrorException();
+			console.log(e)
+			throw new InternalServerErrorException()
 		}
 	}
 
 	async getIsBan(userId: string, userIsAdmin: User): Promise<boolean> {
-		let user: User = undefined;
+		let user: User = undefined
 
 		// if (userIsAdmin.isAdmin === false)
 		// 	throw new UnauthorizedException('You aren\'t an administrator');
 		user = await UsersRepository.findOne({
 			where: { userId: userId },
-		});
-		if (!user) throw new NotFoundException('No user found');
-		return user.isBan;
+		})
+		if (!user) throw new NotFoundException('No user found')
+		return user.isBan
 	}
 
 	async updateIsBan(
@@ -263,36 +261,36 @@ export class UserService {
 		userId: string,
 		userIsAdmin: User,
 	): Promise<void> {
-		let user: User = undefined;
+		let user: User = undefined
 
 		if (userIsAdmin.userId === userId) {
 			throw new UnauthorizedException(
 				'Cannot change your own banned state',
-			);
+			)
 		}
 
 		user = await UsersRepository.findOne({
 			where: { userId: userId },
-		});
-		if (!user) throw new NotFoundException('No user found');
+		})
+		if (!user) throw new NotFoundException('No user found')
 
-		user.isBan = bool;
+		user.isBan = bool
 		try {
-			await UsersRepository.save(user);
+			await UsersRepository.save(user)
 		} catch (e) {
-			console.log(e);
-			throw new InternalServerErrorException();
+			console.log(e)
+			throw new InternalServerErrorException()
 		}
 	}
 
 	async getIsAdmin(userId: string, userIsAdmin: User): Promise<boolean> {
-		let user: User = undefined;
+		let user: User = undefined
 
 		user = await UsersRepository.findOne({
 			where: { userId: userId },
-		});
-		if (!user) throw new NotFoundException('No user found');
-		return user.isAdmin;
+		})
+		if (!user) throw new NotFoundException('No user found')
+		return user.isAdmin
 	}
 
 	async updateIsAdmin(
@@ -300,36 +298,36 @@ export class UserService {
 		userId: string,
 		userIsAdmin: User,
 	): Promise<void> {
-		let user: User = undefined;
+		let user: User = undefined
 
 		if (userIsAdmin.userId === userId) {
 			throw new UnauthorizedException(
 				'Cannot change your own admin state',
-			);
+			)
 		}
 
 		user = await UsersRepository.findOne({
 			where: { userId: userId },
-		});
-		if (!user) throw new NotFoundException('No user found');
+		})
+		if (!user) throw new NotFoundException('No user found')
 
-		user.isAdmin = bool;
+		user.isAdmin = bool
 		try {
-			await UsersRepository.save(user);
+			await UsersRepository.save(user)
 		} catch (e) {
-			console.log(e);
-			throw new InternalServerErrorException();
+			console.log(e)
+			throw new InternalServerErrorException()
 		}
 	}
 
 	calculElo(eloPlayerWin: string, eloPlayerLoose: string): number {
-		const EloRating = require('elo-rating');
+		const EloRating = require('elo-rating')
 
 		const elo = EloRating.calculate(
 			parseInt(eloPlayerWin),
 			parseInt(eloPlayerLoose),
-		);
-		return elo.playerRating - parseInt(eloPlayerWin);
+		)
+		return elo.playerRating - parseInt(eloPlayerWin)
 	}
 
 	updateBlockUser(
@@ -337,6 +335,6 @@ export class UserService {
 		user: User,
 		userToBlock: User,
 	): Promise<User> {
-		return UsersRepository.updateBlockUser(block, user, userToBlock);
+		return UsersRepository.updateBlockUser(block, user, userToBlock)
 	}
 }

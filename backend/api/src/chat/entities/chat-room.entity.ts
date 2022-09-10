@@ -1,33 +1,33 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 // import { MessageI } from "../interface/message.interface"
-import { Message } from "./message.entity"
+import { Message } from './message.entity'
 
 @Entity()
 export class ChatRoom {
-    @PrimaryGeneratedColumn('uuid')
-    id: string
+	@PrimaryGeneratedColumn('uuid')
+	id: string
 
-    @Column('text', { default: '' })
-    name: string
+	@Column('text', { default: '' })
+	name: string
 
-    @Column('simple-array', { default: [] })
-    members: string[]
+	@Column('simple-array', { default: [] })
+	members: string[]
 
-    @Column()
-    owner: string
+	@Column()
+	owner: string
 
-    @Column('simple-array', { default: [] })
-    admins: string[]
+	@Column('simple-array', { default: [] })
+	admins: string[]
 
-    @Column('boolean', { default: false })
-    is_private: boolean
+	@Column('boolean', { default: false })
+	is_private: boolean
 
-    // @Column('simple-array', { default: [] })
-    // logs: MessageI[]
+	// @Column('simple-array', { default: [] })
+	// logs: MessageI[]
 
-    @OneToMany(() => Message, (msg) => msg.room)
-    messages: Message[]
+	@OneToMany(() => Message, (msg) => msg.room)
+	messages: Message[]
 
-    @Column('text', { default: '' })
-    password: string
+	@Column('text', { default: '' })
+	password: string
 }
