@@ -110,7 +110,9 @@ const ChatCreationForm = ({ socket }: Props) => {
     <>
       <Flex w='100%'>
         <Text p={2}>Channels</Text>
-        <Button mr={0} ml="auto" onClick={onOpen}>+</Button>
+        <Button mr={0} ml='auto' onClick={onOpen}>
+          +
+        </Button>
       </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

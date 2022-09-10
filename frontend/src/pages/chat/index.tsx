@@ -1,6 +1,15 @@
 import Layout from '@components/layout'
 // import { Flex } from "@chakra-ui/layout"
-import { Box, Button, HStack, Input, Spacer, Stack, Flex, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  HStack,
+  Input,
+  Spacer,
+  Stack,
+  Flex,
+  Text,
+} from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
@@ -46,7 +55,7 @@ const Chat = () => {
     }
   }, [])
 
-  const onClickSubmit = useCallback( () => {
+  const onClickSubmit = useCallback(() => {
     const message = {
       user: user.username,
       message: inputText,
@@ -64,38 +73,36 @@ const Chat = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
 
-
-
   return (
     <Layout>
-        <Flex>
-          <Flex w="300px" h="90vh" borderEnd="1px solid" borderColor="gray">
-            <ChatSideBar
-              socket={socket}
-              currentRoom={currentRoom}
-              setCurrentRoom={setCurrentRoom}
-              setChatLog={setChatLog}
-              setInputMessage={setInputText}
-            />
-          </Flex>
-          <Flex h='90vh' w='100%' direction="column">
-            <TopBar currentRoom={currentRoom}/>
-            <MiddleBar chatLog={chatLog}/>
-            {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
-            <Flex p={4}>
-              <Input
+      <Flex>
+        <Flex w='300px' h='90vh' borderEnd='1px solid' borderColor='gray'>
+          <ChatSideBar
+            socket={socket}
+            currentRoom={currentRoom}
+            setCurrentRoom={setCurrentRoom}
+            setChatLog={setChatLog}
+            setInputMessage={setInputText}
+          />
+        </Flex>
+        <Flex h='90vh' w='100%' direction='column'>
+          <TopBar currentRoom={currentRoom} />
+          <MiddleBar chatLog={chatLog} />
+          {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
+          <Flex p={4}>
+            <Input
               type='text'
               value={inputText}
               onChange={(event) => {
                 setInputText(event.target.value)
               }}
-              />
-              <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
+            />
+            <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
               Send
-              </Button>
-            </Flex>
+            </Button>
           </Flex>
         </Flex>
+      </Flex>
     </Layout>
   )
 }

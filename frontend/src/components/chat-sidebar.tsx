@@ -74,12 +74,17 @@ const SideBar = ({
   }, [room])
 
   return (
-    <Flex width='100%' direction="column"  bg='gray.100' overflowX="scroll">
-      <Flex width='100%' p={5,5,2,2} borderBottom="1px solid" borderBottomColor="gray.200">
-          <ChatCreationForm socket={socket} />
+    <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
+      <Flex
+        width='100%'
+        p={(5, 5, 2, 2)}
+        borderBottom='1px solid'
+        borderBottomColor='gray.200'
+      >
+        <ChatCreationForm socket={socket} />
       </Flex>
 
-      <Flex direction="column">
+      <Flex direction='column'>
         {chatRooms.map((chatRoom: ChannelObject) => (
           <Flex
             as='button'
