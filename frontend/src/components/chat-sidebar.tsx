@@ -1,6 +1,7 @@
 import {
   Box,
   Stack,
+  Flex,
   Button,
   Input,
   Radio,
@@ -75,32 +76,32 @@ const SideBar = ({
   }, [room])
 
   return (
-    <Box>
-      <Box>
-        <Stack spacing='12px'>
-          <ChatCreationForm socket={socket} />
-        </Stack>
-      </Box>
+    <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
+      <Flex
+        width='100%'
+        p={(5, 5, 2, 2)}
+        borderBottom='1px solid'
+        borderBottomColor='gray.200'
+      >
+        <ChatCreationForm socket={socket} />
+      </Flex>
 
-      <Stack width='sm'>
+      <Flex direction='column'>
         {chatRooms.map((chatRoom: ChannelObject) => (
-          <Box
+          <Flex
             as='button'
-            borderRadius='4px'
             p={4}
-            shadow='sm'
-            borderWidth='1px'
-            _hover={{ borderColor: '#00BABC' }}
+            _hover={{ bgColor: '#00BABC' }}
             onClick={() => {
               onClickChannel(chatRoom)
             }}
             key={chatRoom.id}
           >
             {chatRoom.name}
-          </Box>
+          </Flex>
         ))}
-      </Stack>
-    </Box>
+      </Flex>
+    </Flex>
   )
 }
 
