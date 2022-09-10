@@ -41,7 +41,8 @@ export class UserService {
 		const user: Promise<User> = UsersRepository.createUser(userData)
 		if (await bcrypt.compare(password, (await user).password)) {
 			const auth = false
-			const payload: JwtPayload = { username, auth }
+			const userid = (await user).userId
+			const payload: JwtPayload = { username, auth, userid }
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 			return { accessToken }
@@ -93,7 +94,8 @@ export class UserService {
 		if (user && (await bcrypt.compare(password, user.password))) {
 			const username = user.username
 			const auth = false
-			const payload: JwtPayload = { username, auth }
+			const userid = user.userId
+			const payload: JwtPayload = { username, auth, userid}
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 			return { accessToken }
@@ -154,7 +156,8 @@ export class UserService {
 		)
 		if (updated === true && username !== undefined) {
 			const auth = true
-			const payload: JwtPayload = { username, auth }
+      const userid = user.userId
+			const payload: JwtPayload = { username, auth, userid}
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 		}
@@ -235,7 +238,8 @@ export class UserService {
 		try {
 			await UsersRepository.save(user)
 			const auth = true
-			const payload: JwtPayload = { username, auth }
+      const userid = user.userId
+			const payload: JwtPayload = { username, auth, userid}
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 		} catch (e) {
