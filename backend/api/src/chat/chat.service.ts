@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
-import { MessageI } from './interface/message.interface'
 import { Message } from './entities/message.entity'
 import { v4 as uuidv4 } from 'uuid'
 import { ChatRoom } from './entities/chat-room.entity'
@@ -26,13 +25,10 @@ export class ChatService {
 		addMessageDto: AddMessageDto,
 		roomId: string,
 	): Promise<Message> {
-		const newMessage: MessageI = {
-			id: uuidv4(),
-			...addMessageDto,
-		}
 		const room: ChatRoom = await chatRepository.findId(roomId)
 		const message: Message = {
-			...newMessage,
+			id: uuidv4(),
+			...addMessageDto,
 			room: room,
 		}
 		const savedMessage = await this.messageRepository.save(message)
