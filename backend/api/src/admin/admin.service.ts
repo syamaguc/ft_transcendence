@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/user/entities/user.entity';
-import { UsersRepository } from 'src/user/user.repository';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from 'src/user/entities/user.entity'
+import { UsersRepository } from 'src/user/user.repository'
 
 @Injectable()
 export class AdminService {
@@ -17,8 +17,8 @@ export class AdminService {
 				'user.isAdmin',
 				'user.isBan',
 			])
-			.getMany();
-		return query;
+			.getMany()
+		return query
 	}
 
 	async getAllAdmin(): Promise<Partial<User[]>> {
@@ -30,7 +30,7 @@ export class AdminService {
 				'user.status',
 				'user.profile_picture',
 			])
-			.getMany();
-		return query;
+			.getMany()
+		return query
 	}
 }
