@@ -20,12 +20,59 @@ import BottomBar from '@components/chat/bottombar'
 import { FetchError } from 'src/lib/fetch-json'
 import SimpleSidebar from '@components/chat/simple-sidebar'
 import { useUser } from 'src/lib/use-user'
+import { User } from 'src/types/user'
 
 const socket = io('http://localhost:3000')
 const API_URL = 'http://localhost:3000'
 
+const checkAccessibility = ({currentRoom}, user : User) : Boolean => {
+  if (!user || !currentRoom)
+    return false;
+  const members : string[] = currentRoom.members
+  if (!members)
+    return false;
+  if (members.indexOf(user.userId) == -1)
+    return false;
+  return true;
+}
+
+const InputBody = ({inputText, setInputText, onClickSubmit}) => {
+  return (
+    // <Flex p={4}>
+    <>
+      <Input
+        type='text'
+        value={inputText}
+        onChange={(event) => {
+          setInputText(event.target.value)
+        }}
+      />
+      <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
+        Send
+      </Button>
+    </>
+    // </Flex>
+  )
+}
+
+const onClickJoin = (roomId : string) => {
+  socket.emit('joinRoom', roomId)
+  console.log('joinroom', roomId)
+}
+
+const JoinBody = ({currentRoom}) => {
+  return (
+    <>
+      <Button onClick={() => {onClickJoin(currentRoom.id)}}>
+        join
+      </Button>
+    </>
+  )
+}
+
 const Chat = () => {
   const user = useUser()
+  // console.log(user)
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
@@ -90,16 +137,9 @@ const Chat = () => {
           <MiddleBar chatLog={chatLog} />
           {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
           <Flex p={4}>
-            <Input
-              type='text'
-              value={inputText}
-              onChange={(event) => {
-                setInputText(event.target.value)
-              }}
-            />
-            <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
-              Send
-            </Button>
+            {checkAccessibility(currentRoom, user) ?
+            <InputBody inputText={inputText} setInputText={setInputText} onClickSubmit={onClickSubmit}/>
+            : <JoinBody currentRoom={currentRoom}/>}
           </Flex>
         </Flex>
       </Flex>

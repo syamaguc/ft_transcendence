@@ -23,18 +23,42 @@ const BottomBar = ({ inputText, setInputText, socket }) => {
     setInputText('')
   }, [inputText])
 
+  // const onClickJoin = () => {
+  //   console.log('')
+  //   socket.emit()
+  // }
+
+  const inputBody = () => {
+    return (
+      <>
+        <Input
+          type='text'
+          value={inputText}
+          onChange={(event) => {
+            setInputText(event.target.value)
+          }}
+        />
+        <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
+          Send
+        </Button>
+      </>
+    )
+  }
+
+  const joinBody = () => {
+    return (
+      <>
+        <Button>
+          join
+        </Button>
+      </>
+    )
+  }
+
   return (
     <Flex p={4}>
-      <Input
-        type='text'
-        value={inputText}
-        onChange={(event) => {
-          setInputText(event.target.value)
-        }}
-      />
-      <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
-        Send
-      </Button>
+      {/* <inputBody/> */}
+      <joinBody/>
     </Flex>
   )
 }
