@@ -21,7 +21,7 @@ import { FetchError } from 'src/lib/fetch-json'
 import SimpleSidebar from '@components/chat/simple-sidebar'
 import { useUser } from 'src/lib/use-user'
 
-const socket = io('http://localhost:3000/chat')
+const socket = io('http://localhost:3000/chat', { transports: ['websocket'] })
 const API_URL = 'http://localhost:3000'
 
 const Chat = () => {

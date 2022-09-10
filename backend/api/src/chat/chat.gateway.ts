@@ -20,12 +20,18 @@ export class ChatGateway {
 
 	private logger: Logger = new Logger('ChatGateway')
 
+	handleConnection(@ConnectedSocket() socket: Socket) {
+		this.chatService.connectSocketToUser(socket)
+		this.logger.log(`Client connected: ${socket.id}`)
+	}
+
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
 	async handleMessage(
 		@MessageBody() addMessageDto: AddMessageDto,
 		@ConnectedSocket() socket: Socket,
 	) {
+		//TODO[front]: addMessageDto.user 使わないので消す
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`)
 		const room = [...socket.rooms].slice(0)[1]
 		const newMessage = await this.chatService.addMessage(
@@ -89,11 +95,6 @@ export class ChatGateway {
 		this.server.emit('updateNewRoom', newChatRoom)
 	}
 }
-
-// handleConnection(@ConnectedSocket() socket: Socket) {
-//   //クライアント接続時
-//   this.logger.log(`Client connected: ${socket.id}`);
-// }
 
 // handleDisconnect(@ConnectedSocket() socket: Socket) {
 //   //クライアント切断時
