@@ -7,6 +7,9 @@ import Layout from '@components/layout'
 import Pong from '@components/game-pong'
 import GameSettingForm from '@components/game-setting'
 import GameResult from '@components/game-result'
+import { useUser } from '../../lib/use-user'
+
+const API_URL = 'http://localhost:3000'
 
 export interface KeyStatus {
   upPressed: boolean
@@ -18,18 +21,20 @@ export default function Game() {
     bar1: { top: 0, left: 0 },
     bar2: { top: 0, left: 0 },
     ball: { top: 0, left: 0 },
-    player1: { num: 0, point: 0 },
-    player2: { num: 0, point: 0 },
-    gameStatus: 0,
+    player1: { point: 0, name: '' },
+    player2: { point: 0, name: '' },
+    gameStatus: -1,
     gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
   const didLogRef = useRef(false)
   const keyStatus = useRef({ upPressed: false, downPressed: false })
   const router = useRouter()
-  const [gameStatus, setGameStatus] = useState<number>(0)
+  const [gameStatus, setGameStatus] = useState<number>(-1)
   const [server, setServer] = useState()
   const [playerRole, setPlayerRole] = useState(-1)
+  const [userId, setUserId] = useState()
+  const user = useUser()
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
     console.log(event.code)
@@ -50,6 +55,10 @@ export default function Game() {
   }
 
   useEffect(() => {
+    if (user) setUserId(user['userId'])
+  }, [user])
+
+  useEffect(() => {
     if (0 <= playerRole && playerRole <= 1) {
       const screen = document.getElementById('screen')
       if (screen) {
@@ -62,17 +71,24 @@ export default function Game() {
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      setServer(io('http://localhost:3000'))
+      setServer(io(API_URL))
     }
   }, [])
 
   useEffect(() => {
-    if (!server || !router.isReady) return
+    if (!server || !router.isReady || !userId) return
     const roomId = router.query.id
-    server.emit('connectServer', roomId)
+    server.emit('connectServer', { roomId: roomId, userId: userId })
+
+    server.on('noRoom', () => {
+      router.push('/404')
+    })
+
     server.on('connectClient', (data) => {
-      const playerStatus = data
-      setPlayerRole(data)
+      const playerStatus = data['role']
+      setGameObject(data['gameObject'])
+      setPlayerRole(playerStatus)
+      setGameStatus(data['gameObject'].gameStatus)
 
       server.on('clientMove', (data: GameObject) => {
         setGameObject(data)
@@ -87,8 +103,16 @@ export default function Game() {
         setGameObject(data)
         setGameStatus(data.gameStatus)
       })
+
+      server.on('clientQuit', () => {
+        router.push('/game')
+      })
+
+      server.on('goNewGame', (data: string) => {
+        router.push('/game/' + data)
+      })
     })
-  }, [server, router])
+  }, [server, router, userId])
 
   return (
     <Layout>
@@ -99,6 +123,8 @@ export default function Game() {
           roomId={router.query.id}
           server={server}
           gameSetting={gameObject.gameSetting}
+          player1Name={gameObject.player1.name}
+          player2Name={gameObject.player2.name}
           gameObject={gameObject}
         />
         <Pong gameObject={gameObject} />
@@ -107,7 +133,8 @@ export default function Game() {
           playerRole={playerRole}
           roomId={router.query.id}
           server={server}
-          router={router}
+          player1Name={gameObject.player1.name}
+          player2Name={gameObject.player2.name}
           gameObject={gameObject}
         />
       </div>

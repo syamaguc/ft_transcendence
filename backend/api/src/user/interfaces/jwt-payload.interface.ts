@@ -1,4 +1,4 @@
 export interface JwtPayload {
-	username: string;
-	auth: boolean;
+	username: string
+	auth: boolean
 }

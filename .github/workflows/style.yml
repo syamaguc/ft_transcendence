@@ -1,0 +1,117 @@
+name: 'style'
+
+on:
+  pull_request:
+    types: [opened, labeled, synchronize]
+
+jobs:
+  prettier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.action != 'labeled'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        id: restore-cache
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Setup node
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-node@v3
+
+      - name: Install Prettier - backend
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        working-directory: ./backend/api/
+        run: npm i prettier
+
+      - name: Install Prettier - frontend
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        working-directory: ./frontend
+        run: npm i prettier
+
+      - name: Run Prettier - backend
+        working-directory: ./backend/api/
+        run: npm run format
+
+      - name: Run Prettier - frontend
+        working-directory: ./frontend
+        run: npm run format
+
+      - name: Check Diff
+        id: diff-check
+        run: |
+          git diff --name-only --exit-code
+        continue-on-error: true
+
+      - name: Configure GitHub
+        if: steps.diff-check.outcome == 'failure'
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+
+      - name: Commit
+        if: steps.diff-check.outcome == 'failure'
+        run: |
+          git commit -am "automated: run formatter"
+
+      - name: Push
+        if: steps.diff-check.outcome == 'failure'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref }}
+
+  reviewdog:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.label.name == 'run-reviewdog'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Restore cache
+        uses: actions/cache@v3
+        id: restore-cache
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Setup node
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+        uses: actions/setup-node@v3
+        with:
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/api/package-lock.json
+            frontend/package-lock.json
+
+      - name: Run reviewdog - backend
+        uses: reviewdog/action-eslint@v1
+        with:
+          workdir: './backend/api'
+          filter_mode: nofilter
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run reviewdog - frontend
+        uses: reviewdog/action-eslint@v1
+        with:
+          workdir: './frontend'
+          filter_mode: nofilter
+          reporter: github-pr-review
+          github_token: ${{ secrets.GITHUB_TOKEN }}
