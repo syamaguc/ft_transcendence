@@ -25,18 +25,15 @@ import { User } from 'src/types/user'
 const socket = io('http://localhost:3000')
 const API_URL = 'http://localhost:3000'
 
-const checkAccessibility = ({currentRoom}, user : User) : Boolean => {
-  if (!user || !currentRoom)
-    return false;
-  const members : string[] = currentRoom.members
-  if (!members)
-    return false;
-  if (members.indexOf(user.userId) == -1)
-    return false;
-  return true;
+const checkAccessibility = ({ currentRoom }, user: User): Boolean => {
+  if (!user || !currentRoom) return false
+  const members: string[] = currentRoom.members
+  if (!members) return false
+  if (members.indexOf(user.userId) == -1) return false
+  return true
 }
 
-const InputBody = ({inputText, setInputText, onClickSubmit}) => {
+const InputBody = ({ inputText, setInputText, onClickSubmit }) => {
   return (
     // <Flex p={4}>
     <>
@@ -55,15 +52,19 @@ const InputBody = ({inputText, setInputText, onClickSubmit}) => {
   )
 }
 
-const onClickJoin = (roomId : string) => {
+const onClickJoin = (roomId: string) => {
   socket.emit('joinRoom', roomId)
   console.log('joinroom', roomId)
 }
 
-const JoinBody = ({currentRoom}) => {
+const JoinBody = ({ currentRoom }) => {
   return (
     <>
-      <Button onClick={() => {onClickJoin(currentRoom.id)}}>
+      <Button
+        onClick={() => {
+          onClickJoin(currentRoom.id)
+        }}
+      >
         join
       </Button>
     </>
@@ -137,9 +138,15 @@ const Chat = () => {
           <MiddleBar chatLog={chatLog} />
           {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
           <Flex p={4}>
-            {checkAccessibility(currentRoom, user) ?
-            <InputBody inputText={inputText} setInputText={setInputText} onClickSubmit={onClickSubmit}/>
-            : <JoinBody currentRoom={currentRoom}/>}
+            {checkAccessibility(currentRoom, user) ? (
+              <InputBody
+                inputText={inputText}
+                setInputText={setInputText}
+                onClickSubmit={onClickSubmit}
+              />
+            ) : (
+              <JoinBody currentRoom={currentRoom} />
+            )}
           </Flex>
         </Flex>
       </Flex>

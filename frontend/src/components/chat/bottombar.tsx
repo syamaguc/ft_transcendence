@@ -48,9 +48,7 @@ const BottomBar = ({ inputText, setInputText, socket }) => {
   const joinBody = () => {
     return (
       <>
-        <Button>
-          join
-        </Button>
+        <Button>join</Button>
       </>
     )
   }
@@ -58,7 +56,7 @@ const BottomBar = ({ inputText, setInputText, socket }) => {
   return (
     <Flex p={4}>
       {/* <inputBody/> */}
-      <joinBody/>
+      <joinBody />
     </Flex>
   )
 }

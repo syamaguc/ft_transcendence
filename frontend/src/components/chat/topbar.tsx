@@ -4,13 +4,18 @@ import { ChannelObject, MessageObject } from 'src/types/chat'
 import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
 
-
 const TopBar = ({ currentRoom }) => {
   return (
-    <Flex h='55px' borderBottom='1px solid' borderColor='gray.100' p={4} align='center'>
+    <Flex
+      h='55px'
+      borderBottom='1px solid'
+      borderColor='gray.100'
+      p={4}
+      align='center'
+    >
       <Text>Current Channel : {currentRoom.name}</Text>
       {/* <IconButton size='sm' icon={<UsersIcon/>}/> */}
-      <MemberListModal currentRoom={currentRoom}/>
+      <MemberListModal currentRoom={currentRoom} />
     </Flex>
   )
 }
