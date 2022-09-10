@@ -23,7 +23,7 @@ const API_URL = 'http://localhost:3000'
 const ProfileModal = ({message}) => {
   const [url, setUrl] = useState('')
   const [user, setUser] = useState<User>()
-  const [picture, setPicture] = useState('')
+  // const [picture, setPicture] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   useEffect(() => {
