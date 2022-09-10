@@ -1,13 +1,31 @@
 import Layout from '@components/layout'
-import { Box, Button, HStack, Input, Spacer, Stack } from '@chakra-ui/react'
+// import { Flex } from "@chakra-ui/layout"
+import {
+  Box,
+  Button,
+  HStack,
+  Input,
+  Spacer,
+  Stack,
+  Flex,
+  Text,
+} from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import ChatSideBar from '@components/chat-sidebar'
 import { ChannelObject, MessageObject } from 'src/types/chat'
+import TopBar from '@components/chat/topbar'
+import MiddleBar from '@components/chat/middlebar'
+import BottomBar from '@components/chat/bottombar'
+import { FetchError } from 'src/lib/fetch-json'
+import SimpleSidebar from '@components/chat/simple-sidebar'
+import { useUser } from 'src/lib/use-user'
 
 const socket = io('http://localhost:3000')
+const API_URL = 'http://localhost:3000'
 
 const Chat = () => {
+  const user = useUser()
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
@@ -39,7 +57,7 @@ const Chat = () => {
 
   const onClickSubmit = useCallback(() => {
     const message = {
-      user: 'tmp_user',
+      user: user.username,
       message: inputText,
       timestamp: new Date(),
     }
@@ -57,8 +75,8 @@ const Chat = () => {
 
   return (
     <Layout>
-      <Box>
-        <HStack>
+      <Flex>
+        <Flex w='300px' h='90vh' borderEnd='1px solid' borderColor='gray'>
           <ChatSideBar
             socket={socket}
             currentRoom={currentRoom}
@@ -66,14 +84,12 @@ const Chat = () => {
             setChatLog={setChatLog}
             setInputMessage={setInputText}
           />
-          <Stack>
-            <Box>Current Channel:{currentRoom.name}</Box>
-            <Spacer />
-            {chatLog.length
-              ? chatLog.map((message: MessageObject) => (
-                  <p key={message.id}>{message.message}</p>
-                ))
-              : null}
+        </Flex>
+        <Flex h='90vh' w='100%' direction='column'>
+          <TopBar currentRoom={currentRoom} />
+          <MiddleBar chatLog={chatLog} />
+          {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
+          <Flex p={4}>
             <Input
               type='text'
               value={inputText}
@@ -81,12 +97,12 @@ const Chat = () => {
                 setInputText(event.target.value)
               }}
             />
-            <Button onClick={onClickSubmit} type='submit'>
-              Send Message
+            <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
+              Send
             </Button>
-          </Stack>
-        </HStack>
-      </Box>
+          </Flex>
+        </Flex>
+      </Flex>
     </Layout>
   )
 }
