@@ -58,7 +58,7 @@ export class ChatService {
 		const room: ChatRoom = await chatRepository.findId(roomId)
 		const message: Message = {
 			id: uuidv4(),
-			user: userId,
+			userId: userId,
 			...addMessageDto,
 			room: room,
 		}
