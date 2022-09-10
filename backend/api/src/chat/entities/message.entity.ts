@@ -13,7 +13,7 @@ export class Message {
 	id: string
 
 	@Column()
-	user: string
+	userId: string
 
 	@Column()
 	message: string

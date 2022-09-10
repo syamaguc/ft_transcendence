@@ -22,7 +22,7 @@ import SimpleSidebar from '@components/chat/simple-sidebar'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
 
-const socket = io('http://localhost:3000')
+const socket = io('http://localhost:3000/chat', { transports: ['websocket'] })
 const API_URL = 'http://localhost:3000'
 
 const checkAccessibility = ({ currentRoom }, user: User): Boolean => {

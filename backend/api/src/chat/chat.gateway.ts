@@ -10,15 +10,27 @@ import { Server, Socket } from 'socket.io'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
+import { User } from 'src/user/entities/user.entity'
+import { UserService } from 'src/user/user.service'
 
-@WebSocketGateway({ cors: { origin: '*' } })
+@WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
 	@WebSocketServer()
 	server: Server
 
-	constructor(private readonly chatService: ChatService) {}
+	constructor(
+		private readonly chatService: ChatService,
+		private readonly userService: UserService,
+	) {}
 
 	private logger: Logger = new Logger('ChatGateway')
+
+	async handleConnection(@ConnectedSocket() socket: Socket) {
+		const username = this.chatService.getUsernameFromSocket(socket)
+		const user: Partial<User> = await this.userService.userInfo(username)
+		socket.data.userId = user.userId
+		this.logger.log(`Client connected: ${socket.id}`)
+	}
 
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
@@ -30,8 +42,10 @@ export class ChatGateway {
 		const room = [...socket.rooms].slice(0)[1]
 		const newMessage = await this.chatService.addMessage(
 			addMessageDto,
+			socket.data.userId,
 			room,
 		)
+		console.log(socket.data.userId)
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
@@ -73,7 +87,7 @@ export class ChatGateway {
 	@SubscribeMessage('joinRoom')
 	joinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
 		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
-		this.chatService.joinRoom(roomId)
+		this.chatService.joinRoom(socket.data.userId, roomId)
 		this.watchOrSwitchRoom(roomId, socket)
 	}
 
@@ -83,17 +97,15 @@ export class ChatGateway {
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChatRoom = await this.chatService.createRoom(createChatRoomDto)
+		const newChatRoom = await this.chatService.createRoom(
+			createChatRoomDto,
+			socket.data.userId,
+		)
 		this.joinRoom(newChatRoom.id, socket)
 		this.logger.log(newChatRoom)
 		this.server.emit('updateNewRoom', newChatRoom)
 	}
 }
-
-// handleConnection(@ConnectedSocket() socket: Socket) {
-//   //クライアント接続時
-//   this.logger.log(`Client connected: ${socket.id}`);
-// }
 
 // handleDisconnect(@ConnectedSocket() socket: Socket) {
 //   //クライアント切断時
