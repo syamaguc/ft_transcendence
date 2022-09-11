@@ -16,10 +16,10 @@ export const chatRepository = AppDataSource.getRepository(ChatRoom).extend({
 	async getRooms(): Promise<ChatRoom[]> {
 		return await this.find({
 			order: {
-				time_created: "ASC"
-			}
+				time_created: 'ASC',
+			},
 		})
-	}
+	},
 
 	// async addMessage(newMessage: MessageI, roomId: string): Promise<Message> {
 	// 	const room : ChatRoom = await this.findId(roomId);
