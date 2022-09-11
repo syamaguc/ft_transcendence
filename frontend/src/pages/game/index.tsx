@@ -13,7 +13,7 @@ export default function GameMatching() {
   const didLogRef = useRef(false)
   const router = useRouter()
   const [userId, setUserId] = useState()
-  const user = useUser()
+  const { user } = useUser()
   const gameRoomsRef = useRef<GameRoom[]>([])
   const [gameRooms, setGameRooms] = useState<GameRoom[]>([])
   const [gameRoomsLog, setGameRoomsLog] = useState(false)
