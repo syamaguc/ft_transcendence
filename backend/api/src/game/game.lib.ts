@@ -329,4 +329,16 @@ export class GameRoom {
 			}
 		}
 	}
+
+	inUser(userId: string) {
+		for (let i = 0; i < this.socketDatas.length; i++) {
+			const socketData = this.socketDatas[i]
+			if (
+				(socketData.role == 0 || socketData.role == 1) &&
+				socketData.userId == userId
+			)
+				return true
+		}
+		return false
+	}
 }

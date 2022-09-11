@@ -31,6 +31,15 @@ export class GameGateway {
 		return -1
 	}
 
+	searchRoomFromUserId(userId: string) {
+		for (let i = 0; i < this.gameRooms.length; i++) {
+			if (this.gameRooms[i].inUser(userId)) {
+				return this.gameRooms[i].id
+			}
+		}
+		return null
+	}
+
 	async currentUser(userId: string): Promise<Partial<User>> {
 		let userFound: User = undefined
 		userFound = await UsersRepository.findOne({
@@ -190,13 +199,18 @@ export class GameGateway {
 	) {
 		const userId: string = data['userId']
 		let status = 0
+		const gameId = this.searchRoomFromUserId(userId)
+		if (gameId) {
+			status = 2
+		}
 		this.disconnectMatchUserRemove()
-		if (this.checkInMatchUsers(userId) != -1) {
+		if (!gameId && this.checkInMatchUsers(userId) != -1) {
 			status = 1
 		}
 		this.server.to(client.id).emit('setFirstGameRooms', {
 			gameRooms: this.gameRoomInfos,
 			status: status,
+			gameRoomId: gameId,
 		})
 		client.join('readyIndex')
 	}
