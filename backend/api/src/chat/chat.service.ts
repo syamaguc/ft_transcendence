@@ -12,6 +12,7 @@ import { JwtPayload } from 'src/user/interfaces/jwt-payload.interface'
 import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
+import { UsersRepository } from 'src/user/user.repository'
 
 @Injectable()
 export class ChatService {
@@ -80,6 +81,23 @@ export class ChatService {
 	async getRooms(): Promise<ChatRoom[]> {
 		const rooms = await chatRepository.getRooms()
 		return rooms
+	}
+
+	async getMembers(roomId: string): Promise<User[]> {
+		const members = await chatRepository.getMembers(roomId)
+		return UsersRepository.createQueryBuilder('user')
+			.select([
+				'user.userId',
+				'user.username',
+				'user.profile_picture',
+				'user.elo',
+				'user.game_won',
+				'user.lost_game',
+				'user.ratio',
+				'user.status',
+			])
+			.where('user.userId IN (:...members)', { members })
+			.getMany()
 	}
 
 	async joinRoom(userId: uuidv4, roomId: string): Promise<ChatRoom> {

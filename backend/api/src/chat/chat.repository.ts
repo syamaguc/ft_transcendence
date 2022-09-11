@@ -21,6 +21,16 @@ export const chatRepository = AppDataSource.getRepository(ChatRoom).extend({
 		})
 	},
 
+	async getMembers(roomId: string): Promise<string[]> {
+		const qb = this.createQueryBuilder()
+		const { members } = await qb
+			.select('chat_room.members')
+			.from(ChatRoom, 'chat_room')
+			.where('chat_room.id = :roomId', { roomId })
+			.getOne()
+		return members
+	},
+
 	// async addMessage(newMessage: MessageI, roomId: string): Promise<Message> {
 	// 	const room : ChatRoom = await this.findId(roomId);
 	// 	const msg: Message = {

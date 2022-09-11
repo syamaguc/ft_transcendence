@@ -60,6 +60,16 @@ export class ChatGateway {
 		socket.emit('getRooms', rooms)
 	}
 
+	@SubscribeMessage('getMembers')
+	async getMembers(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`getMembers: for ${socket.id}`)
+		const rooms = await this.chatService.getMembers(roomId)
+		socket.emit('getMembers', rooms)
+	}
+
 	// room which user is watching
 	@SubscribeMessage('watchRoom')
 	watchOrSwitchRoom(
