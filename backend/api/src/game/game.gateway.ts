@@ -4,22 +4,14 @@ import {
 	SubscribeMessage,
 	MessageBody,
 	ConnectedSocket,
-	WsResponse,
 } from '@nestjs/websockets'
-import { Logger, UseGuards, NotFoundException } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import { Logger, NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
-import { UserAuth } from '../user/guards/userAuth.guard'
 import { User } from '../user/entities/user.entity'
 import { UsersRepository } from '../user/user.repository'
 import { GameRoom } from './game.lib'
-import {
-	socketData,
-	KeyStatus,
-	GameRoomInfo,
-	GamePlayer,
-} from './game.interface'
+import { socketData, KeyStatus, GameRoomInfo } from './game.interface'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -39,6 +31,15 @@ export class GameGateway {
 		return -1
 	}
 
+	searchRoomFromUserId(userId: string) {
+		for (let i = 0; i < this.gameRooms.length; i++) {
+			if (this.gameRooms[i].inUser(userId)) {
+				return this.gameRooms[i].id
+			}
+		}
+		return null
+	}
+
 	async currentUser(userId: string): Promise<Partial<User>> {
 		let userFound: User = undefined
 		userFound = await UsersRepository.findOne({
@@ -46,6 +47,7 @@ export class GameGateway {
 		})
 		if (!userFound) throw new NotFoundException('No user found')
 		const { password, ...res } = userFound
+		this.logger.log(password)
 		return res
 	}
 
@@ -121,7 +123,7 @@ export class GameGateway {
 		}
 		// 検索失敗時のエラー処理追加予定
 		const id = uuidv4()
-		let gameRoom = new GameRoom(id, this.server, player1, player2)
+		const gameRoom = new GameRoom(id, this.server, player1, player2)
 		gameRoom.gameObject.gameSetting = gameObject.gameSetting
 		this.gameRooms.push(gameRoom)
 		for (let i = 0; i < socketDatas.length; i++) {
@@ -162,15 +164,20 @@ export class GameGateway {
 		}
 	}
 
-	@SubscribeMessage('readyGameIndex')
-	handleReadyGameIndex(
-		@MessageBody() data: any,
-		@ConnectedSocket() client: Socket,
-	) {
-		this.server
-			.to(client.id)
-			.emit('setFirstGameRooms', { gameRooms: this.gameRoomInfos })
-		client.join('readyIndex')
+	checkInMatchUsers(userId: string): number {
+		for (let i = 0; i < this.matchUsers.length; i++) {
+			if (userId == this.matchUsers[i].userId) {
+				return i
+			}
+		}
+		return -1
+	}
+
+	checkAndUpdateInMatchUsers(userId: string, client: Socket): boolean {
+		const index = this.checkInMatchUsers(userId)
+		if (index == -1) return false
+		this.matchUsers[index].client = client
+		return true
 	}
 
 	disconnectMatchUserRemove() {
@@ -183,6 +190,29 @@ export class GameGateway {
 		for (let i = removeArray.length - 1; i >= 0; i--) {
 			this.matchUsers.splice(removeArray[i], 1)
 		}
+	}
+
+	@SubscribeMessage('readyGameIndex')
+	handleReadyGameIndex(
+		@MessageBody() data: any,
+		@ConnectedSocket() client: Socket,
+	) {
+		const userId: string = data['userId']
+		let status = 0
+		const gameId = this.searchRoomFromUserId(userId)
+		if (gameId) {
+			status = 2
+		}
+		this.disconnectMatchUserRemove()
+		if (!gameId && this.checkInMatchUsers(userId) != -1) {
+			status = 1
+		}
+		this.server.to(client.id).emit('setFirstGameRooms', {
+			gameRooms: this.gameRoomInfos,
+			status: status,
+			gameRoomId: gameId,
+		})
+		client.join('readyIndex')
 	}
 
 	// @UseGuards(AuthGuard('jwt'), UserAuth)
@@ -200,46 +230,48 @@ export class GameGateway {
 			this.logger.log(userId)
 			this.logger.log(userName)
 			this.disconnectMatchUserRemove()
-			const clientData: socketData = {
-				client: client,
-				role: -1,
-				userId: userId,
-				userName: userName,
-			}
-			if (this.matchUsers.length >= 1) {
-				const id = uuidv4()
-				this.matchUsers[0].role = 0
-				clientData.role = 1
-				this.gameRooms.push(
-					new GameRoom(
-						id,
-						this.server,
-						this.matchUsers[0],
-						clientData,
-					),
-				)
-				this.server.to(client.id).emit('goGameRoom', id)
-				this.server
-					.to(this.matchUsers[0].client.id)
-					.emit('goGameRoom', id)
-				const gameRoomInfo = {
-					id: id,
-					player1: {
-						id: this.matchUsers[0].userId,
-						name: this.matchUsers[0].userName,
-					},
-					player2: {
-						id: clientData.userId,
-						name: clientData.userName,
-					},
+			if (!this.checkAndUpdateInMatchUsers(userId, client)) {
+				const clientData: socketData = {
+					client: client,
+					role: -1,
+					userId: userId,
+					userName: userName,
 				}
-				this.gameRoomInfos.push(gameRoomInfo)
-				this.server
-					.to('readyIndex')
-					.emit('addGameRoom', { gameRoom: gameRoomInfo })
-				this.matchUsers.splice(0, 1)
-			} else {
-				this.matchUsers.push(clientData)
+				if (this.matchUsers.length >= 1) {
+					const id = uuidv4()
+					this.matchUsers[0].role = 0
+					clientData.role = 1
+					this.gameRooms.push(
+						new GameRoom(
+							id,
+							this.server,
+							this.matchUsers[0],
+							clientData,
+						),
+					)
+					this.server.to(client.id).emit('goGameRoom', id)
+					this.server
+						.to(this.matchUsers[0].client.id)
+						.emit('goGameRoom', id)
+					const gameRoomInfo = {
+						id: id,
+						player1: {
+							id: this.matchUsers[0].userId,
+							name: this.matchUsers[0].userName,
+						},
+						player2: {
+							id: clientData.userId,
+							name: clientData.userName,
+						},
+					}
+					this.gameRoomInfos.push(gameRoomInfo)
+					this.server
+						.to('readyIndex')
+						.emit('addGameRoom', { gameRoom: gameRoomInfo })
+					this.matchUsers.splice(0, 1)
+				} else {
+					this.matchUsers.push(clientData)
+				}
 			}
 			this.logger.log(this.matchUsers.length)
 		})
