@@ -45,6 +45,7 @@ export class ChatService {
 			...chatRoomData,
 			id: uuidv4(),
 			owner: userId,
+			// admin: [{userId}],
 		}
 		const chat = await this.chatRoomRepository.save(newChatRoom)
 		return chat
@@ -77,7 +78,7 @@ export class ChatService {
 	}
 
 	async getRooms(): Promise<ChatRoom[]> {
-		const rooms = await chatRepository.find()
+		const rooms = await chatRepository.getRooms()
 		return rooms
 	}
 

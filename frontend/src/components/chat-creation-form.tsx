@@ -37,6 +37,7 @@ type CreateChatRoomDto = {
   owner: string
   is_private: boolean
   password: string
+  time_created: Date
 }
 
 const ChatCreationFormContent = ({
@@ -98,9 +99,10 @@ const ChatCreationForm = ({ socket }: Props) => {
     )
     const enterdData: CreateChatRoomDto = {
       name: enteredChannelName,
-      owner: 'user',
+      // owner: 'user',
       is_private: enteredIsPrivate,
       password: enteredPassword,
+      time_created: new Date(),
     }
     socket.emit('createRoom', enterdData)
   }

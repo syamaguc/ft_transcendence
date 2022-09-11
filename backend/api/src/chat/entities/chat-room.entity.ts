@@ -30,4 +30,7 @@ export class ChatRoom {
 
 	@Column('text', { default: '' })
 	password: string
+
+	@Column()
+	time_created: Date
 }
