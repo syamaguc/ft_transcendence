@@ -216,9 +216,7 @@ export class GameRoom {
 		if (finishFlag == 0) {
 			this.play()
 		} else {
-			let player1
-			let player2
-			;[player1, player2] = this._get_player1_and_player2()
+			const [player1, player2] = this._get_player1_and_player2()
 
 			const info: gameInfo = {
 				gameId: this.id,
@@ -287,9 +285,7 @@ export class GameRoom {
 	}
 
 	retry() {
-		let player1
-		let player2
-		;[player1, player2] = this._get_player1_and_player2()
+		const [player1, player2] = this._get_player1_and_player2()
 		return [this.gameObject, player1, player2]
 	}
 

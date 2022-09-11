@@ -4,22 +4,14 @@ import {
 	SubscribeMessage,
 	MessageBody,
 	ConnectedSocket,
-	WsResponse,
 } from '@nestjs/websockets'
-import { Logger, UseGuards, NotFoundException } from '@nestjs/common'
-import { AuthGuard } from '@nestjs/passport'
+import { Logger, NotFoundException } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
-import { UserAuth } from '../user/guards/userAuth.guard'
 import { User } from '../user/entities/user.entity'
 import { UsersRepository } from '../user/user.repository'
 import { GameRoom } from './game.lib'
-import {
-	socketData,
-	KeyStatus,
-	GameRoomInfo,
-	GamePlayer,
-} from './game.interface'
+import { socketData, KeyStatus, GameRoomInfo } from './game.interface'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -46,6 +38,7 @@ export class GameGateway {
 		})
 		if (!userFound) throw new NotFoundException('No user found')
 		const { password, ...res } = userFound
+		this.logger.log(password)
 		return res
 	}
 
@@ -121,7 +114,7 @@ export class GameGateway {
 		}
 		// 検索失敗時のエラー処理追加予定
 		const id = uuidv4()
-		let gameRoom = new GameRoom(id, this.server, player1, player2)
+		const gameRoom = new GameRoom(id, this.server, player1, player2)
 		gameRoom.gameObject.gameSetting = gameObject.gameSetting
 		this.gameRooms.push(gameRoom)
 		for (let i = 0; i < socketDatas.length; i++) {
@@ -196,14 +189,15 @@ export class GameGateway {
 		@ConnectedSocket() client: Socket,
 	) {
 		const userId: string = data['userId']
-		let status: number = 0
+		let status = 0
 		this.disconnectMatchUserRemove()
 		if (this.checkInMatchUsers(userId) != -1) {
 			status = 1
 		}
-		this.server
-			.to(client.id)
-			.emit('setFirstGameRooms', { gameRooms: this.gameRoomInfos, status: status })
+		this.server.to(client.id).emit('setFirstGameRooms', {
+			gameRooms: this.gameRoomInfos,
+			status: status,
+		})
 		client.join('readyIndex')
 	}
 

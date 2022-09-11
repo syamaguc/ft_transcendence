@@ -1,5 +1,4 @@
 import { Socket } from 'socket.io'
-import { User } from '../user/entities/user.entity'
 
 export interface gameInfo {
 	gameId: string
