@@ -10,6 +10,7 @@ import { Server, Socket } from 'socket.io'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
+import { ChatRoom } from './entities/chat-room.entity'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
@@ -56,9 +57,6 @@ export class ChatGateway {
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`)
 		const rooms = await this.chatService.getRooms()
-		//tmp
-		// const roomsList = []
-		// rooms.map((r) => roomsList.push({ id: r.id, name: r.name }))
 		socket.emit('getRooms', rooms)
 	}
 
@@ -76,10 +74,17 @@ export class ChatGateway {
 
 	// join room to be a member
 	@SubscribeMessage('joinRoom')
-	joinRoom(@MessageBody() roomId: string, @ConnectedSocket() socket: Socket) {
+	async joinRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
 		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
-		this.chatService.joinRoom(socket.data.userId, roomId)
 		this.watchOrSwitchRoom(roomId, socket)
+		const room: ChatRoom = await this.chatService.joinRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
@@ -95,6 +100,10 @@ export class ChatGateway {
 		this.joinRoom(newChatRoom.id, socket)
 		this.logger.log(newChatRoom)
 		this.server.emit('updateNewRoom', newChatRoom)
+	}
+
+	async updateRoom(room: ChatRoom) {
+		this.server.to(room.id).emit('updateCurrentRoom', room)
 	}
 }
 

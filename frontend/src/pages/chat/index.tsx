@@ -141,6 +141,10 @@ const Chat = () => {
         console.log('recieved : ', message)
         setMsg(message)
       })
+      socket.on('updateCurrentRoom', (channel: ChannelObject) => {
+        console.log('recupdateCurrentRoom recieved : ', channel)
+        setCurrentRoom(channel)
+      })
     }
   }, [])
 
