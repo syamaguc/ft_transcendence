@@ -60,9 +60,9 @@ export class ChatService {
 		return messageRepository.addMessage(message)
 	}
 
-	async getMessageLog(roomId: string): Promise<Message[]> {
-		const room: ChatRoom = await chatRepository.findId(roomId)
-		return room.messages
+	async getMessageLog(roomId: string): Promise<any> {
+		const messagesWithUserInfo = await messageRepository.getMessages(roomId)
+		return messagesWithUserInfo
 	}
 
 	async findRoom(roomId: string): Promise<ChatRoom> {
