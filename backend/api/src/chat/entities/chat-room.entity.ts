@@ -22,12 +22,18 @@ export class ChatRoom {
 	@Column('boolean', { default: false })
 	is_private: boolean
 
-	// @Column('simple-array', { default: [] })
-	// logs: MessageI[]
-
 	@OneToMany(() => Message, (msg) => msg.room)
 	messages: Message[]
 
 	@Column('text', { default: '' })
 	password: string
+
+	@Column()
+	time_created: Date
+
+	// @Column()
+	// time_updated: Date
+
+	// @Column()
+	// type: string
 }
