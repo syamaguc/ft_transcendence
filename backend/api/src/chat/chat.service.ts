@@ -45,7 +45,7 @@ export class ChatService {
 			...chatRoomData,
 			id: uuidv4(),
 			owner: userId,
-			// admin: [{userId}],
+			admins: [userId],
 		}
 		const chat = await this.chatRoomRepository.save(newChatRoom)
 		return chat
@@ -89,10 +89,11 @@ export class ChatService {
 			console.log('=========new member joined the channel=========')
 			room.members.push(userId)
 			return chatRepository.save(room)
-		} else {
-			console.log(
-				'============error in join room: the user is already a member==========',
-			)
 		}
+		// else {
+		// 	console.log(
+		// 		'============error in join room: the user is already a member==========',
+		// 	)
+		// }
 	}
 }
