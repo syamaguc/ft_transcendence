@@ -80,15 +80,14 @@ export class ChatService {
 	async joinRoom(userId: uuidv4, roomId: string) {
 		const room = await chatRepository.findId(roomId)
 		console.log(room)
-		if (room.members.indexOf(userId) === -1)
-		{
-			console.log("=========new member joined the channel=========")
+		if (room.members.indexOf(userId) === -1) {
+			console.log('=========new member joined the channel=========')
 			room.members.push(userId)
 			const chatRoom = await chatRepository.save(room)
-		}
-		else
-		{
-			console.log("============error in join room: the user is already a member==========")
+		} else {
+			console.log(
+				'============error in join room: the user is already a member==========',
+			)
 		}
 	}
 }

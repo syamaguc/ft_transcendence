@@ -74,29 +74,41 @@ const JoinBody = ({ currentRoom }) => {
   )
 }
 
-const CheckAccessibility = ({inputText, setInputText, onClickSubmit, currentRoom, user }) => {
-  console.log("current room",currentRoom)
-  console.log("user", user)
+const CheckAccessibility = ({
+  inputText,
+  setInputText,
+  onClickSubmit,
+  currentRoom,
+  user,
+}) => {
+  console.log('current room', currentRoom)
+  console.log('user', user)
   if (!user || !currentRoom)
     return (
-      <><JoinBody currentRoom={currentRoom} /></>
-  )
+      <>
+        <JoinBody currentRoom={currentRoom} />
+      </>
+    )
   const members: string[] = currentRoom.members
   if (!members)
     return (
-      <><JoinBody currentRoom={currentRoom} /></>
-  )
+      <>
+        <JoinBody currentRoom={currentRoom} />
+      </>
+    )
   // console.log("member is", members)
   if (members.indexOf(user.userId) == -1)
     return (
-      <><JoinBody currentRoom={currentRoom} /></>
-  )
+      <>
+        <JoinBody currentRoom={currentRoom} />
+      </>
+    )
   return (
     <InputBody
-    inputText={inputText}
-    setInputText={setInputText}
-    onClickSubmit={onClickSubmit}
-  />
+      inputText={inputText}
+      setInputText={setInputText}
+      onClickSubmit={onClickSubmit}
+    />
   )
 }
 
@@ -167,7 +179,13 @@ const Chat = () => {
           <MiddleBar chatLog={chatLog} />
           {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
           <Flex p={4}>
-            <CheckAccessibility inputText={inputText} setInputText={setInputText} onClickSubmit={onClickSubmit} currentRoom={currentRoom} user={user}/>
+            <CheckAccessibility
+              inputText={inputText}
+              setInputText={setInputText}
+              onClickSubmit={onClickSubmit}
+              currentRoom={currentRoom}
+              user={user}
+            />
             {/* {checkAccessibility(currentRoom, user) ? (
               <InputBody
                 inputText={inputText}
