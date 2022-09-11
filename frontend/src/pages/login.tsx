@@ -5,6 +5,7 @@ import {
   Flex,
   Stack,
   VisuallyHidden,
+  Spinner,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
@@ -63,11 +64,29 @@ function LoginAdmin(props: LoginAdminProps) {
 }
 
 function LoginPage() {
-  // here we just check if user is already logged in and redirect to home
-  useUser({ redirectTo: '/', redirectIfFound: true })
-
+  const { status } = useUser({ redirectTo: '/', redirectIfFound: true })
   const admin = useDisclosure()
   const bgColor = useColorModeValue('gray.50', 'inherit')
+
+  if (status === 'loading') {
+    return (
+      <Box w='100%' h='100vh'>
+        <Box
+          w='full'
+          h='full'
+          display='flex'
+          alignItems='center'
+          justifyContent='center'
+        >
+          <Spinner />
+        </Box>
+      </Box>
+    )
+  }
+
+  if (status === 'authenticated') {
+    return <div>Authenticated</div>
+  }
 
   return (
     <>
