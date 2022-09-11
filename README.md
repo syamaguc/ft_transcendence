@@ -19,6 +19,8 @@ SECRET=''
 - restart: コンテナを再起動
 - format_frontend: frontendコンテナ内で`npm run format`を実行
 - lint_frontend: frontendコンテナ内で`npm run lint`を実行
+- format_backend: apiコンテナ内で`npm run format`を実行
+- lint_backend: apiコンテナ内で`npm run lint`を実行
 - down: コンテナを停止し、一部の情報を削除
 - image_clean: イメージの全削除
 - volume_clean: volumeの全削除
