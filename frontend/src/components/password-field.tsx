@@ -2,6 +2,7 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  FormErrorMessage,
   IconButton,
   Input,
   InputGroup,
@@ -13,44 +14,52 @@ import {
 import * as React from 'react'
 import { HiEye, HiEyeOff } from 'react-icons/hi'
 
-const PasswordField = React.forwardRef<HTMLInputElement, InputProps>(
-  (props, ref) => {
-    const { isOpen, onToggle } = useDisclosure()
-    const inputRef = React.useRef<HTMLInputElement>()
+type PasswordFieldProps = {
+  isInvalid: boolean
+  errorMessage: string
+}
 
-    const mergeRef = useMergeRefs(inputRef, ref)
-    const onClickReveal = () => {
-      onToggle()
-      if (inputRef.current) {
-        inputRef.current.focus({ preventScroll: true })
-      }
+const PasswordField = React.forwardRef<
+  HTMLInputElement,
+  PasswordFieldProps & InputProps
+>((props, ref) => {
+  const { isOpen, onToggle } = useDisclosure()
+  const inputRef = React.useRef<HTMLInputElement>()
+
+  const mergeRef = useMergeRefs(inputRef, ref)
+  const onClickReveal = () => {
+    onToggle()
+    if (inputRef.current) {
+      inputRef.current.focus({ preventScroll: true })
     }
-
-    return (
-      <FormControl>
-        <FormLabel htmlFor='password'>Password</FormLabel>
-        <InputGroup>
-          <InputRightElement>
-            <IconButton
-              variant='link'
-              aria-label={isOpen ? 'Mask password' : 'Reveal password'}
-              icon={isOpen ? <HiEyeOff /> : <HiEye />}
-              onClick={onClickReveal}
-            />
-          </InputRightElement>
-          <Input
-            ref={mergeRef}
-            name='password'
-            type={isOpen ? 'text' : 'password'}
-            autoComplete='current-password'
-            required
-            {...props}
-          />
-        </InputGroup>
-        <FormHelperText>{`おすすめ："Test123!"`}</FormHelperText>
-      </FormControl>
-    )
   }
-)
+
+  return (
+    <FormControl isInvalid={props.isInvalid}>
+      <FormLabel htmlFor='password'>Password</FormLabel>
+      <InputGroup>
+        <Input
+          ref={mergeRef}
+          name='password'
+          type={isOpen ? 'text' : 'password'}
+          autoComplete='current-password'
+          onChange={props.onChange}
+          onBlur={props.onBlur}
+          value={props.value}
+        />
+        <InputRightElement>
+          <IconButton
+            variant='link'
+            aria-label={isOpen ? 'Mask password' : 'Reveal password'}
+            icon={isOpen ? <HiEyeOff /> : <HiEye />}
+            onClick={onClickReveal}
+          />
+        </InputRightElement>
+      </InputGroup>
+      <FormHelperText>{`おすすめ："Test123!"`}</FormHelperText>
+      <FormErrorMessage>{props.errorMessage}</FormErrorMessage>
+    </FormControl>
+  )
+})
 
 export default PasswordField

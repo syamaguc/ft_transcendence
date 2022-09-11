@@ -34,7 +34,7 @@ export default function Game() {
   const [server, setServer] = useState()
   const [playerRole, setPlayerRole] = useState(-1)
   const [userId, setUserId] = useState()
-  const user = useUser()
+  const { user } = useUser()
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
     console.log(event.code)
