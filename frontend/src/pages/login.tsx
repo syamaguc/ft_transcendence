@@ -23,6 +23,7 @@ import { useSWRConfig } from 'swr'
 
 import { useUser } from 'src/lib/use-user'
 import PasswordField from '@components/password-field'
+import { SignupForm } from '@components/signup'
 
 const API_URL = 'http://localhost:3000'
 
@@ -109,85 +110,6 @@ function LoginAdmin(props: LoginAdminProps) {
         <LoginForm />
       </Stack>
       <Button onClick={onClose}>Back</Button>
-    </>
-  )
-}
-
-function SignupForm() {
-  const { mutateUser } = useUser()
-  const [username, setUsername] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-
-  const handleSubmit = async () => {
-    console.log('Sign up...')
-    console.log('username: ', username)
-    console.log('email: ', email)
-    console.log('password: ', password)
-
-    let res = await fetch(`${API_URL}/api/user/signup`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        email: email,
-        password: password,
-        passwordConfirm: password,
-      }),
-    })
-
-    const { accessToken } = await res.json()
-
-    console.log('accessToken: ', accessToken)
-
-    mutateUser()
-
-    setUsername('')
-    setEmail('')
-    setPassword('')
-  }
-
-  return (
-    <>
-      <AuthForm title='Sign up'>
-        <Stack spacing='5'>
-          <FormControl>
-            <FormLabel htmlFor='username'>Username</FormLabel>
-            <Input
-              id='username'
-              type='username'
-              value={username}
-              onChange={(e) => {
-                setUsername(e.target.value)
-                setEmail(
-                  e.target.value + (e.target.value ? '@example.com' : '')
-                )
-              }}
-            />
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor='email'>Email</FormLabel>
-            <Input
-              id='email'
-              type='email'
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </FormControl>
-          <PasswordField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Stack>
-        <Stack spacing='6'>
-          <Button colorScheme='blue' onClick={handleSubmit}>
-            Sign up
-          </Button>
-        </Stack>
-      </AuthForm>
     </>
   )
 }
