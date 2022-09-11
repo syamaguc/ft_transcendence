@@ -105,7 +105,6 @@ const Chat = () => {
 
   const onClickSubmit = useCallback(() => {
     const message = {
-      user: user.username,
       message: inputText,
       timestamp: new Date(),
     }

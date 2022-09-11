@@ -1,6 +1,8 @@
 export interface MessageObject {
   id: string
-  user: string
+  userId: string
+  username: string
+  profile_picture: string
   message: string
   timestamp: Date
 }

@@ -39,13 +39,13 @@ const MiddleBar = ({ chatLog }) => {
               direction='horizontal'
               align='flex-start'
             >
-              <ProfileModal message={message} />
+              {/* <ProfileModal message={message} /> */}
 
-              {/* <Avatar m={2} size='sm' src={`${API_URL}/api/user/avatar/${user.profile_picture}`}/> */}
+              <Avatar m={2} size='sm' src={message.profile_picture} />
               <Flex direction='column'>
                 <Flex direction='horizontal' align='flex-end'>
                   <Text as='b' marginEnd={2}>
-                    {message.user}
+                    {message.username}
                   </Text>
                   <Text fontSize='xs' pb='1px'>
                     {timestampToTime(message.timestamp)}

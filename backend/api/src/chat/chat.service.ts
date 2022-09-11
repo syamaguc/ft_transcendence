@@ -10,14 +10,13 @@ import { JwtService } from '@nestjs/jwt'
 import { Socket } from 'socket.io'
 import { JwtPayload } from 'src/user/interfaces/jwt-payload.interface'
 import { parse } from 'cookie'
+import { messageRepository } from './message.repository'
 
 @Injectable()
 export class ChatService {
 	constructor(
 		@InjectRepository(ChatRoom)
 		private readonly chatRoomRepository: Repository<ChatRoom>,
-		@InjectRepository(Message)
-		private readonly messageRepository: Repository<Message>,
 		private jwtService: JwtService,
 	) {}
 
@@ -51,14 +50,14 @@ export class ChatService {
 		roomId: string,
 	): Promise<Message> {
 		const room: ChatRoom = await chatRepository.findId(roomId)
+		const messageId = uuidv4()
 		const message: Message = {
-			id: uuidv4(),
+			id: messageId,
 			userId: userId,
 			...addMessageDto,
 			room: room,
 		}
-		const savedMessage = await this.messageRepository.save(message)
-		return savedMessage
+		return messageRepository.addMessage(message)
 	}
 
 	async getMessageLog(roomId: string): Promise<Message[]> {
