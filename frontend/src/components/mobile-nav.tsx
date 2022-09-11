@@ -2,6 +2,7 @@ import { forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import {
+  Button,
   Box,
   BoxProps,
   Center,
@@ -89,6 +90,10 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
 
   const [shadow, setShadow] = useState<string>()
 
+  const handleLogout = () => {
+    alert('logout')
+  }
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -132,6 +137,9 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   templateColumns='repeat(2, 1fr)'
                   gap='2'
                 >
+                  <NavLink href='/profile' key='Profile'>
+                    Profile
+                  </NavLink>
                   {mainNavLinks.map((item) => (
                     <NavLink href={item.href} key={item.label}>
                       {item.label}
@@ -144,7 +152,10 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   setShadow(scrolled ? 'md' : undefined)
                 }}
               >
-                more nav content
+                <Button w='full' onClick={handleLogout}>
+                  Logout
+                </Button>
+                more nav content...
               </ScrollView>
             </Flex>
           </motion.div>

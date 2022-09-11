@@ -41,7 +41,7 @@ function Index() {
               borderWidth='1px'
               _hover={{ borderColor: '#00BABC' }}
             >
-              <Heading fontSize='xl'>User</Heading>
+              <Heading fontSize='xl'>Users</Heading>
             </Box>
           </NextLink>
           <NextLink href='/chat'>
