@@ -2,14 +2,14 @@ import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import Chakra from '../chakra'
-import { SWRConfig } from 'swr'
-import fetchJson from 'src/lib/fetch-json'
-
 import { Box, Spinner } from '@chakra-ui/react'
+import { SWRConfig } from 'swr'
 
+import fetchJson from 'src/lib/fetch-json'
 import { useUser } from 'src/lib/use-user'
+import { AlertsProvider, Alerts } from '@components/alerts'
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
@@ -27,13 +27,16 @@ function MyApp({ Component, pageProps }) {
             },
           }}
         >
-          {Component.displayName === 'Login' ? (
-            <Component {...pageProps} />
-          ) : (
-            <Auth>
+          <AlertsProvider>
+            {Component.displayName === 'Login' ? (
               <Component {...pageProps} />
-            </Auth>
-          )}
+            ) : (
+              <Auth>
+                <Component {...pageProps} />
+              </Auth>
+            )}
+            <Alerts />
+          </AlertsProvider>
         </SWRConfig>
       </Chakra>
     </>
