@@ -95,7 +95,7 @@ export class UserService {
 			const username = user.username
 			const auth = false
 			const userid = user.userId
-			const payload: JwtPayload = { username, auth, userid}
+			const payload: JwtPayload = { username, auth, userid }
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 			return { accessToken }
@@ -156,8 +156,8 @@ export class UserService {
 		)
 		if (updated === true && username !== undefined) {
 			const auth = true
-      const userid = user.userId
-			const payload: JwtPayload = { username, auth, userid}
+			const userid = user.userId
+			const payload: JwtPayload = { username, auth, userid }
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 		}
@@ -238,8 +238,8 @@ export class UserService {
 		try {
 			await UsersRepository.save(user)
 			const auth = true
-      const userid = user.userId
-			const payload: JwtPayload = { username, auth, userid}
+			const userid = user.userId
+			const payload: JwtPayload = { username, auth, userid }
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 		} catch (e) {
