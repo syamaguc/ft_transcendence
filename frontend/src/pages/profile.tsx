@@ -4,7 +4,7 @@ import { Avatar, Heading, Text } from '@chakra-ui/react'
 import { useUser } from 'src/lib/use-user'
 
 function Profile() {
-  const user = useUser()
+  const { user } = useUser()
 
   return (
     <Layout>
