@@ -11,6 +11,7 @@ import { Socket } from 'socket.io'
 import { JwtPayload } from 'src/user/interfaces/jwt-payload.interface'
 import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
+import { User } from 'src/user/entities/user.entity'
 
 @Injectable()
 export class ChatService {
@@ -23,6 +24,11 @@ export class ChatService {
 	setUserIdToSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
 		const { jwt: token } = parse(cookie)
+		if (!token) {
+			console.log('no JWT provided')
+			socket.disconnect()
+			return
+		}
 		const payload: JwtPayload = this.jwtService.verify(token, {
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
@@ -75,13 +81,13 @@ export class ChatService {
 		return rooms
 	}
 
-	async joinRoom(userId: uuidv4, roomId: string) {
+	async joinRoom(userId: uuidv4, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
 		console.log(room)
 		if (room.members.indexOf(userId) === -1) {
 			console.log('=========new member joined the channel=========')
 			room.members.push(userId)
-			const chatRoom = await chatRepository.save(room)
+			return chatRepository.save(room)
 		} else {
 			console.log(
 				'============error in join room: the user is already a member==========',

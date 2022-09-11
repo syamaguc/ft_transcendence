@@ -10,13 +10,13 @@ export class ChatRoom {
 	@Column('text', { default: '' })
 	name: string
 
-	@Column('simple-array', { default: [] })
+	@Column('text', { array: true, default: {} })
 	members: string[]
 
 	@Column()
 	owner: string
 
-	@Column('simple-array', { default: [] })
+	@Column('text', { array: true, default: {} })
 	admins: string[]
 
 	@Column('boolean', { default: false })
