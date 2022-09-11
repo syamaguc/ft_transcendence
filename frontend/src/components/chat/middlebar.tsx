@@ -17,8 +17,8 @@ const timestampToTime = (timestamp) => {
   const mm = `0${date.getMinutes()}`.slice(-2)
   const ss = `0${date.getSeconds()}`.slice(-2)
 
-  return `${yyyy}/${MM}/${dd}`
-  // return `${yyyy}/${MM}/${dd} ${HH}:${mm}:${ss}`;
+  //   return `${yyyy}/${MM}/${dd}`
+  return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
 const MiddleBar = ({ chatLog }) => {
