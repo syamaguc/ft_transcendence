@@ -10,8 +10,6 @@ import { Box, Spinner } from '@chakra-ui/react'
 import { useUser } from 'src/lib/use-user'
 
 function MyApp({ Component, pageProps }) {
-  // TODO
-  // https://stackoverflow.com/questions/70297964/next-js-how-to-prevent-flash-of-the-unauthorized-route-page-prior-to-redirect-w
   return (
     <>
       <Head>
