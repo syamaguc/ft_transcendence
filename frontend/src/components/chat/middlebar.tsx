@@ -17,8 +17,8 @@ const timestampToTime = (timestamp) => {
   const mm = `0${date.getMinutes()}`.slice(-2)
   const ss = `0${date.getSeconds()}`.slice(-2)
 
-  return `${yyyy}/${MM}/${dd}`
-  // return `${yyyy}/${MM}/${dd} ${HH}:${mm}:${ss}`;
+  //   return `${yyyy}/${MM}/${dd}`
+  return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
 const MiddleBar = ({ chatLog }) => {
@@ -39,13 +39,17 @@ const MiddleBar = ({ chatLog }) => {
               direction='horizontal'
               align='flex-start'
             >
-              <ProfileModal message={message} />
+              {/* <ProfileModal message={message} /> */}
 
-              {/* <Avatar m={2} size='sm' src={`${API_URL}/api/user/avatar/${user.profile_picture}`}/> */}
+              <Avatar
+                m={2}
+                size='sm'
+                src={`${API_URL}/api/user/avatar/${message.profile_picture}`}
+              />
               <Flex direction='column'>
                 <Flex direction='horizontal' align='flex-end'>
                   <Text as='b' marginEnd={2}>
-                    {message.user}
+                    {message.username}
                   </Text>
                   <Text fontSize='xs' pb='1px'>
                     {timestampToTime(message.timestamp)}

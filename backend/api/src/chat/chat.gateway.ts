@@ -10,25 +10,18 @@ import { Server, Socket } from 'socket.io'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
-import { User } from 'src/user/entities/user.entity'
-import { UserService } from 'src/user/user.service'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
 	@WebSocketServer()
 	server: Server
 
-	constructor(
-		private readonly chatService: ChatService,
-		private readonly userService: UserService,
-	) {}
+	constructor(private readonly chatService: ChatService) {}
 
 	private logger: Logger = new Logger('ChatGateway')
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		const username = this.chatService.getUsernameFromSocket(socket)
-		const user: Partial<User> = await this.userService.userInfo(username)
-		socket.data.userId = user.userId
+		this.chatService.setUserIdToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 
@@ -55,9 +48,7 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`)
-		const messageLog: Message[] = await this.chatService.getMessageLog(
-			roomId,
-		)
+		const messageLog = await this.chatService.getMessageLog(roomId)
 		socket.emit('getMessageLog', messageLog)
 	}
 

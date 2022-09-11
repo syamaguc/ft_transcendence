@@ -10,27 +10,25 @@ import { JwtService } from '@nestjs/jwt'
 import { Socket } from 'socket.io'
 import { JwtPayload } from 'src/user/interfaces/jwt-payload.interface'
 import { parse } from 'cookie'
+import { messageRepository } from './message.repository'
 
 @Injectable()
 export class ChatService {
 	constructor(
 		@InjectRepository(ChatRoom)
 		private readonly chatRoomRepository: Repository<ChatRoom>,
-		@InjectRepository(Message)
-		private readonly messageRepository: Repository<Message>,
 		private jwtService: JwtService,
 	) {}
 
-	getUsernameFromSocket(socket: Socket) {
+	setUserIdToSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
-		console.log(cookie)
 		const { jwt: token } = parse(cookie)
 		const payload: JwtPayload = this.jwtService.verify(token, {
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
 		})
-		const { username } = payload
-		return username
+		const { userid } = payload
+		socket.data.userId = userid
 	}
 
 	async createRoom(
@@ -52,19 +50,19 @@ export class ChatService {
 		roomId: string,
 	): Promise<Message> {
 		const room: ChatRoom = await chatRepository.findId(roomId)
+		const messageId = uuidv4()
 		const message: Message = {
-			id: uuidv4(),
+			id: messageId,
 			userId: userId,
 			...addMessageDto,
 			room: room,
 		}
-		const savedMessage = await this.messageRepository.save(message)
-		return savedMessage
+		return messageRepository.addMessage(message)
 	}
 
-	async getMessageLog(roomId: string): Promise<Message[]> {
-		const room: ChatRoom = await chatRepository.findId(roomId)
-		return room.messages
+	async getMessageLog(roomId: string): Promise<any> {
+		const messagesWithUserInfo = await messageRepository.getMessages(roomId)
+		return messagesWithUserInfo
 	}
 
 	async findRoom(roomId: string): Promise<ChatRoom> {
