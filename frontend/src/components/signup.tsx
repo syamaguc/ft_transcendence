@@ -1,8 +1,11 @@
-import { ReactNode } from 'react'
+import { useState, ReactNode } from 'react'
 import {
+  Alert,
+  AlertIcon,
   Box,
   Button,
   Container,
+  Fade,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -68,6 +71,8 @@ interface FormValues {
 
 export function SignupForm() {
   const { mutateUser } = useUser()
+  const [alert, setAlert] = useState(false)
+  const [alertMessage, setAlertMessage] = useState(false)
 
   const signupFormSchema = Yup.object({
     username: Yup.string()
@@ -130,27 +135,44 @@ export function SignupForm() {
     },
     validate,
     onSubmit: async (values, actions) => {
-      let res = await fetch(`${API_URL}/api/user/signup`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: values.username,
-          email: values.email,
-          password: values.password,
-          passwordConfirm: values.password,
-        }),
-      })
+      setAlert(false)
 
-      const { accessToken } = await res.json()
+      try {
+        let res = await fetch(`${API_URL}/api/user/signup`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: values.username,
+            email: values.email,
+            password: values.password,
+            passwordConfirm: values.password,
+          }),
+        })
 
-      console.log('accessToken: ', accessToken)
+        await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      mutateUser()
+        const { accessToken } = await res.json()
 
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+        if (!res.ok) {
+          if (res.status === 409) {
+            console.log('Username or email already exists')
+            setAlert(true)
+          } else {
+            console.log('Invalid inputs')
+            setAlert(true)
+          }
+        }
+
+        console.log('accessToken: ', accessToken)
+
+        mutateUser()
+      } catch (err) {
+        console.log(err)
+        setAlert(true)
+      }
 
       actions.setSubmitting(false)
     },
@@ -210,6 +232,14 @@ export function SignupForm() {
           </Button>
         </Stack>
       </form>
+      {alert && (
+        <Fade in={alert}>
+          <Alert status='error'>
+            <AlertIcon />
+            username taken
+          </Alert>
+        </Fade>
+      )}
     </AuthForm>
   )
 }
