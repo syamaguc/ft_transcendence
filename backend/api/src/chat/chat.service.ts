@@ -23,6 +23,11 @@ export class ChatService {
 	setUserIdToSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
 		const { jwt: token } = parse(cookie)
+		if (!token) {
+			console.log('no JWT provided')
+			socket.disconnect()
+			return
+		}
 		const payload: JwtPayload = this.jwtService.verify(token, {
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
