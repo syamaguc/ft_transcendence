@@ -1,5 +1,4 @@
 import { Socket } from 'socket.io'
-import { User } from '../user/entities/user.entity'
 
 export interface gameInfo {
 	gameId: string
@@ -44,4 +43,15 @@ export interface socketData {
 export interface KeyStatus {
 	upPressed: boolean
 	downPressed: boolean
+}
+
+export interface GamePlayer {
+	id: string
+	name: string
+}
+
+export interface GameRoomInfo {
+	id: string
+	player1: GamePlayer
+	player2: GamePlayer
 }

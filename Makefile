@@ -14,6 +14,12 @@ format_frontend:
 lint_frontend:
 	docker-compose exec frontend npm run lint
 
+format_backend:
+	docker-compose exec api npm run format
+
+lint_backend:
+	docker-compose exec api npm run lint
+
 down:
 	docker-compose down
 
