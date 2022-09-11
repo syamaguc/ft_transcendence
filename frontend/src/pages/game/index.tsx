@@ -105,7 +105,7 @@ export default function GameMatching() {
       }
     })
 
-    server.emit('readyGameIndex', {userId: userId})
+    server.emit('readyGameIndex', { userId: userId })
   }, [gameRoomsLog, server, router, userId])
 
   useEffect(() => {
