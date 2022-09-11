@@ -48,7 +48,7 @@ const onClickJoin = (roomId: String, setIsJoined) => {
   console.log('joinroom', roomId)
 }
 
-const JoinBody = ({currentRoom, setIsJoined}) => {
+const JoinBody = ({ currentRoom, setIsJoined }) => {
   return (
     <>
       <Button
@@ -62,23 +62,30 @@ const JoinBody = ({currentRoom, setIsJoined}) => {
   )
 }
 
-const ShowContents = ({isJoined, setIsJoined, inputText, setInputText, onClickSubmit, currentRoom}) => {
-  if (isJoined)
-  {
-    return (<>
-      <InputBody
-      inputText={inputText}
-      setInputText={setInputText}
-      onClickSubmit={onClickSubmit}/>
-      </>)
-  }
-  else
-  {
-    return (<>
-      <JoinBody
-        currentRoom={currentRoom}
-        setIsJoined={setIsJoined}/>
-      </>)
+const ShowContents = ({
+  isJoined,
+  setIsJoined,
+  inputText,
+  setInputText,
+  onClickSubmit,
+  currentRoom,
+}) => {
+  if (isJoined) {
+    return (
+      <>
+        <InputBody
+          inputText={inputText}
+          setInputText={setInputText}
+          onClickSubmit={onClickSubmit}
+        />
+      </>
+    )
+  } else {
+    return (
+      <>
+        <JoinBody currentRoom={currentRoom} setIsJoined={setIsJoined} />
+      </>
+    )
   }
 }
 
@@ -115,13 +122,12 @@ const Chat = () => {
   }, [])
 
   useEffect(() => {
-    console.log("check if joined")
-    if (user)
-    {
-      console.log("effect user", user)
-      console.log("effect room", currentRoom)
+    console.log('check if joined')
+    if (user) {
+      console.log('effect user', user)
+      console.log('effect room', currentRoom)
       const members = currentRoom.members
-      console.log("index", members.indexOf(user.userId))
+      console.log('index', members.indexOf(user.userId))
       if (members.indexOf(user.userId) != -1) {
         setIsJoined(true)
       } else {
