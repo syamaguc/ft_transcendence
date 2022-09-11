@@ -14,7 +14,6 @@ import {
 import { UsersIcon } from '@components/icons/users'
 
 function MemberList({ currentRoom }) {
-  // console.log(currentRoom);
   if (!currentRoom) return null
   const members: string[] = currentRoom.members
   if (!members) return null
