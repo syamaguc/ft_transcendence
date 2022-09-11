@@ -26,19 +26,19 @@ const ProfileModal = ({ message }) => {
   const [user, setUser] = useState<User>()
   // const [picture, setPicture] = useState('')
   const { isOpen, onOpen, onClose } = useDisclosure()
-  useEffect(() => {
-    fetch(`${API_URL}/api/user/userInfo?username=${message.user}`, {
-      credentials: 'include',
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        // console.log(data.username)
-        setUrl(`${API_URL}/api/user/avatar/${data.profile_picture}`)
-      })
-  }, [])
+  // useEffect(() => {
+  //   fetch(`${API_URL}/api/user/userInfo?username=${message.user}`, {
+  //     credentials: 'include',
+  //   })
+  //     .then((r) => r.json())
+  //     .then((data) => {
+  //       // console.log(data.username)
+  //       setUrl(`${API_URL}/api/user/avatar/${data.profile_picture}`)
+  //     })
+  // }, [])
 
   const onClickProfile = (message: MessageObject) => {
-    fetch(`${API_URL}/api/user/userInfo?username=${message.user}`, {
+    fetch(`${API_URL}/api/user/userInfo?username=${message.username}`, {
       credentials: 'include',
     })
       .then((r) => r.json())
@@ -67,14 +67,14 @@ const ProfileModal = ({ message }) => {
           onOpen()
           onClickProfile(message)
         }}
-        src={url}
+        src={`${API_URL}/api/user/avatar/${message.profile_picture}`}
       />
       {/* <Avatar m={2} size='sm' onClick={onOpen} src={`${API_URL}/api/user/avatar/${user.profile_picture}`}/> */}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{message.user}'s Profile</ModalHeader>
+          <ModalHeader>{message.username}'s Profile</ModalHeader>
           <ModalCloseButton />
           <ModalBody>{user ? profileBody() : null}</ModalBody>
           <ModalFooter>
