@@ -1,71 +1,19 @@
 import Head from 'next/head'
 import {
-  Avatar,
   Box,
   Button,
-  ButtonGroup,
-  Container,
   Flex,
-  FormControl,
-  FormLabel,
-  Input,
-  Heading,
   Stack,
-  Text,
   VisuallyHidden,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
 } from '@chakra-ui/react'
 
-import { useEffect, useState, ReactNode } from 'react'
-import { useSWRConfig } from 'swr'
-
 import { useUser } from 'src/lib/use-user'
-import PasswordField from '@components/password-field'
+import { AuthCard } from '@components/auth'
 import { SignupForm } from '@components/signup'
-
-const API_URL = 'http://localhost:3000'
-
-type AuthFormProps = {
-  children?: ReactNode
-  title: string
-}
-
-function AuthForm({ children, title = '' }: AuthFormProps) {
-  return (
-    <Container
-      maxW='lg'
-      py={{ base: '12', md: '24' }}
-      px={{ base: '0', sm: '8' }}
-    >
-      <Stack spacing='8'>
-        <Stack spacing='6'>
-          <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
-            <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
-              {title}
-            </Heading>
-          </Stack>
-        </Stack>
-        <Box
-          py={{ base: '0', sm: '8' }}
-          px={{ base: '4', sm: '10' }}
-          bg={useBreakpointValue({
-            base: 'transparent',
-            sm: 'inherit',
-          })}
-          boxShadow={{
-            base: 'none',
-            sm: useColorModeValue('base', 'md-dark'),
-          }}
-          borderRadius={{ base: 'none', sm: 'xl' }}
-        >
-          <Stack spacing='6'>{children}</Stack>
-        </Box>
-      </Stack>
-    </Container>
-  )
-}
+import { LoginForm } from '@components/login'
 
 type Login42Props = {
   onSubmit?: () => void
@@ -80,7 +28,7 @@ function Login42(props: Login42Props) {
   }
 
   return (
-    <AuthForm title='ft_transcendence'>
+    <AuthCard title='ft_transcendence'>
       <Stack spacing={4} direction='column' align='center'>
         <Button variant='outline' width='full' onClick={onSubmit}>
           <VisuallyHidden>Sign in with 42</VisuallyHidden>
@@ -91,7 +39,7 @@ function Login42(props: Login42Props) {
           Sign in as admin
         </Button>
       </Stack>
-    </AuthForm>
+    </AuthCard>
   )
 }
 
@@ -110,91 +58,6 @@ function LoginAdmin(props: LoginAdminProps) {
         <LoginForm />
       </Stack>
       <Button onClick={onClose}>Back</Button>
-    </>
-  )
-}
-
-function LoginForm() {
-  const { mutateUser } = useUser()
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-
-  const checkIsLoggedIn = async () => {
-    const res = await fetch(`${API_URL}/api/user/isLogin`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    if (res.ok) {
-      const data = await res.json()
-      console.log(data)
-      if (data) {
-        return true
-      }
-    }
-    return false
-  }
-
-  const handleSubmit = async () => {
-    console.log('Login...')
-    console.log('username: ', username)
-    console.log('password: ', password)
-
-    const isLoggedIn = await checkIsLoggedIn()
-
-    if (isLoggedIn) {
-      console.log('You are already logged in!')
-      return
-    }
-
-    let res = await fetch(`${API_URL}/api/user/signin`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: username,
-        password: password,
-      }),
-    })
-
-    const { accessToken } = await res.json()
-
-    console.log(accessToken)
-
-    mutateUser()
-    setUsername('')
-    setPassword('')
-  }
-
-  return (
-    <>
-      <AuthForm title='Login'>
-        <Stack spacing='5'>
-          <FormControl>
-            <FormLabel htmlFor='username'>Username</FormLabel>
-            <Input
-              id='username'
-              type='username'
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </FormControl>
-          <PasswordField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Stack>
-        <Stack spacing='6'>
-          <Button colorScheme='blue' onClick={handleSubmit}>
-            Login
-          </Button>
-        </Stack>
-      </AuthForm>
     </>
   )
 }

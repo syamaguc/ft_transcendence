@@ -46,11 +46,11 @@ function SignupForm() {
       errors.lastName = 'Must be 15 characters or less'
     }
     if (!values.email) {
-      errors.email = 'Required'
+      errors.email = 'required'
     } else if (
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(values.email)
+      !/^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$/i.test(values.email)
     ) {
-      errors.email = 'Invalid email address'
+      errors.email = 'invalid email address'
     }
     return errors
   }
