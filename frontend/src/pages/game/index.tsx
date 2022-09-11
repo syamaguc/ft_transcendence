@@ -86,7 +86,7 @@ export default function GameMatching() {
   }, [])
 
   useEffect(() => {
-    if (!server || !router.isReady || gameRoomsLog) return
+    if (!server || !router.isReady || gameRoomsLog || !userId) return
     server.on('goGameRoom', (data: string) => {
       router.push('/game/' + data)
     })
@@ -97,10 +97,14 @@ export default function GameMatching() {
       }
       setGameRooms(gameRoomsRef.current)
       setGameRoomsLog(true)
+      const status = data['status']
+      if (status == 1) {
+        matching()
+      }
     })
 
-    server.emit('readyGameIndex')
-  }, [gameRoomsLog, server, router])
+    server.emit('readyGameIndex', {userId: userId})
+  }, [gameRoomsLog, server, router, userId])
 
   useEffect(() => {
     if (!gameRoomsLog) return
