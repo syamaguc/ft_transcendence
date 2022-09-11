@@ -12,25 +12,21 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 
-import { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
-import useSWR, { useSWRConfig } from 'swr'
 import ApiTester from '@components/api-tester'
 
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
-
-import { API_ENDPOINT } from 'src/constants'
+import { API_URL } from 'src/constants'
 
 type ProfileProps = {
   user: User
 }
 
 function Profile({ user }: ProfileProps) {
-  const { mutate } = useSWRConfig()
+  const { mutateUser } = useUser()
 
   const handleLogout = async () => {
-    let res = await fetch(`${API_ENDPOINT}/api/user/logout`, {
+    let res = await fetch(`${API_URL}/api/user/logout`, {
       method: 'DELETE',
       credentials: 'include',
       headers: {
@@ -40,7 +36,7 @@ function Profile({ user }: ProfileProps) {
 
     console.log(res)
 
-    mutate(`${API_ENDPOINT}/api/user/currentUser`)
+    mutateUser()
   }
 
   return (
@@ -51,7 +47,7 @@ function Profile({ user }: ProfileProps) {
             <Stack direction={'row'} spacing='8' align='center'>
               <Avatar
                 size='2xl'
-                src={`${API_ENDPOINT}/api/user/avatar/${user.profile_picture}`}
+                src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
               />
               <Stack direction='column' spacing='0' fontSize='md'>
                 <Text fontWeight='600'>username: {user.username}</Text>
@@ -68,87 +64,7 @@ function Profile({ user }: ProfileProps) {
 }
 
 function Users() {
-  const user = useUser()
-  const { mutate } = useSWRConfig()
-  const router = useRouter()
-
-  const testUpdate = async () => {
-    console.log('Testing Update...')
-
-    let res = await fetch(`${API_ENDPOINT}/api/user/currentUser`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        // Cookie: `jwt=${accessToken}`,
-      },
-    })
-
-    let data = await res.json()
-
-    console.log(data)
-    console.log(data.username)
-
-    res = await fetch(`${API_ENDPOINT}/api/user/settings`, {
-      method: 'PATCH',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        username: `${data.username}`,
-        email: data.email,
-        password: 'Test123!',
-      }),
-    })
-
-    console.log(res)
-
-    res = await fetch(`${API_ENDPOINT}/api/user/currentUser`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        // Cookie: `jwt=${accessToken}`,
-      },
-    })
-
-    console.log(await res.json())
-
-    res = await fetch(`${API_ENDPOINT}/api/user/userInfo?username=test`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-        // Cookie: `jwt=${accessToken}`,
-      },
-    })
-
-    console.log(await res.json())
-  }
-
-  const testAPI = async () => {
-    console.log('testing api...')
-
-    let res = await fetch(`/api/test`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    console.log(res)
-    console.log(await res.json())
-
-    res = await fetch('/api/users/current', {
-      method: 'GET',
-      headers: {
-        'content-type': 'application/json',
-      },
-    })
-
-    console.log(await res.json())
-  }
+  const { user } = useUser()
 
   return (
     <Layout>
@@ -156,13 +72,11 @@ function Users() {
         direction='column'
         alignItems='center'
         justifyContent='center'
-        // my='8'
         px='4'
         gap='4'
         w='full'
       >
         <Stack spacing='6'>
-          <Button onClick={testAPI}>test API</Button>
           <Box>
             {user ? <Profile user={user} /> : <Text>User not found</Text>}
           </Box>

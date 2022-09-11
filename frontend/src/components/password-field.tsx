@@ -40,7 +40,6 @@ const PasswordField = React.forwardRef<
       <InputGroup>
         <Input
           ref={mergeRef}
-          id='password'
           name='password'
           type={isOpen ? 'text' : 'password'}
           autoComplete='current-password'

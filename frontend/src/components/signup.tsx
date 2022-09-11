@@ -147,7 +147,6 @@ export function SignupForm() {
             >
               <FormLabel>username</FormLabel>
               <Input
-                id='username'
                 name='username'
                 type='text'
                 onChange={(e) => {
@@ -165,7 +164,6 @@ export function SignupForm() {
             >
               <FormLabel>email</FormLabel>
               <Input
-                id='email'
                 name='email'
                 type='email'
                 onChange={formik.handleChange}

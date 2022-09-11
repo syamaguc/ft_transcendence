@@ -19,9 +19,6 @@ const Layout = ({ children, title = 'ft_trans' }: Props) => (
     <Box as='main' w='full' maxW='8xl' mx='auto'>
       <Box maxW='8xl' mx='auto' minH='76vh'>
         {children}
-        <Box pb='20'>
-          <Footer />
-        </Box>
       </Box>
     </Box>
   </>

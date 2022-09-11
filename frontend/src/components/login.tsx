@@ -132,7 +132,7 @@ export function LoginForm() {
               >
                 <FormLabel htmlFor='username'>Username</FormLabel>
                 <Input
-                  id='username'
+                  name='username'
                   type='username'
                   onChange={formik.handleChange}
                   onBlur={formik.handleBlur}

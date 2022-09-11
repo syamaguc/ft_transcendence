@@ -37,7 +37,7 @@ async function handleError(res: NextApiResponse, error: string | Error) {
 //   Used for useUser hook
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   // Temporary
-  await new Promise((resolve) => setTimeout(resolve, 2000))
+  await new Promise((resolve) => setTimeout(resolve, 1000))
 
   if (setHeaders(req, res)) return
 

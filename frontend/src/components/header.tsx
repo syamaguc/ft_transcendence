@@ -24,7 +24,6 @@ import {
   useUpdateEffect,
 } from '@chakra-ui/react'
 import { useScroll } from 'framer-motion'
-import { useSWRConfig } from 'swr'
 
 import { MobileNavButton, MobileNavContent } from '@components/mobile-nav'
 import { Logo } from '@components/logo'
@@ -98,7 +97,6 @@ const HeaderContent = () => {
       },
     })
 
-    console.log(res)
     mutateUser()
   }
 

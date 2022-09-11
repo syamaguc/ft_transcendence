@@ -46,7 +46,6 @@ function Auth({ children }) {
   const { status } = useUser({ redirectTo: '/login' })
 
   if (status === 'loading') {
-    console.log('loading in Auth')
     return (
       <Box w='100%' h='100vh'>
         <Box
@@ -63,7 +62,6 @@ function Auth({ children }) {
   }
 
   if (status === 'unauthenticated') {
-    console.log('unauthenticated in Auth')
     return <div>Unauthenticated</div>
   }
 
