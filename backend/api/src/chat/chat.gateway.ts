@@ -57,9 +57,9 @@ export class ChatGateway {
 		this.logger.log(`getRooms: for ${socket.id}`)
 		const rooms = await this.chatService.getRooms()
 		//tmp
-		const roomsList = []
-		rooms.map((r) => roomsList.push({ id: r.id, name: r.name }))
-		socket.emit('getRooms', roomsList)
+		// const roomsList = []
+		// rooms.map((r) => roomsList.push({ id: r.id, name: r.name }))
+		socket.emit('getRooms', rooms)
 	}
 
 	// room which user is watching
