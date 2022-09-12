@@ -16,7 +16,7 @@ export const messageRepository = AppDataSource.getRepository(Message).extend({
 			.getRawMany()
 	},
 
-	async addMessage(message: Message): Promise<any> {
+	async addMessage(message: Partial<Message>): Promise<any> {
 		await this.save(message)
 		return this.createQueryBuilder('message')
 			.select([

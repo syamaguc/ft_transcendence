@@ -4,6 +4,10 @@ export class CreateChatRoomDto {
 	password: string
 }
 
+export class CreateDMRoomDto {
+	memberB: string
+}
+
 export class AddMessageDto {
 	message: string
 	timestamp: Date

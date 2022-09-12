@@ -60,7 +60,7 @@ export class ChatService {
 	): Promise<Message> {
 		const room: ChatRoom = await chatRepository.findId(roomId)
 		const messageId = uuidv4()
-		const message: Message = {
+		const message: Partial<Message> = {
 			id: messageId,
 			userId: userId,
 			...addMessageDto,
