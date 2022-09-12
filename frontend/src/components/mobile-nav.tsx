@@ -2,7 +2,6 @@ import { forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react'
 import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import {
-  Button,
   Box,
   BoxProps,
   Center,
@@ -24,6 +23,7 @@ import { RemoveScroll } from 'react-remove-scroll'
 
 import { Logo } from '@components/logo'
 import { mainNavLinks } from '@components/header'
+import { LogoutButton } from '@components/logout'
 
 import useRouteChanged from 'src/lib/use-route-changed'
 
@@ -90,10 +90,6 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
 
   const [shadow, setShadow] = useState<string>()
 
-  const handleLogout = () => {
-    alert('logout')
-  }
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -152,9 +148,7 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   setShadow(scrolled ? 'md' : undefined)
                 }}
               >
-                <Button w='full' onClick={handleLogout}>
-                  Logout
-                </Button>
+                <LogoutButton colorScheme='gray' w='full' />
                 more nav content...
               </ScrollView>
             </Flex>

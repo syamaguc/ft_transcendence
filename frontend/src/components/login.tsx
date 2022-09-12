@@ -1,18 +1,12 @@
 import { useState, ReactNode } from 'react'
 import {
-  Alert,
-  AlertIcon,
-  Box,
   Button,
-  Fade,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
-  Heading,
   Stack,
-  useBreakpointValue,
-  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
 import { FormikErrors, useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -29,8 +23,7 @@ interface FormValues {
 
 export function LoginForm() {
   const { mutateUser } = useUser()
-  const [showAlert, setShowAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
+  const toast = useToast()
 
   const loginFormSchema = Yup.object({
     username: Yup.string()
@@ -81,8 +74,6 @@ export function LoginForm() {
     },
     validate,
     onSubmit: async (values, actions) => {
-      setShowAlert(false)
-
       try {
         const res = await fetch(`${API_URL}/api/user/signin`, {
           method: 'POST',
@@ -102,21 +93,34 @@ export function LoginForm() {
 
         if (!res.ok) {
           if (res.status === 401) {
-            setAlertMessage('Incorrect username or password')
-            setShowAlert(true)
+            toast({
+              description: 'Incorrect username or password',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
           } else {
-            setAlertMessage('Unable to login')
-            setShowAlert(true)
+            toast({
+              description: 'Internal error occurred',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
           }
         }
 
         console.log(accessToken)
       } catch (err) {
-        setAlertMessage('Unable to login')
-        setShowAlert(true)
+        console.log(err)
+        toast({
+          description: 'Internal error occurred',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
       }
 
-      mutateUser()
+      await mutateUser()
       actions.setSubmitting(false)
     },
   })
@@ -159,14 +163,6 @@ export function LoginForm() {
             </Button>
           </Stack>
         </form>
-        {showAlert && (
-          <Fade in={showAlert}>
-            <Alert status='error'>
-              <AlertIcon />
-              {alertMessage}
-            </Alert>
-          </Fade>
-        )}
       </AuthCard>
     </>
   )
