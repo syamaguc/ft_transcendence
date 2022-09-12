@@ -84,16 +84,11 @@ export class ChatGateway {
 
 	// join room to be a member
 	@SubscribeMessage('joinRoom')
-	async joinRoom(
+	async joinAndUpdateRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
-		this.watchOrSwitchRoom(roomId, socket)
-		const room: ChatRoom = await this.chatService.joinRoom(
-			socket.data.userId,
-			roomId,
-		)
+		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
 	}
 
@@ -103,17 +98,31 @@ export class ChatGateway {
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		const newChatRoom = await this.chatService.createRoom(
+		let newChatRoom = await this.chatService.createRoom(
 			createChatRoomDto,
 			socket.data.userId,
 		)
-		this.joinRoom(newChatRoom.id, socket)
+		newChatRoom = await this.joinRoom(newChatRoom.id, socket)
 		this.logger.log(newChatRoom)
-		this.server.emit('updateNewRoom', newChatRoom)
+		this.server.emit('updateRoom', newChatRoom)
+		this.server.to(socket.id).emit('updateCurrentRoom', newChatRoom.id)
+	}
+
+	async joinRoom(
+		roomId: string,
+		socket: Socket,
+	) {
+		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
+		this.watchOrSwitchRoom(roomId, socket)
+		const room: ChatRoom = await this.chatService.joinRoom(
+			socket.data.userId,
+			roomId,
+		)
+		return room
 	}
 
 	async updateRoom(room: ChatRoom) {
-		this.server.to(room.id).emit('updateCurrentRoom', room)
+		this.server.to(room.id).emit('updateRoom', room)
 	}
 }
 

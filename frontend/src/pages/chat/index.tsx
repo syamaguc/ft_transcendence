@@ -44,7 +44,6 @@ const InputBody = ({ inputText, setInputText, onClickSubmit }) => {
 
 const onClickJoin = (roomId: String, setIsJoined) => {
   socket.emit('joinRoom', roomId)
-  setIsJoined(true)
   console.log('joinroom', roomId)
 }
 
@@ -117,10 +116,6 @@ const Chat = () => {
       socket.on('updateNewMessage', (message: MessageObject) => {
         console.log('recieved : ', message)
         setMsg(message)
-      })
-      socket.on('updateCurrentRoom', (channel: ChannelObject) => {
-        console.log('recupdateCurrentRoom recieved : ', channel)
-        setCurrentRoom(channel)
       })
     }
   }, [])

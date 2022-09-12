@@ -49,6 +49,7 @@ export class ChatService {
 			admins: [userId],
 		}
 		const chat = await this.chatRoomRepository.save(newChatRoom)
+		console.log(chat)
 		return chat
 	}
 
