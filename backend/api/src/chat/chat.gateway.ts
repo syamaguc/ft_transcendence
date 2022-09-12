@@ -108,10 +108,7 @@ export class ChatGateway {
 		this.server.to(socket.id).emit('updateCurrentRoom', newChatRoom.id)
 	}
 
-	async joinRoom(
-		roomId: string,
-		socket: Socket,
-	) {
+	async joinRoom(roomId: string, socket: Socket) {
 		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
 		this.watchOrSwitchRoom(roomId, socket)
 		const room: ChatRoom = await this.chatService.joinRoom(
