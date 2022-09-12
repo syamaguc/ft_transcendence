@@ -1,8 +1,10 @@
 import {
   Avatar,
+  AvatarBadge,
   Box,
   Button,
   Container,
+  Divider,
   Heading,
   FormControl,
   FormLabel,
@@ -13,8 +15,22 @@ import {
   InputLeftElement,
   Text,
   Stack,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
 } from '@chakra-ui/react'
-import { useState, useEffect, useRef } from 'react'
+import {
+  useState,
+  useEffect,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+} from 'react'
 import { FiFile } from 'react-icons/fi'
 
 import Layout from '@components/layout'
@@ -64,11 +80,19 @@ function Preview({ user, file }: ThumbnailProps) {
   )
 }
 
-function AvatarForm() {
+type AvatarFormProps = {
+  isOpen?: boolean
+  onClose?: () => void
+}
+
+const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
   const { user, mutateUser } = useUser()
+  const { isOpen, onClose } = props
 
   const validate = (valies: AvatarFormValues) => {
     const errors: FormikErrors<AvatarFormValues> = {}
+    // File too big
+    // not png or jpeg
     return errors
   }
 
@@ -102,39 +126,66 @@ function AvatarForm() {
 
       console.log(res)
       console.log(res.body)
+
+      await mutateUser()
+      actions.setSubmitting(false)
     },
   })
 
+  const onCloseComplete = () => {
+    formik.values.file = null
+  }
+
   return (
-    <form onSubmit={formik.handleSubmit}>
-      <FormControl>
-        <FormLabel htmlFor='file' fontSize='xs' color='gray.400'>
-          AVATAR
-        </FormLabel>
-        <Preview user={user} file={formik.values.file} />
-        <Input
-          name='file'
-          type='file'
-          accept='image/*'
-          onChange={(e) => {
-            formik.setFieldValue(
-              'file',
-              e.currentTarget.files ? e.currentTarget.files[0] : null
-            )
-          }}
-        />
-      </FormControl>
-      <Button type='submit'>Edit</Button>
-    </form>
+    <Modal isOpen={isOpen} onClose={onClose} onCloseComplete={onCloseComplete}>
+      <ModalOverlay />
+      <ModalContent>
+        <form onSubmit={formik.handleSubmit}>
+          <ModalHeader>Upload Avatar</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody pb={6}>
+            <FormControl>
+              <FormLabel htmlFor='file' fontSize='xs' color='gray.400'>
+                AVATAR
+              </FormLabel>
+              <Preview user={user} file={formik.values.file} />
+              <Input
+                name='file'
+                type='file'
+                accept='image/*'
+                onChange={(e) => {
+                  formik.setFieldValue(
+                    'file',
+                    e.currentTarget.files ? e.currentTarget.files[0] : null
+                  )
+                }}
+              />
+            </FormControl>
+          </ModalBody>
+          <ModalFooter>
+            <Button
+              colorScheme='blue'
+              type='submit'
+              isLoading={formik.isSubmitting}
+              mr={3}
+            >
+              Save
+            </Button>
+            <Button onClick={onClose}>Cancel</Button>
+          </ModalFooter>
+        </form>
+      </ModalContent>
+    </Modal>
   )
-}
+})
 
 function Profile() {
+  const avatarForm = useDisclosure()
   const { user, mutateUser } = useUser()
 
   return (
     <Layout>
-      <Container maxW='2xl' bg='gray.50'>
+      <Container maxW='2xl'>
         <Box py='12'>
           <Stack spacing='12'>
             <Heading as='h1' fontSize='5xl'>
@@ -143,7 +194,31 @@ function Profile() {
             <Stack spacing='8'>
               <Stack>
                 <Heading fontSize='2xl'>Basic information</Heading>
-                <AvatarForm />
+                <Stack
+                  borderRadius='xl'
+                  direction='row'
+                  spacing='8'
+                  align='start'
+                  py='4'
+                  px='8'
+                  mx='8'
+                >
+                  <Avatar
+                    size='xl'
+                    src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                  >
+                    <AvatarBadge boxSize='0.9em' bg='green.500' />
+                  </Avatar>
+                  <Stack direction='column' spacing='2'>
+                    <Text fontWeight='600' fontSize='2xl' mt='2'>
+                      {user.username}
+                    </Text>
+                    <Button size='sm' onClick={avatarForm.onOpen}>
+                      Upload Avatar
+                    </Button>
+                  </Stack>
+                </Stack>
+                <Divider orientation='horizontal' />
                 <form>
                   <Stack spacing='6'>
                     <FormControl>
@@ -184,6 +259,7 @@ function Profile() {
             </Stack>
             <Text>{JSON.stringify(user)}</Text>
           </Stack>
+          <AvatarForm isOpen={avatarForm.isOpen} onClose={avatarForm.onClose} />
         </Box>
       </Container>
     </Layout>
