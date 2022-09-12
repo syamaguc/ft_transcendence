@@ -172,7 +172,7 @@ const HeaderContent = () => {
                     <NextLink href='/profile' passHref>
                       <MenuItem as='a'>Profile</MenuItem>
                     </NextLink>
-                    <MenuItem>My Friends</MenuItem>
+                    <MenuItem>Friends</MenuItem>
                     <MenuDivider />
                     <LogoutMenuItem />
                   </MenuList>

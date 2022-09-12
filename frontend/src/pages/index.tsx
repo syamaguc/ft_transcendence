@@ -1,15 +1,8 @@
-import {
-  Box,
-  Heading,
-  Flex,
-  Spacer,
-  Link as ChakraLink,
-} from '@chakra-ui/react'
+import { Box, Heading, Flex, Link as ChakraLink } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
 
 import Layout from '@components/layout'
-import Deadline from '@components/deadline'
 
 function Index() {
   return (
@@ -23,15 +16,7 @@ function Index() {
         mb={8}
         w='full'
       >
-        <Box my={8}>
-          <Deadline />
-        </Box>
-        <Flex
-          w='full'
-          direction='row'
-          alignItems='center'
-          justifyContent='space-around'
-        >
+        <Flex w='full' alignItems='center' justifyContent='space-around'>
           <NextLink href='/users'>
             <Box
               as='button'
