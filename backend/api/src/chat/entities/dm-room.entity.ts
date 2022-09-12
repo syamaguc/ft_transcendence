@@ -1,5 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm'
-import { MessageI } from '../interface/message.interface'
+import { Message } from './message.entity'
 
 @Entity()
 export class DMRoom {
@@ -10,5 +10,5 @@ export class DMRoom {
 	members: string[]
 
 	@Column('simple-array', { default: [] })
-	logs: MessageI[]
+	logs: Message[]
 }

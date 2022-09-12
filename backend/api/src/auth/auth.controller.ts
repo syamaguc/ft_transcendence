@@ -41,8 +41,9 @@ export class AuthController {
 		@Req() req: Request,
 	) {
 		const username = req.user['username']
+		const userid = req.user['userid']
 		const auth = false
-		const payload: JwtPayload = { username, auth }
+		const payload: JwtPayload = { username, auth, userid }
 		const accessToken: string = await this.jwtService.sign(payload)
 		res.cookie('jwt', accessToken, { httpOnly: true })
 		res.redirect(process.env.IP_FRONTEND)
@@ -83,8 +84,9 @@ export class AuthController {
 			.toPromise()
 		if (resp.data === 'True') {
 			const username = user.username
+			const userid = user.userId
 			const auth = true
-			const payload: JwtPayload = { username, auth }
+			const payload: JwtPayload = { username, auth, userid }
 			const accessToken: string = await this.jwtService.sign(payload)
 			res.cookie('jwt', accessToken, { httpOnly: true })
 		}

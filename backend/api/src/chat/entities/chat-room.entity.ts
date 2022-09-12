@@ -10,24 +10,30 @@ export class ChatRoom {
 	@Column('text', { default: '' })
 	name: string
 
-	@Column('simple-array', { default: [] })
+	@Column('text', { array: true, default: {} })
 	members: string[]
 
 	@Column()
 	owner: string
 
-	@Column('simple-array', { default: [] })
+	@Column('text', { array: true, default: {} })
 	admins: string[]
 
 	@Column('boolean', { default: false })
 	is_private: boolean
-
-	// @Column('simple-array', { default: [] })
-	// logs: MessageI[]
 
 	@OneToMany(() => Message, (msg) => msg.room)
 	messages: Message[]
 
 	@Column('text', { default: '' })
 	password: string
+
+	@Column()
+	time_created: Date
+
+	// @Column()
+	// time_updated: Date
+
+	// @Column()
+	// type: string
 }

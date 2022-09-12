@@ -1,4 +1,7 @@
 import {
+  Text,
+  Box,
+  Flex,
   Input,
   Switch,
   FormControl,
@@ -34,6 +37,7 @@ type CreateChatRoomDto = {
   owner: string
   is_private: boolean
   password: string
+  time_created: Date
 }
 
 const ChatCreationFormContent = ({
@@ -95,9 +99,10 @@ const ChatCreationForm = ({ socket }: Props) => {
     )
     const enterdData: CreateChatRoomDto = {
       name: enteredChannelName,
-      owner: 'user',
+      // owner: 'user',
       is_private: enteredIsPrivate,
       password: enteredPassword,
+      time_created: new Date(),
     }
     socket.emit('createRoom', enterdData)
   }
@@ -105,7 +110,12 @@ const ChatCreationForm = ({ socket }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <>
-      <Button onClick={onOpen}>Create Channel</Button>
+      <Flex w='100%'>
+        <Text p={2}>Channels</Text>
+        <Button mr={0} ml='auto' onClick={onOpen}>
+          +
+        </Button>
+      </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
