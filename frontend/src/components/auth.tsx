@@ -33,7 +33,7 @@ export function AuthCard({ children, title = '' }: AuthCardProps) {
           px={{ base: '4', sm: '10' }}
           bg={useBreakpointValue({
             base: 'transparent',
-            sm: 'inherit',
+            sm: useColorModeValue('whiteAlpha.900', 'inherit'),
           })}
           boxShadow={{
             base: 'none',

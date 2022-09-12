@@ -84,7 +84,7 @@ export function LoginForm() {
       setShowAlert(false)
 
       try {
-        let res = await fetch(`${API_URL}/api/user/signin`, {
+        const res = await fetch(`${API_URL}/api/user/signin`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -149,7 +149,9 @@ export function LoginForm() {
               />
             </Stack>
             <Button
-              colorScheme='blue'
+              colorScheme='blackAlpha'
+              bg='blackAlpha.900'
+              _dark={{ bg: 'whiteAlpha.900', _hover: { bg: 'whiteAlpha.600' } }}
               type='submit'
               isLoading={formik.isSubmitting}
             >
