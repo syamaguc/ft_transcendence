@@ -78,9 +78,9 @@ const SideBar = ({
           setChatRooms(newChatRooms)
           break
         }
-        if (!existFlag) {
-          setChatRooms([...chatRooms, room])
-        }
+      }
+      if (!existFlag) {
+        setChatRooms([...chatRooms, room])
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
