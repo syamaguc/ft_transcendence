@@ -286,9 +286,10 @@ export class UserController {
 	/*******/
 	@UseGuards(AuthGuard('jwt'))
 	@Delete('/logout')
-	logout(@Res({ passthrough: true }) res: Response) {
+	logout(@Req() req, @Res({ passthrough: true }) res: Response) {
+    const user: User = req.user
 		res.clearCookie('jwt')
-		return 'User is logout'
+		return this.userService.logout(user)
 	}
 
 	@ApiOperation({ summary: 'Get Boolean TwoFactorAuth' })
