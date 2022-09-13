@@ -220,18 +220,8 @@ function BasicInfoForm() {
 
     if (!values.password) {
       errors.password = 'Required'
-    } else if (values.password.length < 8) {
-      errors.password = 'Must be 8 characters minimum'
-    } else if (values.password.length > 30) {
-      errors.password = 'Must be 30 characters or less'
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/.test(
-        values.password
-      )
-    ) {
-      errors.password =
-        'Must contain uppercase, lowercase, number and symbol chracter'
     }
+
     return errors
   }
 
@@ -258,18 +248,29 @@ function BasicInfoForm() {
         })
 
         if (res.ok) {
+          await mutateUser()
           toast({
             description: 'Successfully updated your info.',
             status: 'success',
             duration: 5000,
             isClosable: true,
           })
-        } else {
+        } else if (res.status === 400) {
           const data = await res.json()
           toast({
             description: data.message
               ? data.message[0]
               : 'Internal error occurred',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else if (res.status === 500) {
+          toast({
+            description:
+              modalField === 'username'
+                ? 'username already exists'
+                : 'email already exists',
             status: 'error',
             duration: 5000,
             isClosable: true,
@@ -285,9 +286,8 @@ function BasicInfoForm() {
         })
       }
 
-      await mutateUser()
-      actions.setSubmitting(false)
       modal.onClose()
+      actions.setSubmitting(false)
     },
   })
 
@@ -300,6 +300,9 @@ function BasicInfoForm() {
     formik.setFieldValue('username', initialValues.username)
     formik.setFieldValue('email', initialValues.email)
     formik.setFieldValue('password', initialValues.password)
+    formik.setFieldTouched('username', false)
+    formik.setFieldTouched('email', false)
+    formik.setFieldTouched('password', false)
     setModalField('')
   }
 
