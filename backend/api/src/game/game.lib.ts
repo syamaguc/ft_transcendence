@@ -16,6 +16,7 @@ const barBaseWidth = 50
 const ballBaseSize = 50
 const ballSpeed = 20
 const barSpeed = 20
+const settingTime = 30
 
 class BallDirection {
 	ballRadian: number
@@ -32,7 +33,7 @@ export class GameRoom {
 	socketDatas: socketData[]
 	logger: Logger
 
-	_get_player1_and_player2() {
+	getPlayer1AndPlayer2() {
 		let player1
 		let player2
 		for (let i = 0; i < this.socketDatas.length; i++) {
@@ -70,6 +71,7 @@ export class GameRoom {
 			player1: { point: 0, name: player1Name },
 			player2: { point: 0, name: player2Name },
 			gameStatus: 0,
+			remainSeconds: 0,
 			gameSetting: { point: point, speed: speed },
 		}
 	}
@@ -79,6 +81,7 @@ export class GameRoom {
 		server: Server,
 		player1: socketData,
 		player2: socketData,
+		gameGateWay
 	) {
 		this.id = id
 		this.server = server
@@ -90,6 +93,24 @@ export class GameRoom {
 		}
 		this.socketDatas = [player1, player2]
 		this.logger = new Logger('GameRoom Log')
+		this.settingStart(gameGateWay)
+	}
+
+	settingStart(gameGateWay) {
+		this.gameObject.remainSeconds = settingTime
+		this.interval = setInterval(() => {
+			this.gameObject.remainSeconds -= 1
+			if (this.gameObject.remainSeconds == 0) {
+				clearInterval(this.interval)
+				gameGateWay.settingEnd(this.id)
+			} else {
+				this.updateObject()
+			}
+		}, 1000)
+	}
+
+	settingEnd() {
+		clearInterval(this.interval)
 	}
 
 	setBallBounce(barTop: number) {
@@ -216,7 +237,7 @@ export class GameRoom {
 		if (finishFlag == 0) {
 			this.play()
 		} else {
-			const [player1, player2] = this._get_player1_and_player2()
+			const [player1, player2] = this.getPlayer1AndPlayer2()
 
 			const info: gameInfo = {
 				gameId: this.id,
@@ -228,7 +249,7 @@ export class GameRoom {
 			new GameService().saveGameHistory(info)
 
 			this.gameObject.gameStatus = 2
-			this.server.to(this.id).emit('updateGameObject', this.gameObject)
+			this.updateObject()
 		}
 	}
 
@@ -275,6 +296,7 @@ export class GameRoom {
 	}
 
 	start(point: number, speed: number) {
+		this.settingEnd()
 		this.gameObjectInit(
 			point,
 			speed,
@@ -285,12 +307,16 @@ export class GameRoom {
 	}
 
 	retry() {
-		const [player1, player2] = this._get_player1_and_player2()
+		const [player1, player2] = this.getPlayer1AndPlayer2()
 		return [this.gameObject, player1, player2]
 	}
 
 	quit() {
 		this.server.to(this.id).emit('clientQuit')
+	}
+
+	updateObject() {
+		this.server.to(this.id).emit('updateGameObject', this.gameObject)
 	}
 
 	settingChange(name: string, checked: boolean, value: number) {
@@ -303,7 +329,7 @@ export class GameRoom {
 				this.gameObject.gameSetting.speed = value
 			}
 		}
-		this.server.to(this.id).emit('updateGameObject', this.gameObject)
+		this.updateObject()
 	}
 
 	barMove(keyStatus: KeyStatus, position: Position) {

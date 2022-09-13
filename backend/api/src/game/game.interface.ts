@@ -30,6 +30,7 @@ export interface GameObject {
 	player1: Player
 	player2: Player
 	gameStatus: number
+	remainSeconds: number
 	gameSetting: GameSetting
 }
 

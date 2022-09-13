@@ -53,26 +53,18 @@ export class GameGateway {
 
 	@SubscribeMessage('connectServer')
 	handleConnect(@MessageBody() data, @ConnectedSocket() client: Socket) {
-		// debug
-		// if (this.gameRooms.length == 0) {
-		//   this.gameRooms.push(new GameRoom('a', this.server));
-		//   this.gameRooms.push(new GameRoom('b', this.server));
-		//   this.gameRooms.push(new GameRoom('c', this.server));
-		// }
-
 		const roomId = data['roomId']
 		const userId = data['userId']
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				const role: number = this.gameRooms[i].connect(client, userId)
-				this.server.to(client.id).emit('connectClient', {
-					role: role,
-					gameObject: this.gameRooms[i].gameObject,
-				})
-				return
-			}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) {
+			this.server.to(client.id).emit('noRoom')
+		} else {
+			const role: number = this.gameRooms[roomIndex].connect(client, userId)
+			this.server.to(client.id).emit('connectClient', {
+				role: role,
+				gameObject: this.gameRooms[roomIndex].gameObject,
+			})
 		}
-		this.server.to(client.id).emit('noRoom')
 	}
 
 	@SubscribeMessage('settingChange')
@@ -81,11 +73,25 @@ export class GameGateway {
 		const name = data['name']
 		const checked = data['checked']
 		const value = data['value']
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				this.gameRooms[i].settingChange(name, checked, value)
-			}
-		}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		this.gameRooms[roomIndex].settingChange(name, checked, value)
+	}
+
+	deleteGameRoom(roomIndex: number) {
+		this.gameRooms.splice(roomIndex, 1)
+		const gameRoomId: string = this.gameRoomInfos[roomIndex].id
+		this.gameRoomInfos.splice(roomIndex, 1)
+		this.server
+			.to('readyIndex')
+			.emit('deleteGameRoom', { gameRoomId: gameRoomId })
+	}
+
+	settingEnd(gameRoomId: string) {
+		const roomIndex = this.searchRoom(gameRoomId)
+		if (roomIndex == -1) return
+		this.gameRooms[roomIndex].quit()
+		this.deleteGameRoom(roomIndex)
 	}
 
 	@SubscribeMessage('start')
@@ -93,37 +99,23 @@ export class GameGateway {
 		const roomId = data['id']
 		const point = data['point']
 		const speed = data['speed']
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				this.gameRooms[i].start(point, speed)
-			}
-		}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		this.gameRooms[roomIndex].start(point, speed)
 	}
 
 	@SubscribeMessage('retry')
 	handleRetry(@MessageBody() data: any) {
 		const roomId = data['id']
-		let gameObject
-		let player1
-		let player2
-		let socketDatas
-		let gameRoomInfo
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				;[gameObject, player1, player2] = this.gameRooms[i].retry()
-				socketDatas = this.gameRooms[i].socketDatas
-				gameRoomInfo = this.gameRoomInfos[i]
-				this.gameRooms.splice(i, 1)
-				this.gameRoomInfos.splice(i, 1)
-				this.server
-					.to('readyIndex')
-					.emit('deleteGameRoom', { gameRoomId: gameRoomInfo.id })
-				break
-			}
-		}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		const [gameObject, player1, player2] = this.gameRooms[roomIndex].retry()
+		const socketDatas = this.gameRooms[roomIndex].socketDatas
+		const gameRoomInfo = this.gameRoomInfos[roomIndex]
+		this.deleteGameRoom(roomIndex)
 		// 検索失敗時のエラー処理追加予定
 		const id = uuidv4()
-		const gameRoom = new GameRoom(id, this.server, player1, player2)
+		const gameRoom = new GameRoom(id, this.server, player1, player2, this)
 		gameRoom.gameObject.gameSetting = gameObject.gameSetting
 		this.gameRooms.push(gameRoom)
 		for (let i = 0; i < socketDatas.length; i++) {
@@ -139,29 +131,19 @@ export class GameGateway {
 	@SubscribeMessage('quit')
 	handleQuit(@MessageBody() data: any) {
 		const roomId = data['id']
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				this.gameRooms[i].quit()
-				this.gameRooms.splice(i, 1)
-				const gameRoomId: string = this.gameRoomInfos[i].id
-				this.gameRoomInfos.splice(i, 1)
-				this.server
-					.to('readyIndex')
-					.emit('deleteGameRoom', { gameRoomId: gameRoomId })
-				break
-			}
-		}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		this.gameRooms[roomIndex].quit()
+		this.deleteGameRoom(roomIndex)
 	}
 
 	@SubscribeMessage('move')
 	handleMove(@MessageBody() data: any, @ConnectedSocket() client: Socket) {
 		const roomId = data['id']
 		const keyStatus: KeyStatus = data['key']
-		for (let i = 0; i < this.gameRooms.length; i++) {
-			if (roomId == this.gameRooms[i].id) {
-				this.gameRooms[i].barSelect(keyStatus, client)
-			}
-		}
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		this.gameRooms[roomIndex].barSelect(keyStatus, client)
 	}
 
 	checkInMatchUsers(userId: string): number {
@@ -247,6 +229,7 @@ export class GameGateway {
 							this.server,
 							this.matchUsers[0],
 							clientData,
+							this
 						),
 					)
 					this.server.to(client.id).emit('goGameRoom', id)
