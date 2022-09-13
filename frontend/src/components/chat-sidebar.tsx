@@ -1,6 +1,7 @@
 import {
   Box,
   Stack,
+  Flex,
   Button,
   Input,
   Radio,
@@ -32,6 +33,7 @@ const SideBar = ({
   const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
   const [room, setRoom] = useState<ChannelObject>()
   const didLogRef = useRef(false)
+  const [moveChannelId, setMoveChannelId] = useState()
 
   const onClickChannel = (chatRoom: ChannelObject) => {
     if (currentRoom != chatRoom) {
@@ -45,10 +47,6 @@ const SideBar = ({
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      socket.on('updateNewRoom', (newChatRoom: ChannelObject) => {
-        console.log('created : ', newChatRoom)
-        setRoom(newChatRoom)
-      })
       socket.on('getMessageLog', (messageLog: MessageObject[]) => {
         console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
@@ -56,49 +54,87 @@ const SideBar = ({
       socket.on('getRooms', (rooms: ChannelObject[]) => {
         setChatRooms(rooms)
       })
+      socket.on('updateRoom', (channel: ChannelObject) => {
+        console.log('updateRoom received : ', channel)
+        setRoom(channel)
+      })
+      socket.on('updateCurrentRoom', (channelId: string) => {
+        console.log('updateCurrentRoom received : ', channelId)
+        setMoveChannelId(channelId)
+      })
+      socket.emit('getRooms')
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    socket.emit('getRooms')
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (room) {
-      setChatRooms([...chatRooms, room])
+      let existFlag = false
+      for (let i = 0; i < chatRooms.length; i++) {
+        if (chatRooms[i].id == room.id) {
+          existFlag = true
+          chatRooms[i] = room
+          const newChatRooms = chatRooms.slice(0)
+          setChatRooms(newChatRooms)
+          break
+        }
+      }
+      if (!existFlag) {
+        setChatRooms([...chatRooms, room])
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [room])
 
-  return (
-    <Box>
-      <Box>
-        <Stack spacing='12px'>
-          <ChatCreationForm socket={socket} />
-        </Stack>
-      </Box>
+  useEffect(() => {
+    if (!moveChannelId) return
+    for (let i = 0; i < chatRooms.length; i++) {
+      if (chatRooms[i].id == moveChannelId) {
+        setCurrentRoom(chatRooms[i])
+        setMoveChannelId(null)
+        break
+      }
+    }
+  }, [chatRooms, moveChannelId])
 
-      <Stack width='sm'>
+  useEffect(() => {
+    for (let i = 0; i < chatRooms.length; i++) {
+      if (chatRooms[i].id == currentRoom.id) {
+        if (chatRooms[i] !== currentRoom) {
+          setCurrentRoom(chatRooms[i])
+        }
+        break
+      }
+    }
+  }, [currentRoom, chatRooms])
+
+  return (
+    <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
+      <Flex
+        width='100%'
+        p={(5, 5, 2, 2)}
+        borderBottom='1px solid'
+        borderBottomColor='gray.200'
+      >
+        <ChatCreationForm socket={socket} />
+      </Flex>
+
+      <Flex direction='column'>
         {chatRooms.map((chatRoom: ChannelObject) => (
-          <Box
+          <Flex
             as='button'
-            borderRadius='4px'
             p={4}
-            shadow='sm'
-            borderWidth='1px'
-            _hover={{ borderColor: '#00BABC' }}
+            _hover={{ bgColor: '#00BABC' }}
             onClick={() => {
               onClickChannel(chatRoom)
             }}
             key={chatRoom.id}
           >
             {chatRoom.name}
-          </Box>
+          </Flex>
         ))}
-      </Stack>
-    </Box>
+      </Flex>
+    </Flex>
   )
 }
 

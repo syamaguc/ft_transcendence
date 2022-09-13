@@ -12,8 +12,8 @@ export class Message {
 	@PrimaryGeneratedColumn('uuid')
 	id: string
 
-	@Column()
-	user: string
+	@Column('uuid')
+	userId: string
 
 	@Column()
 	message: string
