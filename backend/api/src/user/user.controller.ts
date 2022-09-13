@@ -287,7 +287,7 @@ export class UserController {
 	@UseGuards(AuthGuard('jwt'))
 	@Delete('/logout')
 	logout(@Req() req, @Res({ passthrough: true }) res: Response) {
-    const user: User = req.user
+		const user: User = req.user
 		res.clearCookie('jwt')
 		return this.userService.logout(user)
 	}
