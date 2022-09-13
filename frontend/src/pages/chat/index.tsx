@@ -89,7 +89,7 @@ const ShowContents = ({
 }
 
 const Chat = () => {
-  const user = useUser()
+  const { user } = useUser()
   const [isJoined, setIsJoined] = useState(false)
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
