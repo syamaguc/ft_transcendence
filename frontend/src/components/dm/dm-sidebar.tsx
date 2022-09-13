@@ -14,6 +14,7 @@ import {
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { DMObject, MessageObject } from 'src/types/chat'
+import DMCreationForm from './dm-creation-form'
 
 type Props = {
   socket: Socket
@@ -65,9 +66,7 @@ const DMSideBar = ({
         borderBottom='1px solid'
         borderBottomColor='gray.200'
       >
-        <Text as='b' p={2}>
-          Direct Messages
-        </Text>
+        <DMCreationForm socket={socket} />
       </Flex>
       <Flex direction='column'>
         {DMRooms.map((DMRoom: DMObject) => (
