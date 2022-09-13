@@ -12,6 +12,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react'
+import { useRouter } from 'next/router'
 import { MutableRefObject, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 
@@ -21,6 +22,7 @@ type Props = {
 
 const DMCreationForm = ({ socket }: Props) => {
   const userNameInputRef = useRef<HTMLInputElement>()
+  const router = useRouter()
 
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()

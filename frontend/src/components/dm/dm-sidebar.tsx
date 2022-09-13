@@ -11,6 +11,7 @@ import {
   FormLabel,
   FormHelperText,
 } from '@chakra-ui/react'
+import { NextRouter } from 'next/router'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { DMObject, MessageObject } from 'src/types/chat'
@@ -19,44 +20,36 @@ import DMCreationForm from './dm-creation-form'
 type Props = {
   socket: Socket
   currentRoom: DMObject
-  setCurrentRoom: (room: DMObject) => void
-  setChatLog: (chatLog: MessageObject[]) => void
-  setInputMessage: (input: string) => void
+  router: NextRouter
 }
 
-const DMSideBar = ({
-  socket,
-  currentRoom,
-  setCurrentRoom,
-  setChatLog,
-  setInputMessage,
-}: Props) => {
+const DMSideBar = ({ socket, currentRoom, router }: Props) => {
   const [DMRooms, setDMRooms] = useState<DMObject[]>([currentRoom])
+  const [newDMRoom, setnewDMRoom] = useState<DMObject>()
   const didLogRef = useRef(false)
-
-  const onClickChannel = (DMRoom: DMObject) => {
-    if (currentRoom != DMRoom) {
-      setCurrentRoom(DMRoom)
-      socket.emit('watchRoom', DMRoom.id)
-      socket.emit('getMessageLog', DMRoom.id)
-      setInputMessage('')
-    }
-  }
 
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      socket.on('getMessageLog', (messageLog: MessageObject[]) => {
-        console.log('messageLog loaded', messageLog)
-        setChatLog(messageLog)
-      })
       socket.on('getRooms', (rooms: DMObject[]) => {
         setDMRooms(rooms)
+      })
+      socket.on('updateRoom', (newDMRoom: DMObject) => {
+        console.log('updateRoom called', newDMRoom)
+        setnewDMRoom(newDMRoom)
       })
       socket.emit('getRooms')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (newDMRoom) {
+      setDMRooms([...DMRooms, newDMRoom])
+      console.log(DMRooms)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newDMRoom])
 
   return (
     <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
@@ -75,7 +68,7 @@ const DMSideBar = ({
             p={4}
             _hover={{ bgColor: '#00BABC' }}
             onClick={() => {
-              onClickChannel(DMRoom)
+              router.push('/chat/' + DMRoom.id)
             }}
             key={DMRoom.id}
           >

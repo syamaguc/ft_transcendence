@@ -84,12 +84,12 @@ export class DMGateway {
 		@MessageBody() createDMRoomDto: CreateDMRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
+		console.log('called', createDMRoomDto)
 		let newDMRoom = await this.DMService.createRoom(
 			createDMRoomDto,
 			socket.data.userId,
 		)
 		this.server.emit('updateRoom', newDMRoom)
-		this.server.to(socket.id).emit('updateCurrentRoom', newDMRoom.id)
 	}
 }
 

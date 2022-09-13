@@ -30,19 +30,32 @@ export class DMService {
 		return this.DMRoomRepository.save(selfDM)
 	}
 	*/
+	toDMFrontObject(DM: DMRoom, userId: string): any {
+		let otherMember = DM.memberA
+		if (DM.memberA == userId) {
+			otherMember = DM.memberB
+		}
+		const DMFrontObject = {
+			id: DM.id,
+			toUserName: otherMember,
+			logs: DM.messages,
+		}
+		console.log(DMFrontObject)
+		return DMFrontObject
+	}
 
 	async createRoom(
 		DMRoomData: CreateDMRoomDto,
 		userId: string,
-	): Promise<DMRoom> {
+	): Promise<any> {
 		const newDMRoom = {
 			...DMRoomData,
 			id: uuidv4(),
 			memberA: userId,
 		}
 		const DM = await this.DMRoomRepository.save(newDMRoom)
-		console.log(DM)
-		return DM
+
+		return this.toDMFrontObject(DM, userId)
 	}
 
 	async addMessage(
@@ -69,11 +82,11 @@ export class DMService {
 	}
 
 	async getRooms(userId: string): Promise<any[]> {
-		const rooms = await this.DMRoomRepository.createQueryBuilder()
-			.where('memberA = :userId', { userId })
-			.orWhere('memberB = :userId', { userId })
-			.innerJoinAndSelect(User, 'user', 'memberA = user.userId')
-			.innerJoinAndSelect(User, 'user', 'memberB = user.userId')
+		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
+			.where('dm.memberA = :userId', { userId })
+			.orWhere('dm.memberB = :userId', { userId })
+			.innerJoinAndSelect(User, 'user', 'dm.memberA = user.userId')
+			.innerJoinAndSelect(User, 'user', 'dm.memberB = user.userId')
 			.getRawMany()
 		console.log(rooms)
 		return rooms
