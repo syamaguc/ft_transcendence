@@ -43,12 +43,6 @@ import { API_URL } from 'src/constants'
 
 import { useFormik, FormikErrors } from 'formik'
 
-import PasswordField from '@components/password-field'
-
-interface AvatarFormValues {
-  file: File
-}
-
 type ThumbnailProps = {
   user: User
   file: File
@@ -88,14 +82,27 @@ type AvatarFormProps = {
   onClose?: () => void
 }
 
+interface AvatarFormValues {
+  file: File
+}
+
 const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
   const { user, mutateUser } = useUser()
+  const toast = useToast()
   const { isOpen, onClose } = props
 
-  const validate = (valies: AvatarFormValues) => {
+  const validate = (values: AvatarFormValues) => {
     const errors: FormikErrors<AvatarFormValues> = {}
-    // File too big
-    // not png or jpeg
+    if (!values.file) {
+      errors.file = 'Required'
+    } else if (
+      values.file.type !== 'image/png' &&
+      values.file.type !== 'image/jpeg'
+    ) {
+      errors.file = 'File must be png or jpeg'
+    } else if (values.file.size > 1000000) {
+      errors.file = 'File must be less than 1MB'
+    }
     return errors
   }
 
@@ -118,25 +125,57 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
         )
       )
 
-      const body = new FormData()
-      body.append('file', values.file)
+      try {
+        const body = new FormData()
+        body.append('file', values.file)
 
-      const res = await fetch(`${API_URL}/api/user/upload/avatar`, {
-        method: 'POST',
-        credentials: 'include',
-        body,
-      })
+        const res = await fetch(`${API_URL}/api/user/upload/avatar`, {
+          method: 'POST',
+          credentials: 'include',
+          body,
+        })
 
-      console.log(res)
-      console.log(res.body)
+        if (res.ok) {
+          await mutateUser()
+          toast({
+            description: 'Successfully updated your avatar.',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else if (res.status === 413) {
+          toast({
+            description: 'File too large.',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else {
+          toast({
+            description: 'Failed to update your avatar',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        }
+      } catch (err) {
+        console.log(err)
+        toast({
+          description: 'Failed to update your avatar',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+      }
 
-      await mutateUser()
       actions.setSubmitting(false)
+      onClose()
     },
   })
 
   const onCloseComplete = () => {
-    formik.values.file = null
+    formik.setFieldValue('file', null)
+    formik.setFieldTouched('file', null)
   }
 
   return (
@@ -147,7 +186,11 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
           <ModalHeader>Upload Avatar</ModalHeader>
           <ModalCloseButton />
           <ModalBody pb={6}>
-            <FormControl>
+            <FormControl
+              isInvalid={
+                formik.errors.file && formik.touched.file ? true : false
+              }
+            >
               <FormLabel htmlFor='file' fontSize='xs' color='gray.400'>
                 AVATAR
               </FormLabel>
@@ -163,6 +206,9 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
                   )
                 }}
               />
+              <FormErrorMessage>
+                {formik.errors.file ? `${formik.errors.file}` : null}
+              </FormErrorMessage>
             </FormControl>
           </ModalBody>
           <ModalFooter>
