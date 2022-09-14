@@ -54,17 +54,22 @@ function MemberList({ socket, currentRoom, members }) {
             />
           <Text>{member.username}</Text>
           <Box opacity='0' _hover={{ transition: '0.3s' , opacity: '1' }} p={2}>
-          {/* <Box p={2}> */}
             <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
             <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
             <Button onClick={() => onClickAdmin(member.userId)}>ADMIN</Button>
-            {/* <Button onClick={onClickBan}>BAN</Button>
-            <Button onClick={onClickAdmin}>ADMIN</Button> */}
-            {/* <Button>BAN</Button>
-            <Button>ADMIN</Button> */}
           </Box>
-
         </Flex>
+      ))}
+    </>
+  )
+}
+
+function FriendList({friends}) {
+  if (!friends || !friends.length) return <Text>You have no friends</Text>
+  return (
+    <>
+      {friends.map((friend) => (
+        <Text>{friend.username}</Text>
       ))}
     </>
   )
@@ -72,29 +77,38 @@ function MemberList({ socket, currentRoom, members }) {
 
 function MemberListModal({ socket, currentRoom }) {
   const [members, setMembers] = useState<User[]>([])
+  const [friends, setFriends] = useState()
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const didLogRef = useRef(false)
 
   const onClickGet = (roomId: string) => {
     socket.emit('getMembers', roomId)
-    console.log('getmembers')
   }
 
-  //load members in the channel
   useEffect(() => {
+    //load members in the channel
     if (didLogRef.current === false) {
       didLogRef.current = true
       socket.on('getMembers', (users: User[]) => {
-        console.log('recieved members')
         setMembers(users)
         })
     }
+
+    //load friends
+    fetch(`${API_URL}/api/user/friendList`, {
+      credentials: 'include',
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        setFriends(data)
+        console.log("get Friends")
+        console.log(data);
+      })
   }, [])
 
   return (
     <>
-      {/* <Button onClick={onOpen}>Open Modal</Button> */}
       <IconButton
         size='sm'
         icon={<UsersIcon />}
@@ -109,7 +123,10 @@ function MemberListModal({ socket, currentRoom }) {
           <ModalHeader>Members</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
+            <Text>Members</Text>
             <MemberList socket={socket} currentRoom={currentRoom} members={members} />
+            <Text>Friends</Text>
+            <FriendList friends={friends}/>
           </ModalBody>
           <ModalFooter>
             <Button mr={3} onClick={onClose}>
