@@ -37,7 +37,7 @@ export function SignupForm() {
       .required('Password is required')
       .min(8, 'Must be 8 characters minimum')
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/,
         'Must contain uppercase, lowercase, number and symbol chracter'
       ),
   })
@@ -67,7 +67,7 @@ export function SignupForm() {
     } else if (values.password.length > 30) {
       errors.password = 'Must be 30 characters or less'
     } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/.test(
         values.password
       )
     ) {
