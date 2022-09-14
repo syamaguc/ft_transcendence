@@ -1,4 +1,5 @@
 import {
+  Tooltip,
   Text,
   Box,
   Stack,
@@ -21,7 +22,9 @@ const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.is_private) {
     return (
       <Flex align='center'>
-        <AtSignIcon mr={2} color='gray.600'/>
+        <Tooltip label='private channel'>
+          <AtSignIcon mr={2} color='gray.600'/>
+        </Tooltip>
         <Text>{roomInfo.name} </Text>
       </Flex>
     )
@@ -30,7 +33,9 @@ const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.password != '') {
     return (
       <Flex align='center'>
-        <LockIcon mr={2} color='gray.600'/>
+        <Tooltip label='protected channel'>
+          <LockIcon mr={2} color='gray.600'/>
+        </Tooltip>
         <Text>{roomInfo.name} </Text>
       </Flex>
     )
