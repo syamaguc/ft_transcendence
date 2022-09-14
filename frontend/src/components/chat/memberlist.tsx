@@ -21,22 +21,24 @@ import { generateKey } from 'crypto'
 
 const API_URL = 'http://localhost:3000'
 
-// function MemberList({ currentRoom }) {
-//   if (!currentRoom) return null
-//   const members: string[] = currentRoom.members
-//   if (!members) return null
-//   if (!members.length) return <Text>This room is empty</Text>
 
-//   return (
-//     <>
-//       {members.map((member) => (
-//         <Text>member.id</Text>
-//       ))}
-//     </>
-//   )
-// }
 
-function MemberList({ members }) {
+function MemberList({ socket, currentRoom, members }) {
+  const onClickMute = (userId: string) => {
+    socket.emit('muteMember', currentRoom.id, userId)
+    console.log(userId, ' has been muted from channel ' , currentRoom.id)
+  }
+
+  const onClickBan = (userId: string) => {
+    socket.emit('banMember', currentRoom.id, userId)
+    console.log(userId, ' has been banned from channel ' , currentRoom.id)
+  }
+
+  const onClickAdmin = (userId: string) => {
+    socket.emit('addAdmin', currentRoom.id, userId)
+    console.log(userId, ' has been added to admin in channel ' , currentRoom.id)
+  }
+
   if (!members || !members.length) return <Text>This room is empty</Text>
   return (
     <>
@@ -45,7 +47,6 @@ function MemberList({ members }) {
           key={member.userId}
           p={2}
           align='center'
-          // _hover={{ bgColor: '#00BABC' }}
         >
           <Avatar
             src={`${API_URL}/api/user/avatar/${member.profile_picture}`}
@@ -53,9 +54,14 @@ function MemberList({ members }) {
             />
           <Text>{member.username}</Text>
           <Box opacity='0' _hover={{ transition: '0.3s' , opacity: '1' }} p={2}>
-            <Button>MUTE</Button>
-            <Button>BAN</Button>
-            <Button>ADMIN</Button>
+          {/* <Box p={2}> */}
+            <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
+            <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
+            <Button onClick={() => onClickAdmin(member.userId)}>ADMIN</Button>
+            {/* <Button onClick={onClickBan}>BAN</Button>
+            <Button onClick={onClickAdmin}>ADMIN</Button> */}
+            {/* <Button>BAN</Button>
+            <Button>ADMIN</Button> */}
           </Box>
 
         </Flex>
@@ -64,22 +70,18 @@ function MemberList({ members }) {
   )
 }
 
-
 function MemberListModal({ socket, currentRoom }) {
   const [members, setMembers] = useState<User[]>([])
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const didLogRef = useRef(false)
 
-  // useEffect(() => {
-  //   socket.emit('getMembers', currentRoom.id)
-  // }, [])
-
   const onClickGet = (roomId: string) => {
     socket.emit('getMembers', roomId)
     console.log('getmembers')
   }
 
+  //load members in the channel
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
@@ -88,11 +90,7 @@ function MemberListModal({ socket, currentRoom }) {
         setMembers(users)
         })
     }
-
-
-
   }, [])
-
 
   return (
     <>
@@ -111,13 +109,13 @@ function MemberListModal({ socket, currentRoom }) {
           <ModalHeader>Members</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <MemberList members={members} />
+            <MemberList socket={socket} currentRoom={currentRoom} members={members} />
           </ModalBody>
           <ModalFooter>
-            <Button colorScheme='blue' mr={3} onClick={onClose}>
+            <Button mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant='ghost'>Invite User</Button>
+            <Button colorScheme='blue' variant='ghost'>Invite User</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
