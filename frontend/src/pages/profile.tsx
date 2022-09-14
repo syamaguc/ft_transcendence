@@ -8,12 +8,9 @@ import {
   Heading,
   FormControl,
   FormLabel,
-  FormHelperText,
   FormErrorMessage,
-  Icon,
   Input,
   InputGroup,
-  InputLeftElement,
   Text,
   Stack,
   Modal,
@@ -234,7 +231,8 @@ interface BasicInfoFormValues {
   password: string
 }
 
-function BasicInfoForm() {
+function BasicInfo() {
+  const avatarForm = useDisclosure()
   const { user, mutateUser } = useUser()
   const toast = useToast()
   const modal = useDisclosure()
@@ -353,148 +351,6 @@ function BasicInfoForm() {
   }
 
   return (
-    <form id='form-basic-info' onSubmit={formik.handleSubmit}>
-      <Stack spacing='6'>
-        <FormControl>
-          <FormLabel fontSize='xs' color='gray.400'>
-            USERNAME
-          </FormLabel>
-          <Stack direction='row' spacing='4' align='center'>
-            <Input
-              name='readonly-username'
-              type='text'
-              isReadOnly={true}
-              value={user.username}
-            />
-            <Button size='sm' onClick={() => modalOnOpen('username')}>
-              Edit
-            </Button>
-          </Stack>
-        </FormControl>
-        <FormControl>
-          <FormLabel fontSize='xs' color='gray.400'>
-            EMAIL
-          </FormLabel>
-          <Stack direction='row' spacing='4' align='center'>
-            <Input
-              name='readonly-email'
-              type='email'
-              isReadOnly={true}
-              value={user.email}
-            />
-            <Button size='sm' onClick={() => modalOnOpen('email')}>
-              Edit
-            </Button>
-          </Stack>
-        </FormControl>
-        <Modal
-          isOpen={modal.isOpen}
-          onClose={modal.onClose}
-          onCloseComplete={modalOnCloseComplete}
-        >
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Change your username</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={6}>
-              <Stack spacing='6'>
-                {modalField === 'username' && (
-                  <>
-                    <Text>
-                      Enter a new username and your existing password.
-                    </Text>
-                    <FormControl
-                      isInvalid={
-                        formik.errors.username && formik.touched.username
-                      }
-                    >
-                      <FormLabel
-                        htmlFor='username'
-                        fontSize='xs'
-                        color='gray.400'
-                      >
-                        USERNAME
-                      </FormLabel>
-                      <Input
-                        name='username'
-                        type='text'
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.username}
-                      />
-                      <FormErrorMessage>
-                        {formik.errors.username}
-                      </FormErrorMessage>
-                    </FormControl>
-                  </>
-                )}
-                {modalField === 'email' && (
-                  <>
-                    <Text>Enter a new email and your existing password.</Text>
-                    <FormControl
-                      isInvalid={formik.errors.email && formik.touched.email}
-                    >
-                      <FormLabel htmlFor='email' fontSize='xs' color='gray.400'>
-                        EMAIL
-                      </FormLabel>
-                      <Input
-                        name='email'
-                        type='email'
-                        onChange={formik.handleChange}
-                        onBlur={formik.handleBlur}
-                        value={formik.values.email}
-                      />
-                      <FormErrorMessage>{formik.errors.email}</FormErrorMessage>
-                    </FormControl>
-                  </>
-                )}
-                <FormControl
-                  isInvalid={formik.errors.password && formik.touched.password}
-                >
-                  <FormLabel htmlFor='password' fontSize='xs' color='gray.400'>
-                    PASSWORD
-                  </FormLabel>
-                  <InputGroup>
-                    <Input
-                      name='password'
-                      type='password'
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.password}
-                    />
-                  </InputGroup>
-                  <FormErrorMessage>{formik.errors.password}</FormErrorMessage>
-                </FormControl>
-              </Stack>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                type='submit'
-                form='form-basic-info'
-                colorScheme='blue'
-                isLoading={formik.isSubmitting}
-                mr={3}
-              >
-                Save
-              </Button>
-              <Button onClick={modal.onClose}>Cancel</Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-      </Stack>
-    </form>
-  )
-}
-
-type BasicInfoFormProps = {
-  user: User
-}
-
-function BasicInfo() {
-  const avatarForm = useDisclosure()
-  const { user, mutateUser } = useUser()
-
-  return (
     <Stack>
       <Heading fontSize='2xl'>Basic information</Heading>
       <Stack
@@ -523,7 +379,150 @@ function BasicInfo() {
         </Stack>
       </Stack>
       <Divider orientation='horizontal' />
-      <BasicInfoForm />
+      <form id='form-basic-info' onSubmit={formik.handleSubmit}>
+        <Stack spacing='6'>
+          <FormControl>
+            <FormLabel fontSize='xs' color='gray.400'>
+              USERNAME
+            </FormLabel>
+            <Stack direction='row' spacing='4' align='center'>
+              <Input
+                name='readonly-username'
+                type='text'
+                isReadOnly={true}
+                value={user.username}
+              />
+              <Button size='sm' onClick={() => modalOnOpen('username')}>
+                Edit
+              </Button>
+            </Stack>
+          </FormControl>
+          <FormControl>
+            <FormLabel fontSize='xs' color='gray.400'>
+              EMAIL
+            </FormLabel>
+            <Stack direction='row' spacing='4' align='center'>
+              <Input
+                name='readonly-email'
+                type='email'
+                isReadOnly={true}
+                value={user.email}
+              />
+              <Button size='sm' onClick={() => modalOnOpen('email')}>
+                Edit
+              </Button>
+            </Stack>
+          </FormControl>
+          <Modal
+            isOpen={modal.isOpen}
+            onClose={modal.onClose}
+            onCloseComplete={modalOnCloseComplete}
+          >
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Change your username</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody pb={6}>
+                <Stack spacing='6'>
+                  {modalField === 'username' && (
+                    <>
+                      <Text>
+                        Enter a new username and your existing password.
+                      </Text>
+                      <FormControl
+                        isInvalid={
+                          formik.errors.username && formik.touched.username
+                        }
+                      >
+                        <FormLabel
+                          htmlFor='username'
+                          fontSize='xs'
+                          color='gray.400'
+                        >
+                          USERNAME
+                        </FormLabel>
+                        <Input
+                          name='username'
+                          type='text'
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          value={formik.values.username}
+                        />
+                        <FormErrorMessage>
+                          {formik.errors.username}
+                        </FormErrorMessage>
+                      </FormControl>
+                    </>
+                  )}
+                  {modalField === 'email' && (
+                    <>
+                      <Text>Enter a new email and your existing password.</Text>
+                      <FormControl
+                        isInvalid={formik.errors.email && formik.touched.email}
+                      >
+                        <FormLabel
+                          htmlFor='email'
+                          fontSize='xs'
+                          color='gray.400'
+                        >
+                          EMAIL
+                        </FormLabel>
+                        <Input
+                          name='email'
+                          type='email'
+                          onChange={formik.handleChange}
+                          onBlur={formik.handleBlur}
+                          value={formik.values.email}
+                        />
+                        <FormErrorMessage>
+                          {formik.errors.email}
+                        </FormErrorMessage>
+                      </FormControl>
+                    </>
+                  )}
+                  <FormControl
+                    isInvalid={
+                      formik.errors.password && formik.touched.password
+                    }
+                  >
+                    <FormLabel
+                      htmlFor='password'
+                      fontSize='xs'
+                      color='gray.400'
+                    >
+                      PASSWORD
+                    </FormLabel>
+                    <InputGroup>
+                      <Input
+                        name='password'
+                        type='password'
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        value={formik.values.password}
+                      />
+                    </InputGroup>
+                    <FormErrorMessage>
+                      {formik.errors.password}
+                    </FormErrorMessage>
+                  </FormControl>
+                </Stack>
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  type='submit'
+                  form='form-basic-info'
+                  colorScheme='blue'
+                  isLoading={formik.isSubmitting}
+                  mr={3}
+                >
+                  Save
+                </Button>
+                <Button onClick={modal.onClose}>Cancel</Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </Stack>
+      </form>
     </Stack>
   )
 }
@@ -544,6 +543,10 @@ function Profile() {
               <Stack>
                 <Heading fontSize='2xl'>Status</Heading>
                 <Text>{user.status}</Text>
+              </Stack>
+              <Stack>
+                <Heading fontSize='2xl'>Two-factor authentication</Heading>
+                <Text>{user.twoFactorAuth ? 'true' : 'false'}</Text>
               </Stack>
               <Stack>
                 <Heading fontSize='2xl'>Statistics</Heading>
