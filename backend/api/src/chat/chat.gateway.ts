@@ -66,8 +66,8 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMembers: for ${socket.id}`)
-		const rooms = await this.chatService.getMembers(roomId)
-		socket.emit('getMembers', rooms)
+		const users = await this.chatService.getMembers(roomId)
+		socket.emit('getMembers', users)
 	}
 
 	// room which user is watching

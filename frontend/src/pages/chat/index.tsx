@@ -165,7 +165,7 @@ const Chat = () => {
           />
         </Flex>
         <Flex h='90vh' w='100%' direction='column'>
-          <TopBar currentRoom={currentRoom} />
+          <TopBar socket={socket} currentRoom={currentRoom} />
           <MiddleBar chatLog={chatLog} />
           {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
           <Flex p={4}>
