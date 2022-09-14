@@ -14,8 +14,8 @@ export interface GameSetting {
 }
 
 export interface RetryFlag {
-	player1: boolean
-	player2: boolean
+  player1: boolean
+  player2: boolean
 }
 
 export interface GameObject {

@@ -14,7 +14,12 @@ import { User } from '../user/entities/user.entity'
 import { UsersRepository } from '../user/user.repository'
 // import { UserAuth } from '../user/guards/userAuth.guard'
 import { GameRoom } from './game.lib'
-import { socketData, KeyStatus, GameRoomInfo, GameSetting } from './game.interface'
+import {
+	socketData,
+	KeyStatus,
+	GameRoomInfo,
+	GameSetting,
+} from './game.interface'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -63,7 +68,10 @@ export class GameGateway {
 		if (roomIndex == -1) {
 			this.server.to(client.id).emit('noRoom')
 		} else {
-			const role: number = this.gameRooms[roomIndex].connect(client, userId)
+			const role: number = this.gameRooms[roomIndex].connect(
+				client,
+				userId,
+			)
 			this.server.to(client.id).emit('connectClient', {
 				role: role,
 				gameObject: this.gameRooms[roomIndex].gameObject,
@@ -82,7 +90,11 @@ export class GameGateway {
 		this.gameRooms[roomIndex].settingChange(name, checked, value)
 	}
 
-	makeGameRoom(player1: socketData, player2: socketData, gameSetting?: GameSetting): string {
+	makeGameRoom(
+		player1: socketData,
+		player2: socketData,
+		gameSetting?: GameSetting,
+	): string {
 		const id = uuidv4()
 		this.disconnectAllRooms(player1.userId)
 		this.disconnectAllRooms(player2.userId)
@@ -142,7 +154,8 @@ export class GameGateway {
 		const userId = data['userId']
 		const roomIndex = this.searchRoom(roomId)
 		if (roomIndex == -1) return
-		const [gameObject, player1, player2] = this.gameRooms[roomIndex].retry(userId)
+		const [gameObject, player1, player2] =
+			this.gameRooms[roomIndex].retry(userId)
 		if (!gameObject.retryFlag.player1 || !gameObject.retryFlag.player2) {
 			return
 		}
@@ -150,9 +163,15 @@ export class GameGateway {
 		const gameRoomInfo = this.gameRoomInfos[roomIndex]
 		this.deleteGameRoom(roomIndex)
 		// 検索失敗時のエラー処理追加予定
-		const newRoomId = this.makeGameRoom(player1, player2, gameObject.gameSetting)
+		const newRoomId = this.makeGameRoom(
+			player1,
+			player2,
+			gameObject.gameSetting,
+		)
 		for (let i = 0; i < socketDatas.length; i++) {
-			this.server.to(socketDatas[i].client.id).emit('goNewGame', newRoomId)
+			this.server
+				.to(socketDatas[i].client.id)
+				.emit('goNewGame', newRoomId)
 		}
 	}
 
@@ -266,7 +285,10 @@ export class GameGateway {
 				if (this.matchUsers.length >= 1) {
 					this.matchUsers[0].role = 0
 					clientData.role = 1
-					const roomId = this.makeGameRoom(this.matchUsers[0], clientData)
+					const roomId = this.makeGameRoom(
+						this.matchUsers[0],
+						clientData,
+					)
 					this.server.to(client.id).emit('goGameRoom', roomId)
 					this.server
 						.to(this.matchUsers[0].client.id)

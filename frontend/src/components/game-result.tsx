@@ -74,10 +74,20 @@ const GameResult = ({
         <button
           className={style.startButton}
           id='endButton'
-          onClick={(playerRole == 0 && gameObject.retryFlag.player1) || (playerRole == 1 && gameObject.retryFlag.player2) ? retryCancel: playerRole == 0 || playerRole == 1 ? retry: nop}
+          onClick={
+            (playerRole == 0 && gameObject.retryFlag.player1) ||
+            (playerRole == 1 && gameObject.retryFlag.player2)
+              ? retryCancel
+              : playerRole == 0 || playerRole == 1
+              ? retry
+              : nop
+          }
           disabled={playerRole != 0 && playerRole != 1}
         >
-          {(playerRole == 0 && gameObject.retryFlag.player1) || (playerRole == 1 && gameObject.retryFlag.player2 ) ? 'cancel': 'retry'}
+          {(playerRole == 0 && gameObject.retryFlag.player1) ||
+          (playerRole == 1 && gameObject.retryFlag.player2)
+            ? 'cancel'
+            : 'retry'}
         </button>
       </div>
     </div>

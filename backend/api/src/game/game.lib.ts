@@ -74,7 +74,7 @@ export class GameRoom {
 			gameStatus: 0,
 			remainSeconds: 0,
 			gameSetting: { point: point, speed: speed },
-			retryFlag: {player1: false, player2: false}
+			retryFlag: { player1: false, player2: false },
 		}
 	}
 
@@ -83,7 +83,7 @@ export class GameRoom {
 		server: Server,
 		player1: socketData,
 		player2: socketData,
-		gameGateWay
+		gameGateWay,
 	) {
 		this.id = id
 		this.server = server
@@ -309,7 +309,7 @@ export class GameRoom {
 
 	disconnectUser(userId: string) {
 		for (let i = 0; i < this.socketDatas.length; i++) {
-			if(this.socketDatas[i].userId == userId) {
+			if (this.socketDatas[i].userId == userId) {
 				if (this.socketDatas[i].client.connected) {
 					this.socketDatas[i].client.leave(this.id)
 				}

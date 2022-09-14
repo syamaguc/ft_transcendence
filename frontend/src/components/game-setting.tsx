@@ -21,7 +21,7 @@ const GameSettingForm = ({
   gameSetting,
   player1Name,
   player2Name,
-  remainSeconds
+  remainSeconds,
 }: Props) => {
   const didLogRef = useRef(false)
 
