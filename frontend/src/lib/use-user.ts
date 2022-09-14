@@ -16,7 +16,6 @@ async function fetchUser(url: string): Promise<{ user: User }> {
   return { user: null }
 }
 
-// TODO
 export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
   const { data, mutate, error } = useSWR('/api/users/current', fetchUser)
   const user = data?.user
