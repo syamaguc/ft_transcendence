@@ -59,6 +59,19 @@ export class GameGateway {
 		return res
 	}
 
+	updateGameStatus(userId: string, inGame: boolean) {
+		// ゲームのステータスの更新をする処理を追加予定
+	}
+
+	updateGameStatusRoom(roomId: string, inGame: boolean) {
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		const player1Id = this.gameRoomInfos[roomIndex].player1.id
+		const player2Id = this.gameRoomInfos[roomIndex].player2.id
+		this.updateGameStatus(player1Id, inGame)
+		this.updateGameStatus(player2Id, inGame)
+	}
+
 	@SubscribeMessage('connectServer')
 	handleConnect(@MessageBody() data, @ConnectedSocket() client: Socket) {
 		const roomId = data['roomId']
@@ -132,6 +145,7 @@ export class GameGateway {
 	}
 
 	settingEnd(gameRoomId: string) {
+		this.updateGameStatusRoom(gameRoomId, false)
 		const roomIndex = this.searchRoom(gameRoomId)
 		if (roomIndex == -1) return
 		this.gameRooms[roomIndex].quit()
@@ -186,6 +200,7 @@ export class GameGateway {
 	@SubscribeMessage('quit')
 	handleQuit(@MessageBody() data: any) {
 		const roomId = data['id']
+		this.updateGameStatusRoom(roomId, false)
 		const roomIndex = this.searchRoom(roomId)
 		if (roomIndex == -1) return
 		this.gameRooms[roomIndex].quit()
@@ -288,6 +303,7 @@ export class GameGateway {
 						this.matchUsers[0],
 						clientData,
 					)
+					this.updateGameStatusRoom(roomId, true)
 					this.server.to(client.id).emit('goGameRoom', roomId)
 					this.server
 						.to(this.matchUsers[0].client.id)
