@@ -160,7 +160,6 @@ export class GameGateway {
 			return
 		}
 		const socketDatas = this.gameRooms[roomIndex].socketDatas
-		const gameRoomInfo = this.gameRoomInfos[roomIndex]
 		this.deleteGameRoom(roomIndex)
 		// 検索失敗時のエラー処理追加予定
 		const newRoomId = this.makeGameRoom(
