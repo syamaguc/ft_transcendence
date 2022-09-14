@@ -2,10 +2,8 @@ import { serialize, parse, CookieSerializeOptions } from 'cookie'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { Session } from 'src/types/user'
 
-const SESSION_SECRET = 'this-is-a-secret-value-with-at-least-32-characters'
-const SESSION_NAME = 'session'
-
-export const MAX_AGE = 60 * 60 * 24 * 7 // 1 week
+export const SESSION_NAME = 'session'
+export const MAX_AGE = 60 * 60 * 24 * 400 // 400 days
 
 export function setCookie(
   res: NextApiResponse,
@@ -20,8 +18,6 @@ export function setCookie(
     options.expires = new Date(Date.now() + options.maxAge * 1000)
   }
 
-  console.log('setting stringValue: ', stringValue)
-
   const cookie = serialize(name, stringValue, {
     maxAge: MAX_AGE,
     expires: new Date(Date.now() + MAX_AGE * 1000),
@@ -29,7 +25,7 @@ export function setCookie(
     path: '/',
     sameSite: 'lax',
   })
-  console.log('setting cookie: ', cookie)
+
   res.setHeader('Set-Cookie', cookie)
 }
 

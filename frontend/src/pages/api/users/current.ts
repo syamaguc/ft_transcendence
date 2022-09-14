@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { User } from 'src/types/user'
+import { User, Session } from 'src/types/user'
+import { getSessionCookie } from 'src/lib/cookies'
 
 const API_URL = 'http://api:3000'
 
@@ -33,10 +34,7 @@ async function handleError(res: NextApiResponse, error: string | Error) {
   })
 }
 
-// /api/user Get current user
-//   Used for useUser hook
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  // Temporary
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
   if (setHeaders(req, res)) return
@@ -45,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { jwt } = req.cookies
     if (!jwt) {
       // This is not optimal, but avoids 401 fetch error
-      res.status(200).json({ user: null })
+      res.status(200).json({ user: null, session: null })
       return
     }
 
@@ -59,8 +57,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const data = await apiResponse.json()
 
+    // TODO: may throw
+    const stringValue = getSessionCookie(req)
+    const session = JSON.parse(stringValue)
+
     if (apiResponse.ok) {
-      res.status(200).json({ user: data })
+      res.status(200).json({ user: data, session: session ? session : null })
     } else {
       res.status(500).json({
         status: 'error',

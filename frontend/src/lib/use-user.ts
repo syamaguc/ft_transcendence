@@ -11,6 +11,7 @@ async function fetchUser(
   const data = await res.json()
 
   if (res.ok) {
+    console.log('fetchUser session: ', data?.session)
     return { user: data?.user || null, session: data?.session }
   }
 
@@ -25,6 +26,7 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
   const finished = Boolean(data)
   const hasUser = Boolean(user)
 
+  console.log('userUser session: ', session)
   useEffect(() => {
     // if no redirect needed, just return (example: already on /dashboard)
     // if user data not yet there (fetch in progress, logged in or not) then don't do anything yet

@@ -1,12 +1,104 @@
-import { Box, Heading, Flex, Link as ChakraLink } from '@chakra-ui/react'
+import {
+  Box,
+  Button,
+  CloseButton,
+  Heading,
+  Flex,
+  Stack,
+  Text,
+  Link as ChakraLink,
+  useDisclosure,
+} from '@chakra-ui/react'
+
+import { useState } from 'react'
+import { useUser } from 'src/lib/use-user'
 
 import NextLink from 'next/link'
 
 import Layout from '@components/layout'
+import { API_URL } from 'src/constants'
+
+function Prompt() {
+  const [isOpen, setIsOpen] = useState(true)
+
+  const handleClose = async () => {
+    // set cookie to visited
+    setIsOpen(false)
+  }
+
+  return (
+    <>
+      {isOpen ? (
+        <Stack w='full' direction='row' align='center' justify='center'>
+          <Box borderRadius='lg' boxShadow='md'>
+            <Stack direction='row' p='4' align='center' spacing='4'>
+              <Text fontWeight='semibold'>
+                Welcome! Setup your profile here 👉
+              </Text>
+              <NextLink href='/profile'>
+                <Button size='sm' variant='outline'>
+                  Go to profile
+                </Button>
+              </NextLink>
+              <CloseButton onClick={handleClose} />
+            </Stack>
+          </Box>
+        </Stack>
+      ) : (
+        <></>
+      )}
+    </>
+  )
+}
 
 function Index() {
+  const { mutateUser, session } = useUser()
+
+  const setFalse = async () => {
+    const res = await fetch(`/api/visited`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isFirstTime: false }),
+    })
+
+    console.log('res: ', res)
+    await mutateUser()
+  }
+
+  const setTrue = async () => {
+    const res = await fetch(`/api/visited`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ isFirstTime: true }),
+    })
+
+    console.log('res: ', res)
+    await mutateUser()
+  }
+
+  const getCookie = async () => {
+    const res = await fetch(`/api/visited`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    console.log('res: ', res)
+    const data = await res.json()
+    console.log('data: ', data)
+  }
+
   return (
     <Layout>
+      <Button onClick={setFalse}>Set false</Button>
+      <Button onClick={setTrue}>Set True</Button>
+      <Button onClick={getCookie}>Get</Button>
+      {session && session.isFirstTime && <Prompt />}
       <Flex
         direction='column'
         alignItems='center'
