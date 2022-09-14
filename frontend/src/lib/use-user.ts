@@ -2,23 +2,26 @@ import { useEffect } from 'react'
 import Router from 'next/router'
 import useSWR, { KeyedMutator } from 'swr'
 
-import { User } from 'src/types/user'
+import { User, Session } from 'src/types/user'
 
-async function fetchUser(url: string): Promise<{ user: User }> {
+async function fetchUser(
+  url: string
+): Promise<{ user: User; session: Session }> {
   const res = await fetch(url, { credentials: 'include' })
   const data = await res.json()
 
   if (res.ok) {
-    return { user: data?.user || null }
+    return { user: data?.user || null, session: data?.session }
   }
 
   // TODO: throw
-  return { user: null }
+  return { user: null, session: null }
 }
 
 export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
   const { data, mutate, error } = useSWR('/api/users/current', fetchUser)
   const user = data?.user
+  const session = data?.session
   const finished = Boolean(data)
   const hasUser = Boolean(user)
 
@@ -46,6 +49,7 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
     isError: error,
     isAuthenticated: hasUser,
     isUnauthenticated: !hasUser,
+    session: session,
     status: isLoading ? 'loading' : user ? 'authenticated' : 'unauthenticated',
   }
 }
