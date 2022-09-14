@@ -16,7 +16,8 @@ const barBaseWidth = 50
 const ballBaseSize = 50
 const ballSpeed = 20
 const barSpeed = 20
-const settingTime = 30
+// const settingTime = 30
+const settingTime = 10
 
 class BallDirection {
 	ballRadian: number
@@ -73,6 +74,7 @@ export class GameRoom {
 			gameStatus: 0,
 			remainSeconds: 0,
 			gameSetting: { point: point, speed: speed },
+			retryFlag: {player1: false, player2: false}
 		}
 	}
 
@@ -94,6 +96,18 @@ export class GameRoom {
 		this.socketDatas = [player1, player2]
 		this.logger = new Logger('GameRoom Log')
 		this.settingStart(gameGateWay)
+	}
+
+	gameSave() {
+		const [player1, player2] = this.getPlayer1AndPlayer2()
+		const info: gameInfo = {
+			gameId: this.id,
+			player1Score: this.gameObject.player1.point,
+			player2Score: this.gameObject.player2.point,
+			player1: player1.userId,
+			player2: player2.userId,
+		}
+		new GameService().saveGameHistory(info)
 	}
 
 	settingStart(gameGateWay) {
@@ -237,17 +251,7 @@ export class GameRoom {
 		if (finishFlag == 0) {
 			this.play()
 		} else {
-			const [player1, player2] = this.getPlayer1AndPlayer2()
-
-			const info: gameInfo = {
-				gameId: this.id,
-				player1Score: this.gameObject.player1.point,
-				player2Score: this.gameObject.player2.point,
-				player1: player1.userId,
-				player2: player2.userId,
-			}
-			new GameService().saveGameHistory(info)
-
+			this.gameSave()
 			this.gameObject.gameStatus = 2
 			this.updateObject()
 		}
@@ -295,6 +299,25 @@ export class GameRoom {
 		return role
 	}
 
+	disconnectAll() {
+		for (let i = 0; i < this.socketDatas.length; i++) {
+			if (this.socketDatas[i].client.connected) {
+				this.socketDatas[i].client.leave(this.id)
+			}
+		}
+	}
+
+	disconnectUser(userId: string) {
+		for (let i = 0; i < this.socketDatas.length; i++) {
+			if(this.socketDatas[i].userId == userId) {
+				if (this.socketDatas[i].client.connected) {
+					this.socketDatas[i].client.leave(this.id)
+				}
+				break
+			}
+		}
+	}
+
 	start(point: number, speed: number) {
 		this.settingEnd()
 		this.gameObjectInit(
@@ -306,9 +329,25 @@ export class GameRoom {
 		this.play()
 	}
 
-	retry() {
+	retry(userId: string) {
 		const [player1, player2] = this.getPlayer1AndPlayer2()
+		if (player1.userId == userId) {
+			this.gameObject.retryFlag.player1 = true
+		} else if (player2.userId == userId) {
+			this.gameObject.retryFlag.player2 = true
+		}
+		this.updateObject()
 		return [this.gameObject, player1, player2]
+	}
+
+	retryCancel(userId: string) {
+		const [player1, player2] = this.getPlayer1AndPlayer2()
+		if (player1.userId == userId) {
+			this.gameObject.retryFlag.player1 = false
+		} else if (player2.userId == userId) {
+			this.gameObject.retryFlag.player2 = false
+		}
+		this.updateObject()
 	}
 
 	quit() {
