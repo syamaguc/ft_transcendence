@@ -7,7 +7,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     if (req.method === 'POST') {
       const isFirstTime = req.body.isFirstTime
-      if (isFirstTime === undefined) {
+      if (typeof isFirstTime === 'undefined') {
         return res.status(400).end()
       }
 

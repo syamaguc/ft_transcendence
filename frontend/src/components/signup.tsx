@@ -14,6 +14,7 @@ import { AuthCard } from '@components/auth'
 import PasswordField from '@components/password-field'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { setIsFirstTime } from 'src/lib/session'
 
 interface FormValues {
   username: string
@@ -101,17 +102,31 @@ export function SignupForm() {
           }),
         })
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
-        const { accessToken } = await res.json()
+        const data = await res.json()
 
-        if (!res.ok) {
-          if (res.status === 409) {
+        if (res.ok) {
+          console.log('data: ', data)
+          await setIsFirstTime(true)
+          await mutateUser()
+          actions.setSubmitting(false)
+        } else {
+          if (res.status === 409 && typeof data.message === 'string') {
             toast({
-              description: 'Username or email already exists',
+              description: data.message,
               status: 'error',
               duration: 5000,
               isClosable: true,
+            })
+          } else if (res.status === 400 && typeof data.message === 'object') {
+            data.message.forEach((m: string) => {
+              toast({
+                description: m,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+              })
             })
           } else {
             toast({
@@ -122,8 +137,6 @@ export function SignupForm() {
             })
           }
         }
-
-        console.log('accessToken: ', accessToken)
       } catch (err) {
         console.log(err)
         toast({
@@ -133,9 +146,6 @@ export function SignupForm() {
           isClosable: true,
         })
       }
-
-      await mutateUser()
-      actions.setSubmitting(false)
     },
   })
 

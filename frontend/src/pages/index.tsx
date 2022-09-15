@@ -14,16 +14,25 @@ import { useState } from 'react'
 import { useUser } from 'src/lib/use-user'
 
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 
 import Layout from '@components/layout'
 import { API_URL } from 'src/constants'
 
+import { getIsFirstTime, setIsFirstTime } from 'src/lib/session'
+
 function Prompt() {
   const [isOpen, setIsOpen] = useState(true)
+  const router = useRouter()
 
   const handleClose = async () => {
-    // set cookie to visited
     setIsOpen(false)
+    setIsFirstTime(false)
+  }
+
+  const handleClick = async () => {
+    router.push('/profile')
+    setIsFirstTime(false)
   }
 
   return (
@@ -35,11 +44,9 @@ function Prompt() {
               <Text fontWeight='semibold'>
                 Welcome! Setup your profile here 👉
               </Text>
-              <NextLink href='/profile'>
-                <Button size='sm' variant='outline'>
-                  Go to profile
-                </Button>
-              </NextLink>
+              <Button size='sm' variant='outline' onClick={handleClick}>
+                Go to profile
+              </Button>
               <CloseButton onClick={handleClose} />
             </Stack>
           </Box>
@@ -55,44 +62,18 @@ function Index() {
   const { mutateUser, isFirstTime } = useUser()
 
   const setFalse = async () => {
-    const res = await fetch(`/api/session/is-first-time`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ isFirstTime: false }),
-    })
-
-    console.log('res: ', res)
+    await setIsFirstTime(false)
     await mutateUser()
   }
 
   const setTrue = async () => {
-    const res = await fetch(`/api/session/is-first-time`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ isFirstTime: true }),
-    })
-
-    console.log('res: ', res)
+    await setIsFirstTime(true)
     await mutateUser()
   }
 
   const getCookie = async () => {
-    const res = await fetch(`/api/session/is-first-time`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    console.log('res: ', res)
-    if (res.ok) {
-      const data = await res.json()
-      console.log('data: ', data)
-    }
+    const res = await getIsFirstTime()
+    console.log(res)
   }
 
   return (

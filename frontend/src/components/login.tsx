@@ -87,14 +87,18 @@ export function LoginForm() {
           }),
         })
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
-        const { accessToken } = await res.json()
+        const data = await res.json()
 
-        if (!res.ok) {
-          if (res.status === 401) {
+        if (res.ok) {
+          console.log('data: ', data)
+          await mutateUser()
+          actions.setSubmitting(false)
+        } else {
+          if (res.status === 401 && typeof data.message === 'string') {
             toast({
-              description: 'Incorrect username or password',
+              description: data.message,
               status: 'error',
               duration: 5000,
               isClosable: true,
@@ -108,8 +112,6 @@ export function LoginForm() {
             })
           }
         }
-
-        console.log(accessToken)
       } catch (err) {
         console.log(err)
         toast({
@@ -119,9 +121,6 @@ export function LoginForm() {
           isClosable: true,
         })
       }
-
-      await mutateUser()
-      actions.setSubmitting(false)
     },
   })
 

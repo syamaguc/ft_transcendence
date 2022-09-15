@@ -11,7 +11,6 @@ async function fetchUser(
   const data = await res.json()
 
   if (res.ok) {
-    console.log('fetchUser session: ', data?.session)
     return { user: data?.user || null, session: data?.session }
   }
 
