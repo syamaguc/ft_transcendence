@@ -15,6 +15,7 @@ import { AuthCard } from '@components/auth'
 import PasswordField from '@components/password-field'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { setIsFirstTime } from 'src/lib/session'
 
 interface FormValues {
   username: string
@@ -93,6 +94,7 @@ export function LoginForm() {
 
         if (res.ok) {
           console.log('data: ', data)
+          await setIsFirstTime(false)
           await mutateUser()
           actions.setSubmitting(false)
         } else {

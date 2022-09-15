@@ -1,22 +1,7 @@
 import { useEffect } from 'react'
 import Router from 'next/router'
 import useSWR, { KeyedMutator } from 'swr'
-
-import { User, Session } from 'src/types/user'
-
-async function fetchUser(
-  url: string
-): Promise<{ user: User; session: Session }> {
-  const res = await fetch(url, { credentials: 'include' })
-  const data = await res.json()
-
-  if (res.ok) {
-    return { user: data?.user || null, session: data?.session }
-  }
-
-  // TODO: throw
-  return { user: null, session: null }
-}
+import { fetchUser } from 'src/lib/fetchers'
 
 export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
   const { data, mutate, error } = useSWR('/api/users/current', fetchUser)

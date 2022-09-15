@@ -7,7 +7,6 @@ import {
   Stack,
   Text,
   Link as ChakraLink,
-  useDisclosure,
 } from '@chakra-ui/react'
 
 import { useState } from 'react'
@@ -17,9 +16,8 @@ import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 
 import Layout from '@components/layout'
-import { API_URL } from 'src/constants'
 
-import { getIsFirstTime, setIsFirstTime } from 'src/lib/session'
+import { setIsFirstTime } from 'src/lib/session'
 
 function Prompt() {
   const [isOpen, setIsOpen] = useState(true)
@@ -27,12 +25,12 @@ function Prompt() {
 
   const handleClose = async () => {
     setIsOpen(false)
-    setIsFirstTime(false)
+    await setIsFirstTime(false)
   }
 
   const handleClick = async () => {
     router.push('/profile')
-    setIsFirstTime(false)
+    await setIsFirstTime(false)
   }
 
   return (
@@ -59,28 +57,10 @@ function Prompt() {
 }
 
 function Index() {
-  const { mutateUser, isFirstTime } = useUser()
-
-  const setFalse = async () => {
-    await setIsFirstTime(false)
-    await mutateUser()
-  }
-
-  const setTrue = async () => {
-    await setIsFirstTime(true)
-    await mutateUser()
-  }
-
-  const getCookie = async () => {
-    const res = await getIsFirstTime()
-    console.log(res)
-  }
+  const { isFirstTime } = useUser()
 
   return (
     <Layout>
-      <Button onClick={setFalse}>Set false</Button>
-      <Button onClick={setTrue}>Set True</Button>
-      <Button onClick={getCookie}>Get</Button>
       {isFirstTime && <Prompt />}
       <Flex
         direction='column'

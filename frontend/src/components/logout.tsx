@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { MenuItem, Button, ButtonProps, useToast } from '@chakra-ui/react'
 import { API_URL } from 'src/constants'
 import { useUser } from 'src/lib/use-user'
+import { setIsFirstTime } from 'src/lib/session'
 
 export function LogoutButton(props: ButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
@@ -23,6 +24,7 @@ export function LogoutButton(props: ButtonProps) {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       if (res.ok) {
+        await setIsFirstTime(false)
         await mutateUser()
         toast({
           description: 'Successfully logged out.',
@@ -78,6 +80,7 @@ export function LogoutMenuItem() {
       await new Promise((resolve) => setTimeout(resolve, 1000))
 
       if (res.ok) {
+        await setIsFirstTime(false)
         await mutateUser()
         toast({
           description: 'Successfully logged out.',
