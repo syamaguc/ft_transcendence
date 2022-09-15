@@ -83,8 +83,20 @@ export class GameGateway {
 		if (roomIndex == -1) return
 		const player1Id = this.gameRoomInfos[roomIndex].player1.id
 		const player2Id = this.gameRoomInfos[roomIndex].player2.id
-		this.updateGameStatus(player1Id, inGame)
-		this.updateGameStatus(player2Id, inGame)
+		Promise.all([
+			this.updateGameStatus(player1Id, inGame),
+			this.updateGameStatus(player2Id, inGame),
+		])
+			.then(() => {
+				this.logger.log('update game status: ', player1Id, player2Id)
+			})
+			.catch(() => {
+				this.logger.log(
+					'update game status error: ',
+					player1Id,
+					player2Id,
+				)
+			})
 	}
 
 	@SubscribeMessage('connectServer')
@@ -291,7 +303,7 @@ export class GameGateway {
 
 	// @UseGuards(AuthGuard('jwt'), UserAuth)
 	@SubscribeMessage('registerMatch')
-	async handleRegisterMatch(
+	handleRegisterMatch(
 		@MessageBody() data: any,
 		@ConnectedSocket() client: Socket,
 	) {
