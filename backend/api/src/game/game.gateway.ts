@@ -5,7 +5,11 @@ import {
 	MessageBody,
 	ConnectedSocket,
 } from '@nestjs/websockets'
-import { Logger, NotFoundException } from '@nestjs/common'
+import {
+	Logger,
+	NotFoundException,
+	InternalServerErrorException,
+} from '@nestjs/common'
 // import { Logger, NotFoundException, UseGuards } from '@nestjs/common'
 // import { AuthGuard } from '@nestjs/passport'
 import { Server, Socket } from 'socket.io'
@@ -20,6 +24,7 @@ import {
 	GameRoomInfo,
 	GameSetting,
 } from './game.interface'
+import { UserStatus } from 'src/user/interfaces/user-status.enum'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -59,8 +64,18 @@ export class GameGateway {
 		return res
 	}
 
-	updateGameStatus(userId: string, inGame: boolean) {
-		// ゲームのステータスの更新をする処理を追加予定
+	async updateGameStatus(userId: string, inGame: boolean) {
+		let userFound: User = undefined
+		userFound = await UsersRepository.findOne({
+			where: { userId: userId },
+		})
+		userFound.status = inGame ? UserStatus.INGAME : UserStatus.ONLINE
+		try {
+			await UsersRepository.save(userFound)
+		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException()
+		}
 	}
 
 	updateGameStatusRoom(roomId: string, inGame: boolean) {
