@@ -294,9 +294,10 @@ function BasicInfo() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
+            currentPassword: values.password,
             username: values.username,
             email: values.email,
-            password: values.password,
+            password: values.newPassword,
           }),
         })
 
@@ -313,6 +314,16 @@ function BasicInfo() {
           toast({
             description: data.message
               ? data.message[0]
+              : 'Internal error occurred',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+        } else if (res.status === 403) {
+          const data = await res.json()
+          toast({
+            description: data.message
+              ? data.message
               : 'Internal error occurred',
             status: 'error',
             duration: 5000,

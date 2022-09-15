@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger'
 import {
 	IsAlphanumeric,
 	IsEmail,
+	IsNotEmpty,
 	IsOptional,
 	Matches,
 	MaxLength,
@@ -9,6 +10,10 @@ import {
 } from 'class-validator'
 
 export class UpdateUserDto {
+	@IsNotEmpty()
+	@ApiProperty()
+	currentPassword: string
+
 	@IsOptional()
 	@MinLength(3)
 	@MaxLength(15)
