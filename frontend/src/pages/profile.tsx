@@ -41,12 +41,13 @@ import {
   useImperativeHandle,
 } from 'react'
 import { FiFile } from 'react-icons/fi'
+import ChakraNextImage from 'src/components/chakra-next-image'
 import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
-import { fetchUserPartialInfo } from 'src/lib/fetchers'
+import { fetchUserPartialInfo, fetchText } from 'src/lib/fetchers'
 
-import Layout from '@components/layout'
+import Layout from '@components/scrollable-layout'
 
 import { User, UserPartialInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
@@ -727,6 +728,201 @@ function MatchHistory({ user }: MatchHistoryProps) {
   )
 }
 
+function TwoFactorAuth() {
+  const { user, mutateUser } = useUser()
+  const modal = useDisclosure()
+  const toast = useToast()
+
+  const { data } = useSWR(`${API_URL}/api/auth/2fa`, fetchText)
+
+  console.log('data: ', data)
+  const htmlText = data?.text
+
+  let qrCodeImage: string = null
+
+  if (htmlText) {
+    const re = /https:\/\/chart\.googleapis\.com[^']*/
+    const match = htmlText.match(re)
+    if (match[0]) {
+      qrCodeImage = match[0]
+    }
+    console.log('match: ', match)
+  }
+
+  const validate = (values: { code: string }) => {
+    const errors: FormikErrors<{ code: string }> = {}
+    if (!values.code) {
+      errors.code = 'Required'
+    }
+  }
+
+  const formik = useFormik<{ code: string }>({
+    initialValues: {
+      code: '',
+    },
+    validate,
+    onSubmit: async (values, actions) => {
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      const res = await fetch(`${API_URL}/api/auth/2fa/${values.code}`, {
+        method: 'POST',
+        credentials: 'include',
+      })
+
+      console.log(res)
+
+      if (res.ok) {
+        // 1. toggle 2FA
+        // 2. show toast
+        // 3. mutate user
+        await mutateUser()
+      } else {
+        // failed
+      }
+
+      actions.setSubmitting(false)
+      modal.onClose()
+    },
+  })
+
+  const getTwoFactorAuth = async () => {
+    const res = await fetch(`${API_URL}/api/user/twoFactorAuth`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+    })
+
+    console.log(res)
+    console.log(await res.json())
+
+    if (!res.ok) {
+      console.error('Failed to set isFirstTime')
+    }
+  }
+
+  const toggleTrue = async () => {
+    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ toggle: true }),
+    })
+
+    console.log(res)
+
+    if (!res.ok) {
+      console.error('Failed to set isFirstTime')
+    }
+    mutateUser()
+  }
+  const toggleFalse = async () => {
+    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ toggle: false }),
+    })
+
+    console.log(res)
+
+    if (!res.ok) {
+      console.error('Failed to set isFirstTime')
+    }
+    mutateUser()
+  }
+
+  const enableTwoFactorAuth = async () => {}
+
+  const getQRCode = async () => {}
+
+  const onCloseComplete = () => {
+    formik.setFieldValue('code', null)
+  }
+
+  return (
+    <Stack>
+      <Heading fontSize='2xl'>Two-factor authentication</Heading>
+      <Text color='gray.600' fontSize={{ base: 'sm', md: 'md' }}>
+        {`Two factor authentication is an enhanced security measure. Once enabled, you'll be required to give additional identification through Google Authenticator`}
+      </Text>
+      <Stack direction='row' align='center'>
+        <Text>{user.twoFactorAuth ? 'Enabled' : 'Not enabled'}</Text>
+        <Button size='sm' onClick={modal.onOpen}>
+          Setup
+        </Button>
+      </Stack>
+      <Button onClick={toggleTrue}>Set True 2FA</Button>
+      <Button onClick={toggleFalse}>Set False 2FA</Button>
+      <Button onClick={getTwoFactorAuth}>Get 2FA</Button>
+      <Modal
+        isOpen={modal.isOpen}
+        onClose={modal.onClose}
+        onCloseComplete={onCloseComplete}
+      >
+        <ModalOverlay />
+        <ModalContent>
+          <form id='form-2fa' onSubmit={formik.handleSubmit}>
+            <ModalHeader>Setup Two factor authentication</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody pb={6}>
+              <Text>
+                Open the Google Authenticator app and scan this QR code.
+              </Text>
+              {qrCodeImage && (
+                <ChakraNextImage
+                  src={qrCodeImage}
+                  width='300px'
+                  height='300px'
+                />
+              )}
+              {!qrCodeImage && <Text>{htmlText}</Text>}
+              <FormControl
+                mt={4}
+                isInvalid={
+                  formik.errors.code && formik.touched.code ? true : false
+                }
+              >
+                <FormLabel htmlFor='code' fontSize='xs' color='gray.400'>
+                  CODE
+                </FormLabel>
+                <Input
+                  name='code'
+                  type='text'
+                  placeholder='Enter code'
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.code}
+                />
+                <FormErrorMessage>
+                  {formik.errors.code ? `${formik.errors.code}` : null}
+                </FormErrorMessage>
+              </FormControl>
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                colorScheme='blue'
+                type='submit'
+                form='form-2fa'
+                isLoading={formik.isSubmitting}
+                mr={3}
+              >
+                Send
+              </Button>
+              <Button onClick={modal.onClose}>Cancel</Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </Stack>
+  )
+}
+
 function Profile() {
   const { user } = useUser()
 
@@ -744,10 +940,7 @@ function Profile() {
                 <Heading fontSize='2xl'>Status</Heading>
                 <Text>{user.status}</Text>
               </Stack>
-              <Stack>
-                <Heading fontSize='2xl'>Two-factor authentication</Heading>
-                <Text>{user.twoFactorAuth ? 'true' : 'false'}</Text>
-              </Stack>
+              <TwoFactorAuth />
               <Statistics user={user} />
               <MatchHistory user={user} />
             </Stack>

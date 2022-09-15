@@ -104,3 +104,15 @@ export async function fetchUserPartialInfo(
   // TODO: throw
   return { user: null }
 }
+
+export async function fetchText(url: string): Promise<{ text: string }> {
+  const res = await fetch(url, { credentials: 'include' })
+
+  if (res.ok) {
+    const text = await res.text()
+    return { text: text }
+  }
+
+  // TODO: throw
+  return { text: null }
+}
