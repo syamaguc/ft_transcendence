@@ -10,8 +10,8 @@ type Props = {
 const GameMatchList = ({ gameRooms }: Props) => {
   return (
     <VStack h='70vh' overflowY='scroll'>
-      {gameRooms.map((value) => (
-        <Box>
+      {gameRooms.map((value, index) => (
+        <Box key={index}>
           <NextLink href={'/game/' + value.id}>
             <Box as='button'>
               {value.player1.name}
