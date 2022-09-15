@@ -4,10 +4,12 @@ import {
   AvatarBadge,
   Box,
   Button,
+  Circle,
   Container,
   Flex,
   Heading,
   Stack,
+  Spacer,
   Skeleton,
   SkeletonCircle,
   SkeletonText,
@@ -20,6 +22,7 @@ import NextLink from 'next/link'
 import useSWR from 'swr'
 
 import ApiTester from '@components/api-tester'
+import { FiMessageSquare } from 'react-icons/fi'
 
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
@@ -140,14 +143,24 @@ function UserList() {
                         >
                           <AvatarBadge boxSize='1.25em' bg='green.500' />
                         </Avatar>
-                        <Stack direction='column' spacing='0'>
-                          <Text fontWeight='800' fontSize='md'>
-                            {user.username}
-                          </Text>
-                          <Text fontWeight='600' color='gray.400' fontSize='sm'>
-                            {user.status}
-                          </Text>
-                        </Stack>
+                        <Flex direction='row' align='center' w='full'>
+                          <Stack direction='column' spacing='0'>
+                            <Text fontWeight='800' fontSize='md'>
+                              {user.username}
+                            </Text>
+                            <Text
+                              fontWeight='600'
+                              color='gray.400'
+                              fontSize='sm'
+                            >
+                              {user.status}
+                            </Text>
+                          </Stack>
+                          <Spacer />
+                          <Circle bg='gray.100' size='38px' mr='16px'>
+                            <FiMessageSquare />
+                          </Circle>
+                        </Flex>
                       </Stack>
                     </NextLink>
                   ))}

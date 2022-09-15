@@ -52,10 +52,10 @@ function Prompt() {
 }
 
 function Index() {
-  const { mutateUser, session } = useUser()
+  const { mutateUser, isFirstTime } = useUser()
 
   const setFalse = async () => {
-    const res = await fetch(`/api/visited`, {
+    const res = await fetch(`/api/session/is-first-time`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -68,7 +68,7 @@ function Index() {
   }
 
   const setTrue = async () => {
-    const res = await fetch(`/api/visited`, {
+    const res = await fetch(`/api/session/is-first-time`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ function Index() {
   }
 
   const getCookie = async () => {
-    const res = await fetch(`/api/visited`, {
+    const res = await fetch(`/api/session/is-first-time`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -89,8 +89,10 @@ function Index() {
     })
 
     console.log('res: ', res)
-    const data = await res.json()
-    console.log('data: ', data)
+    if (res.ok) {
+      const data = await res.json()
+      console.log('data: ', data)
+    }
   }
 
   return (
@@ -98,7 +100,7 @@ function Index() {
       <Button onClick={setFalse}>Set false</Button>
       <Button onClick={setTrue}>Set True</Button>
       <Button onClick={getCookie}>Get</Button>
-      {session && session.isFirstTime && <Prompt />}
+      {isFirstTime && <Prompt />}
       <Flex
         direction='column'
         alignItems='center'

@@ -13,19 +13,26 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
       const session: Session = { isFirstTime: isFirstTime }
       setSessionCookie(res, session)
-      res.status(200).end(res.getHeader('Set-Cookie'))
-    } else if (req.method === 'GET') {
-      // TODO: may throw
-      const stringValue = getSessionCookie(req)
-      const session = JSON.parse(stringValue)
-      if (session) {
-        res.status(200).json(session)
-      } else {
-        res.status(400).end()
-      }
-    } else {
-      res.status(400).end()
+
+      return res.status(200).end(res.getHeader('Set-Cookie'))
     }
+    if (req.method === 'GET') {
+      let session: Session
+
+      const stringValue = getSessionCookie(req)
+      if (stringValue) {
+        session = JSON.parse(stringValue)
+      } else {
+        session = null
+      }
+
+      if (session) {
+        return res.status(200).json(session)
+      } else {
+        return res.status(400).end()
+      }
+    }
+    res.status(400).end()
   } catch (err) {
     console.error(err)
     res.status(500).send(err.message)

@@ -35,7 +35,7 @@ async function handleError(res: NextApiResponse, error: string | Error) {
 }
 
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
-  await new Promise((resolve) => setTimeout(resolve, 1000))
+  await new Promise((resolve) => setTimeout(resolve, 500))
 
   if (setHeaders(req, res)) return
 
@@ -57,12 +57,16 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const data = await apiResponse.json()
 
-    // TODO: may throw
+    let session: Session
     const stringValue = getSessionCookie(req)
-    const session = JSON.parse(stringValue)
+    if (stringValue) {
+      session = JSON.parse(stringValue)
+    } else {
+      session = null
+    }
 
     if (apiResponse.ok) {
-      res.status(200).json({ user: data, session: session ? session : null })
+      res.status(200).json({ user: data, session: session })
     } else {
       res.status(500).json({
         status: 'error',

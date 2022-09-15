@@ -24,3 +24,7 @@ export interface User {
   isAdmin: boolean
   blockedUsers: string[]
 }
+
+export interface Session {
+  isFirstTime: boolean
+}
