@@ -17,22 +17,11 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import useSWR from 'swr'
+import { fetchUserInfo } from 'src/lib/fetchers'
 import { useRouter } from 'next/router'
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
-
-async function fetchUserInfo(url: string): Promise<{ user: User }> {
-  const res = await fetch(url, { credentials: 'include' })
-  const data = await res.json()
-
-  if (res.ok) {
-    return { user: data || null }
-  }
-
-  // TODO: throw
-  return { user: null }
-}
 
 function UserDetail() {
   const router = useRouter()

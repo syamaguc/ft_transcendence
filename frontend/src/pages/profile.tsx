@@ -20,6 +20,13 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Stat,
+  StatLabel,
+  StatNumber,
+  StatHelpText,
+  StatArrow,
+  StatGroup,
+  Skeleton,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
@@ -32,13 +39,15 @@ import {
 } from 'react'
 import { FiFile } from 'react-icons/fi'
 
+import { useFormik, FormikErrors } from 'formik'
+import useSWR from 'swr'
+import { fetchUserPartialInfo } from 'src/lib/fetchers'
+
 import Layout from '@components/layout'
 
-import { User } from 'src/types/user'
+import { User, UserPartialInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
-
-import { useFormik, FormikErrors } from 'formik'
 
 type ThumbnailProps = {
   user: User
@@ -359,7 +368,7 @@ function BasicInfo() {
         spacing='8'
         align='start'
         py='4'
-        px='8'
+        px='0'
         mx='8'
       >
         <Avatar
@@ -527,8 +536,123 @@ function BasicInfo() {
   )
 }
 
+type StatistiscProps = {
+  user: User
+}
+
+function Statistics({ user }: StatistiscProps) {
+  return (
+    <Stack>
+      <Heading fontSize='2xl'>Statistics</Heading>
+      <StatGroup py='4'>
+        <Stat>
+          <StatLabel>Games Won</StatLabel>
+          <StatNumber>{user.game_won}</StatNumber>
+          <StatHelpText></StatHelpText>
+        </Stat>
+
+        <Stat>
+          <StatLabel>Games Lost</StatLabel>
+          <StatNumber>{user.lost_game}</StatNumber>
+          <StatHelpText></StatHelpText>
+        </Stat>
+        <Stat>
+          <StatLabel>Elo</StatLabel>
+          <StatNumber>{user.elo}</StatNumber>
+          <StatHelpText></StatHelpText>
+        </Stat>
+      </StatGroup>
+    </Stack>
+  )
+}
+
+type PlayerInfoProps = {
+  player: UserPartialInfo
+}
+
+function PlayerInfo({ player }: PlayerInfoProps) {
+  return (
+    <>
+      <Avatar src={`${API_URL}/api/user/avatar/${player.profile_picture}`} />
+      <Text>{player.userId}</Text>
+      <Text>{player.username}</Text>
+      <Text>{player.elo}</Text>
+    </>
+  )
+}
+
+type MatchInfoProps = {
+  user: User
+  game: GameHistory
+}
+
+function MatchInfo({ user, game }: MatchInfoProps) {
+  let opponentId: string
+  if (user.userId === game.playerOne) {
+    opponentId = game.playerTwo
+  } else {
+    opponentId = game.playerOne
+  }
+
+  const { data: data, error } = useSWR(
+    `${API_URL}/api/user/partialInfo?userId=${opponentId}`,
+    fetchUserPartialInfo
+  )
+
+  const isLoading = !data && !error
+  const opponent = data?.user
+
+  return (
+    <>
+      {error && <Text>Error occurred</Text>}
+      {isLoading && <Skeleton height='60px' isLoaded={!isLoading} />}
+      {!opponent && <Text>User not found</Text>}
+      {opponent && (
+        <Stack direction='row'>
+          <Stack>
+            <Text>Game Info</Text>
+            <Text>{game.playerOne}</Text>
+            <Text>{game.playerTwo}</Text>
+            <Text>{game.playerOneScore}</Text>
+            <Text>{game.playerTwoScore}</Text>
+            <Text>{game.playerWin}</Text>
+            <Text>{game.playerLoose}</Text>
+          </Stack>
+          <Stack>
+            <Text>Player one</Text>
+            <PlayerInfo
+              player={game.playerOne === user.userId ? user : opponent}
+            />
+          </Stack>
+          <Stack>
+            <Text>Player two</Text>
+            <PlayerInfo
+              player={game.playerTwo === user.userId ? user : opponent}
+            />
+          </Stack>
+        </Stack>
+      )}
+    </>
+  )
+}
+
+type MatchHistoryProps = {
+  user: User
+}
+
+function MatchHistory({ user }: MatchHistoryProps) {
+  return (
+    <Stack>
+      <Heading fontSize='2xl'>Match History</Heading>
+      {user.game_history.map((game) => (
+        <MatchInfo key={game.gameId} user={user} game={game} />
+      ))}
+    </Stack>
+  )
+}
+
 function Profile() {
-  const { user, mutateUser } = useUser()
+  const { user } = useUser()
 
   return (
     <Layout>
@@ -548,14 +672,8 @@ function Profile() {
                 <Heading fontSize='2xl'>Two-factor authentication</Heading>
                 <Text>{user.twoFactorAuth ? 'true' : 'false'}</Text>
               </Stack>
-              <Stack>
-                <Heading fontSize='2xl'>Statistics</Heading>
-                <Text>WIP</Text>
-              </Stack>
-              <Stack>
-                <Heading fontSize='2xl'>Match History</Heading>
-                <Text>WIP</Text>
-              </Stack>
+              <Statistics user={user} />
+              <MatchHistory user={user} />
             </Stack>
             <Text>{JSON.stringify(user)}</Text>
           </Stack>

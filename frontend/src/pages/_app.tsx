@@ -5,7 +5,7 @@ import Chakra from '../chakra'
 import { Box, Spinner } from '@chakra-ui/react'
 import { SWRConfig } from 'swr'
 
-import fetchJson from 'src/lib/fetch-json'
+import { fetchJson } from 'src/lib/fetchers'
 import { useUser } from 'src/lib/use-user'
 import { AlertsProvider, Alerts } from '@components/alerts'
 

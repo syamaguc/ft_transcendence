@@ -11,8 +11,6 @@ import {
   Stack,
   Spacer,
   Skeleton,
-  SkeletonCircle,
-  SkeletonText,
   Text,
   useBreakpointValue,
   useColorModeValue,
@@ -20,70 +18,13 @@ import {
 import NextLink from 'next/link'
 
 import useSWR from 'swr'
+import { fetchUsers } from 'src/lib/fetchers'
 
-import ApiTester from '@components/api-tester'
 import { FiMessageSquare } from 'react-icons/fi'
 
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
-
-type ProfileProps = {
-  user: User
-}
-
-function Profile({ user }: ProfileProps) {
-  const { mutateUser } = useUser()
-
-  const handleLogout = async () => {
-    let res = await fetch(`${API_URL}/api/user/logout`, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    console.log(res)
-
-    mutateUser()
-  }
-
-  return (
-    <>
-      <Container maxW='lg' px={{ base: '0', sm: '8' }}>
-        <Stack spacing='8'>
-          <Box boxShadow='base' p='8'>
-            <Stack direction={'row'} spacing='8' align='center'>
-              <Avatar
-                size='2xl'
-                src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-              />
-              <Stack direction='column' spacing='0' fontSize='md'>
-                <Text fontWeight='600'>username: {user.username}</Text>
-                <Text>email: {user.email}</Text>
-                <Text>userId: {user.userId}</Text>
-                <Button onClick={handleLogout}>Logout</Button>
-              </Stack>
-            </Stack>
-          </Box>
-        </Stack>
-      </Container>
-    </>
-  )
-}
-
-async function fetchUsers(url: string): Promise<User[]> {
-  const res = await fetch(url, { credentials: 'include' })
-  const data = await res.json()
-
-  if (res.ok) {
-    return data
-  }
-
-  // TODO: throw
-  return []
-}
 
 function UserList() {
   const { user: currentUser } = useUser()
