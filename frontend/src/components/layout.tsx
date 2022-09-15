@@ -15,7 +15,7 @@ const Layout = ({ children, title = 'ft_trans' }: Props) => (
     <Head>
       <title>{title}</title>
     </Head>
-    <Header maxH='10vh'/>
+    <Header maxH='10vh' />
     <Box as='main' w='full' maxW='8xl' mx='auto'>
       <Box maxW='8xl' mx='auto' minH='76vh' maxH='90vh'>
         {children}
