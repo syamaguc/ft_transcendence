@@ -29,7 +29,6 @@ export default function Game() {
     gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
-  const didLogRef = useRef(false)
   const keyStatus = useRef({ upPressed: false, downPressed: false })
   const router = useRouter()
   const [gameStatus, setGameStatus] = useState<number>(-1)
@@ -71,10 +70,10 @@ export default function Game() {
   }, [playerRole])
 
   useEffect(() => {
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      // setServer(io(API_URL, { transports: ['websocket'] }))
-      setServer(io(API_URL))
+    const tempServer = io(API_URL)
+    setServer(tempServer)
+    return () => {
+      tempServer.disconnect()
     }
   }, [])
 
