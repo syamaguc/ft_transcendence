@@ -6,6 +6,7 @@ import {
   Container,
   Divider,
   Heading,
+  Flex,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -20,6 +21,7 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
+  Spacer,
   Stat,
   StatLabel,
   StatNumber,
@@ -38,7 +40,7 @@ import {
   useImperativeHandle,
 } from 'react'
 import { FiFile } from 'react-icons/fi'
-
+import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
 import { fetchUserPartialInfo } from 'src/lib/fetchers'
@@ -119,17 +121,6 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
     validate: validate,
     onSubmit: async (values, actions) => {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log(
-        JSON.stringify(
-          {
-            fileName: values.file.name,
-            type: values.file.type,
-            size: `${values.file.size} bytes`,
-          },
-          null,
-          2
-        )
-      )
 
       try {
         const body = new FormData()
@@ -238,6 +229,7 @@ interface BasicInfoFormValues {
   username: string
   email: string
   password: string
+  currentPassword: string
 }
 
 function BasicInfo() {
@@ -251,6 +243,7 @@ function BasicInfo() {
     username: user.username,
     email: user.email,
     password: '',
+    currentPassword: '',
   }
 
   const validate = (values: BasicInfoFormValues) => {
@@ -282,9 +275,7 @@ function BasicInfo() {
     initialValues,
     validate,
     onSubmit: async (values, actions) => {
-      console.log('submit called')
       await new Promise((resolve) => setTimeout(resolve, 1000))
-      console.log(JSON.stringify(values, null, 2))
 
       try {
         const res = await fetch(`${API_URL}/api/user/settings`, {
@@ -294,10 +285,10 @@ function BasicInfo() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            currentPassword: values.password,
             username: values.username,
             email: values.email,
-            password: values.newPassword,
+            password: values.password,
+            currentPassword: values.password,
           }),
         })
 
@@ -312,19 +303,22 @@ function BasicInfo() {
         } else if (res.status === 400) {
           const data = await res.json()
           toast({
-            description: data.message
-              ? data.message[0]
-              : 'Internal error occurred',
+            description:
+              typeof data.message === 'object'
+                ? data.message[0]
+                : 'Internal error occurred',
             status: 'error',
             duration: 5000,
             isClosable: true,
           })
         } else if (res.status === 403) {
           const data = await res.json()
+          console.log(data)
           toast({
-            description: data.message
-              ? data.message
-              : 'Internal error occurred',
+            description:
+              typeof data.message === 'string'
+                ? data.message
+                : 'Internal error occurred',
             status: 'error',
             duration: 5000,
             isClosable: true,
@@ -584,10 +578,24 @@ type PlayerInfoProps = {
 function PlayerInfo({ player }: PlayerInfoProps) {
   return (
     <>
-      <Avatar src={`${API_URL}/api/user/avatar/${player.profile_picture}`} />
-      <Text>{player.userId}</Text>
-      <Text>{player.username}</Text>
-      <Text>{player.elo}</Text>
+      <NextLink href={`/users/${player.username}`}>
+        <Stack
+          direction='row'
+          align='center'
+          borderRadius='md'
+          transition='color 0.2s'
+          _hover={{ cursor: 'pointer' }}
+        >
+          <Avatar
+            size='sm'
+            mr='4px'
+            src={`${API_URL}/api/user/avatar/${player.profile_picture}`}
+          />
+          <Text fontWeight='800' fontSize='md'>
+            {player.username}
+          </Text>
+        </Stack>
+      </NextLink>
     </>
   )
 }
@@ -619,29 +627,45 @@ function MatchInfo({ user, game }: MatchInfoProps) {
       {isLoading && <Skeleton height='60px' isLoaded={!isLoading} />}
       {!opponent && <Text>User not found</Text>}
       {opponent && (
-        <Stack direction='row'>
-          <Stack>
-            <Text>Game Info</Text>
-            <Text>{game.playerOne}</Text>
-            <Text>{game.playerTwo}</Text>
-            <Text>{game.playerOneScore}</Text>
-            <Text>{game.playerTwoScore}</Text>
-            <Text>{game.playerWin}</Text>
-            <Text>{game.playerLoose}</Text>
-          </Stack>
-          <Stack>
-            <Text>Player one</Text>
+        <Flex
+          direction='row'
+          w='full'
+          px='6'
+          py='4'
+          bg={game.playerWin === user.userId ? 'blue.100' : 'red.100'}
+          borderRadius='md'
+        >
+          <Stack flex='1'>
+            <Text fontWeight='600' color='gray.600' fontSize='sm'>
+              Player one
+            </Text>
             <PlayerInfo
               player={game.playerOne === user.userId ? user : opponent}
             />
+            <Flex direction='row' alignItems='center' w='full'>
+              <Stack></Stack>
+            </Flex>
           </Stack>
-          <Stack>
-            <Text>Player two</Text>
+          <Stack direction='row' align='center'>
+            <Text fontWeight='extrabold' fontSize='2xl'>
+              {game.playerOneScore}
+            </Text>
+            <Text fontWeight='semibold' fontSize='xl'>
+              -
+            </Text>
+            <Text fontWeight='extrabold' fontSize='2xl'>
+              {game.playerTwoScore}
+            </Text>
+          </Stack>
+          <Stack flex='1' align='end'>
+            <Text fontWeight='600' color='gray.600' fontSize='sm'>
+              Player Two
+            </Text>
             <PlayerInfo
               player={game.playerTwo === user.userId ? user : opponent}
             />
           </Stack>
-        </Stack>
+        </Flex>
       )}
     </>
   )
@@ -653,11 +677,13 @@ type MatchHistoryProps = {
 
 function MatchHistory({ user }: MatchHistoryProps) {
   return (
-    <Stack>
+    <Stack w='full'>
       <Heading fontSize='2xl'>Match History</Heading>
-      {user.game_history.map((game) => (
-        <MatchInfo key={game.gameId} user={user} game={game} />
-      ))}
+      <Stack align='center' w='full'>
+        {user.game_history.map((game) => (
+          <MatchInfo key={game.gameId} user={user} game={game} />
+        ))}
+      </Stack>
     </Stack>
   )
 }
