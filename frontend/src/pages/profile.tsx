@@ -1,6 +1,7 @@
 import {
   Avatar,
   AvatarBadge,
+  Badge,
   Box,
   Button,
   Container,
@@ -632,20 +633,38 @@ function MatchInfo({ user, game }: MatchInfoProps) {
           w='full'
           px='6'
           py='4'
-          bg={game.playerWin === user.userId ? 'blue.100' : 'red.100'}
+          // bg={game.playerWin === user.userId ? 'blue.100' : 'red.100'}
           borderRadius='md'
+          borderWidth='1px'
         >
-          <Stack flex='1'>
-            <Text fontWeight='600' color='gray.600' fontSize='sm'>
-              Player one
-            </Text>
-            <PlayerInfo
-              player={game.playerOne === user.userId ? user : opponent}
-            />
-            <Flex direction='row' alignItems='center' w='full'>
-              <Stack></Stack>
-            </Flex>
-          </Stack>
+          <Flex
+            flex='1'
+            w='full'
+            direction='row'
+            align='center'
+            justify='end'
+            pr='4'
+          >
+            <Stack>
+              <Text fontWeight='600' color='gray.600' fontSize='sm'>
+                Player one
+              </Text>
+              <PlayerInfo
+                player={game.playerOne === user.userId ? user : opponent}
+              />
+            </Stack>
+            <Spacer />
+            <Badge
+              mr='1'
+              // variant='solid'
+              fontSize='0.8em'
+              colorScheme={
+                game.playerOneScore > game.playerTwoScore ? 'blue' : 'red'
+              }
+            >
+              {game.playerOneScore > game.playerTwoScore ? 'WIN' : 'LOSE'}
+            </Badge>
+          </Flex>
           <Stack direction='row' align='center'>
             <Text fontWeight='extrabold' fontSize='2xl'>
               {game.playerOneScore}
@@ -657,14 +676,34 @@ function MatchInfo({ user, game }: MatchInfoProps) {
               {game.playerTwoScore}
             </Text>
           </Stack>
-          <Stack flex='1' align='end'>
-            <Text fontWeight='600' color='gray.600' fontSize='sm'>
-              Player Two
-            </Text>
-            <PlayerInfo
-              player={game.playerTwo === user.userId ? user : opponent}
-            />
-          </Stack>
+          <Flex
+            flex='1'
+            w='full'
+            direction='row'
+            align='center'
+            justify='end'
+            pl='4'
+          >
+            <Badge
+              ml='1'
+              // variant='solid'
+              fontSize='0.8em'
+              colorScheme={
+                game.playerTwoScore > game.playerOneScore ? 'blue' : 'red'
+              }
+            >
+              {game.playerTwoScore > game.playerOneScore ? 'WIN' : 'LOSE'}
+            </Badge>
+            <Spacer />
+            <Stack align='end'>
+              <Text fontWeight='600' color='gray.600' fontSize='sm'>
+                Player Two
+              </Text>
+              <PlayerInfo
+                player={game.playerTwo === user.userId ? user : opponent}
+              />
+            </Stack>
+          </Flex>
         </Flex>
       )}
     </>
@@ -712,7 +751,6 @@ function Profile() {
               <Statistics user={user} />
               <MatchHistory user={user} />
             </Stack>
-            <Text>{JSON.stringify(user)}</Text>
           </Stack>
         </Box>
       </Container>
