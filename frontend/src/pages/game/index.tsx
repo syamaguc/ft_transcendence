@@ -66,6 +66,7 @@ export default function GameMatching() {
       // }
 
       setServer(io(API_URL))
+      // setServer(io(API_URL, { transports: ['websocket'] }))
       // setServer(io(API_URL, {
       //   extraHeaders: {
       //     jwt: cookie

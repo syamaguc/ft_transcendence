@@ -10,7 +10,7 @@ type Props = {
   gameSetting: GameSetting
   player1Name: string
   player2Name: string
-  gameObject: GameObject
+  remainSeconds: number
 }
 
 const GameSettingForm = ({
@@ -21,7 +21,7 @@ const GameSettingForm = ({
   gameSetting,
   player1Name,
   player2Name,
-  gameObject,
+  remainSeconds,
 }: Props) => {
   const didLogRef = useRef(false)
 
@@ -104,6 +104,9 @@ const GameSettingForm = ({
       className={gameStatus == 0 ? style.startBox : style.boxNonActive}
       id='startBox'
     >
+      <div>
+        <p>{remainSeconds}</p>
+      </div>
       <div>
         {playerRole == 0 ? (
           <p>
