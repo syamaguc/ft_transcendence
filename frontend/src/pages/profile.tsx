@@ -733,6 +733,7 @@ function TwoFactorAuth() {
   const modal = useDisclosure()
   const toast = useToast()
 
+  // TODO: revalidates on every form onChange event
   const { data } = useSWR(`${API_URL}/api/auth/2fa`, fetchText)
 
   console.log('data: ', data)
@@ -756,34 +757,76 @@ function TwoFactorAuth() {
     }
   }
 
+  const updateTwoFactorAuth = async (toggle: boolean) => {
+    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify({ toggle: toggle }),
+    })
+
+    return res
+  }
+
   const formik = useFormik<{ code: string }>({
     initialValues: {
       code: '',
     },
     validate,
     onSubmit: async (values, actions) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
       const res = await fetch(`${API_URL}/api/auth/2fa/${values.code}`, {
         method: 'POST',
         credentials: 'include',
       })
 
-      console.log(res)
-
-      if (res.ok) {
-        // 1. toggle 2FA
-        // 2. show toast
-        // 3. mutate user
-        await mutateUser()
-      } else {
-        // failed
+      const body = await res.text()
+      if (body === 'True') {
+        const updateRes = await updateTwoFactorAuth(true)
+        if (updateRes.ok) {
+          await mutateUser()
+          toast({
+            description: 'Successfully enabled 2FA',
+            status: 'success',
+            duration: 5000,
+            isClosable: true,
+          })
+          actions.setSubmitting(false)
+          modal.onClose()
+          return
+        }
       }
-
+      toast({
+        description: 'Failed to provide identification',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
       actions.setSubmitting(false)
       modal.onClose()
     },
   })
+
+  const turnOffTwoFactorAuth = async () => {
+    const res = await updateTwoFactorAuth(false)
+    if (res.ok) {
+      toast({
+        description: 'Turned off 2FA',
+        status: 'info',
+        duration: 5000,
+        isClosable: true,
+      })
+    } else {
+      toast({
+        description: 'Failed to turn off 2FA',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      })
+    }
+    await mutateUser()
+  }
 
   const getTwoFactorAuth = async () => {
     const res = await fetch(`${API_URL}/api/user/twoFactorAuth`, {
@@ -802,47 +845,8 @@ function TwoFactorAuth() {
     }
   }
 
-  const toggleTrue = async () => {
-    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ toggle: true }),
-    })
-
-    console.log(res)
-
-    if (!res.ok) {
-      console.error('Failed to set isFirstTime')
-    }
-    mutateUser()
-  }
-  const toggleFalse = async () => {
-    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ toggle: false }),
-    })
-
-    console.log(res)
-
-    if (!res.ok) {
-      console.error('Failed to set isFirstTime')
-    }
-    mutateUser()
-  }
-
-  const enableTwoFactorAuth = async () => {}
-
-  const getQRCode = async () => {}
-
   const onCloseComplete = () => {
-    formik.setFieldValue('code', null)
+    formik.setFieldValue('code', '')
   }
 
   return (
@@ -851,14 +855,22 @@ function TwoFactorAuth() {
       <Text color='gray.600' fontSize={{ base: 'sm', md: 'md' }}>
         {`Two factor authentication is an enhanced security measure. Once enabled, you'll be required to give additional identification through Google Authenticator`}
       </Text>
-      <Stack direction='row' align='center'>
-        <Text>{user.twoFactorAuth ? 'Enabled' : 'Not enabled'}</Text>
-        <Button size='sm' onClick={modal.onOpen}>
-          Setup
-        </Button>
-      </Stack>
-      <Button onClick={toggleTrue}>Set True 2FA</Button>
-      <Button onClick={toggleFalse}>Set False 2FA</Button>
+      {!user.twoFactorAuth && (
+        <Stack direction='row' align='center'>
+          <Text>Off</Text>
+          <Button size='sm' onClick={modal.onOpen}>
+            Turn on
+          </Button>
+        </Stack>
+      )}
+      {user.twoFactorAuth && (
+        <Stack direction='row' align='center'>
+          <Text>On</Text>
+          <Button size='sm' onClick={turnOffTwoFactorAuth}>
+            Turn off
+          </Button>
+        </Stack>
+      )}
       <Button onClick={getTwoFactorAuth}>Get 2FA</Button>
       <Modal
         isOpen={modal.isOpen}
