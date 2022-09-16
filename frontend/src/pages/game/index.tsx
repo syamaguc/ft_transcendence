@@ -1,6 +1,7 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
+import { Center, Flex } from '@chakra-ui/react'
 import Layout from '@components/layout'
 import GameMatchList from '@components/game-matchlist'
 import { useUser } from '../../lib/use-user'
@@ -18,6 +19,7 @@ export default function GameMatching() {
   const [gameRooms, setGameRooms] = useState<GameRoom[]>([])
   const [gameRoomsLog, setGameRoomsLog] = useState(false)
   const [myGameRoomId, setMyGameRoomId] = useState()
+  const [deleteRoomId, setDeleteRoomId] = useState()
 
   useEffect(() => {
     if (user) setUserId(user['userId'])
@@ -54,33 +56,33 @@ export default function GameMatching() {
   useEffect(() => {
     if (!didLogRef.current) {
       didLogRef.current = true
+      changeButton(0)
+    }
+  }, [])
 
-      // const cookie = document.cookie
-      // console.log(cookie)
+  useEffect(() => {
+    // const cookie = document.cookie
+    // console.log(cookie)
 
-      // var cookiesArray = cookie.split(';');
+    // var cookiesArray = cookie.split(';');
 
-      // for(var c of cookiesArray){
-      //     var cArray = c.split('=');
-      //     console.log(cArray);
-      // }
+    // for(var c of cookiesArray){
+    //     var cArray = c.split('=');
+    //     console.log(cArray);
+    // }
 
-      setServer(io(API_URL))
-      // setServer(io(API_URL, { transports: ['websocket'] }))
-      // setServer(io(API_URL, {
-      //   extraHeaders: {
-      //     jwt: cookie
-      //   }
-      // }))
+    // setServer(io(API_URL, { transports: ['websocket'] }))
+    // setServer(io(API_URL, {
+    //   extraHeaders: {
+    //     jwt: cookie
+    //   }
+    // }))
+    // const tempServer = io(API_URL)
+    const tempServer = io(API_URL, { transports: ['websocket'] })
+    setServer(tempServer)
 
-      const cancelButton = document.getElementById('cancelButton')
-      const backGameButton = document.getElementById('backGameButton')
-      if (cancelButton) {
-        cancelButton.style.display = 'none'
-      }
-      if (backGameButton) {
-        backGameButton.style.display = 'none'
-      }
+    return () => {
+      tempServer.disconnect()
     }
   }, [])
 
@@ -129,10 +131,10 @@ export default function GameMatching() {
     })
 
     server.on('deleteGameRoom', (data) => {
-      console.log('delete')
-      const deleteRoomId: string = data['gameRoomId']
+      const deleteRoomIdTemp: string = data['gameRoomId']
+      setDeleteRoomId(deleteRoomIdTemp)
       for (let i = 0; i < gameRoomsRef.current.length; i++) {
-        if (deleteRoomId == gameRoomsRef.current[i].id) {
+        if (deleteRoomIdTemp == gameRoomsRef.current[i].id) {
           gameRoomsRef.current.splice(i, 1)
           const newGameRooms = gameRoomsRef.current.slice(0)
           setGameRooms(newGameRooms)
@@ -142,20 +144,34 @@ export default function GameMatching() {
     })
   }, [gameRoomsLog, server, router])
 
+  useEffect(() => {
+    if (!myGameRoomId || !deleteRoomId) return
+    if (deleteRoomId == myGameRoomId) {
+      changeButton(0)
+      setDeleteRoomId(null)
+      setMyGameRoomId(null)
+    }
+  }, [deleteRoomId, myGameRoomId])
+
   return (
     <Layout>
-      <div>
-        <button id='matchButton' onClick={matching}>
-          Matching
-        </button>
-        <button id='cancelButton' onClick={cancel}>
-          Cancel
-        </button>
-        <button id='backGameButton' onClick={backGame}>
-          Back to the game
-        </button>
-      </div>
+      <Center h='10vh'>
+        <p>Matching list</p>
+      </Center>
       <GameMatchList gameRooms={gameRooms} />
+      <Center h='10vh'>
+        <Flex w='80%' justify='flex-end'>
+          <button id='matchButton' onClick={matching}>
+            Matching
+          </button>
+          <button id='cancelButton' onClick={cancel}>
+            Cancel
+          </button>
+          <button id='backGameButton' onClick={backGame}>
+            Back to the game
+          </button>
+        </Flex>
+      </Center>
     </Layout>
   )
 }
