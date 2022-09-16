@@ -1,4 +1,5 @@
 import { IsAlphanumeric, IsEmail } from 'class-validator'
+import { UserStatus } from '../interfaces/user-status.enum'
 import {
 	Entity,
 	Column,
@@ -45,7 +46,7 @@ export class User {
 	@Column('int', { default: 0 })
 	ratio: number
 
-	@Column('text', { default: 'Offline' })
+	@Column('text', { default: 'Online' })
 	status: UserStatus
 
 	@Column('date', { default: () => '((CURRENT_DATE))' })

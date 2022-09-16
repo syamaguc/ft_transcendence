@@ -5,7 +5,11 @@ import {
 	MessageBody,
 	ConnectedSocket,
 } from '@nestjs/websockets'
-import { Logger, NotFoundException } from '@nestjs/common'
+import {
+	Logger,
+	NotFoundException,
+	InternalServerErrorException,
+} from '@nestjs/common'
 // import { Logger, NotFoundException, UseGuards } from '@nestjs/common'
 // import { AuthGuard } from '@nestjs/passport'
 import { Server, Socket } from 'socket.io'
@@ -20,6 +24,7 @@ import {
 	GameRoomInfo,
 	GameSetting,
 } from './game.interface'
+import { UserStatus } from 'src/user/interfaces/user-status.enum'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -57,6 +62,41 @@ export class GameGateway {
 		const { password, ...res } = userFound
 		this.logger.log(password)
 		return res
+	}
+
+	async updateGameStatus(userId: string, inGame: boolean) {
+		let userFound: User = undefined
+		userFound = await UsersRepository.findOne({
+			where: { userId: userId },
+		})
+		userFound.status = inGame ? UserStatus.INGAME : UserStatus.ONLINE
+		try {
+			await UsersRepository.save(userFound)
+		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException()
+		}
+	}
+
+	updateGameStatusRoom(roomId: string, inGame: boolean) {
+		const roomIndex = this.searchRoom(roomId)
+		if (roomIndex == -1) return
+		const player1Id = this.gameRoomInfos[roomIndex].player1.id
+		const player2Id = this.gameRoomInfos[roomIndex].player2.id
+		Promise.all([
+			this.updateGameStatus(player1Id, inGame),
+			this.updateGameStatus(player2Id, inGame),
+		])
+			.then(() => {
+				this.logger.log('update game status: ', player1Id, player2Id)
+			})
+			.catch(() => {
+				this.logger.log(
+					'update game status error: ',
+					player1Id,
+					player2Id,
+				)
+			})
 	}
 
 	@SubscribeMessage('connectServer')
@@ -132,6 +172,7 @@ export class GameGateway {
 	}
 
 	settingEnd(gameRoomId: string) {
+		this.updateGameStatusRoom(gameRoomId, false)
 		const roomIndex = this.searchRoom(gameRoomId)
 		if (roomIndex == -1) return
 		this.gameRooms[roomIndex].quit()
@@ -186,6 +227,7 @@ export class GameGateway {
 	@SubscribeMessage('quit')
 	handleQuit(@MessageBody() data: any) {
 		const roomId = data['id']
+		this.updateGameStatusRoom(roomId, false)
 		const roomIndex = this.searchRoom(roomId)
 		if (roomIndex == -1) return
 		this.gameRooms[roomIndex].quit()
@@ -261,7 +303,7 @@ export class GameGateway {
 
 	// @UseGuards(AuthGuard('jwt'), UserAuth)
 	@SubscribeMessage('registerMatch')
-	async handleRegisterMatch(
+	handleRegisterMatch(
 		@MessageBody() data: any,
 		@ConnectedSocket() client: Socket,
 	) {
@@ -288,6 +330,7 @@ export class GameGateway {
 						this.matchUsers[0],
 						clientData,
 					)
+					this.updateGameStatusRoom(roomId, true)
 					this.server.to(client.id).emit('goGameRoom', roomId)
 					this.server
 						.to(this.matchUsers[0].client.id)

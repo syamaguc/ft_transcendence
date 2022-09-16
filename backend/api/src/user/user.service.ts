@@ -23,6 +23,7 @@ import { Observable, of } from 'rxjs'
 import { join } from 'path'
 import { User42Dto } from './dto/user42.dto'
 import { Response, Request } from 'express'
+import { UserStatus } from './interfaces/user-status.enum'
 // import { UserModule } from './user.module';
 
 @Injectable()
@@ -92,6 +93,13 @@ export class UserService {
 			})
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
+			user.status = UserStatus.ONLINE
+			try {
+				await UsersRepository.save(user)
+			} catch (e) {
+				console.log(e)
+				throw new InternalServerErrorException()
+			}
 			const username = user.username
 			const auth = false
 			const userid = user.userId
@@ -103,6 +111,20 @@ export class UserService {
 			throw new UnauthorizedException(
 				'Please check your login credentials',
 			)
+		}
+	}
+
+	async logout(user: User) {
+		let userFound: User = undefined
+		userFound = await UsersRepository.findOne({
+			where: { userId: user.userId },
+		})
+		userFound.status = UserStatus.OFFLINE
+		try {
+			await UsersRepository.save(userFound)
+		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException()
 		}
 	}
 
