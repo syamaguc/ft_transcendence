@@ -32,7 +32,6 @@ const SideBar = ({
 }: Props) => {
   const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
   const [room, setRoom] = useState<ChannelObject>()
-  const didLogRef = useRef(false)
   const [moveChannelId, setMoveChannelId] = useState()
 
   const onClickChannel = (chatRoom: ChannelObject) => {
@@ -45,27 +44,25 @@ const SideBar = ({
   }
 
   useEffect(() => {
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      socket.on('getMessageLog', (messageLog: MessageObject[]) => {
-        console.log('messageLog loaded', messageLog)
-        setChatLog(messageLog)
-      })
-      socket.on('getRooms', (rooms: ChannelObject[]) => {
-        setChatRooms(rooms)
-      })
-      socket.on('updateRoom', (channel: ChannelObject) => {
-        console.log('updateRoom received : ', channel)
-        setRoom(channel)
-      })
-      socket.on('updateCurrentRoom', (channelId: string) => {
-        console.log('updateCurrentRoom received : ', channelId)
-        setMoveChannelId(channelId)
-      })
-      socket.emit('getRooms')
-    }
+    if (!socket) return
+    socket.on('getMessageLog', (messageLog: MessageObject[]) => {
+      console.log('messageLog loaded', messageLog)
+      setChatLog(messageLog)
+    })
+    socket.on('getRooms', (rooms: ChannelObject[]) => {
+      setChatRooms(rooms)
+    })
+    socket.on('updateRoom', (channel: ChannelObject) => {
+      console.log('updateRoom received : ', channel)
+      setRoom(channel)
+    })
+    socket.on('updateCurrentRoom', (channelId: string) => {
+      console.log('updateCurrentRoom received : ', channelId)
+      setMoveChannelId(channelId)
+    })
+    socket.emit('getRooms')
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [socket])
 
   useEffect(() => {
     if (room) {
