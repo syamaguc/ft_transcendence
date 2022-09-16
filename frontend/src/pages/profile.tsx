@@ -733,21 +733,16 @@ function TwoFactorAuth() {
   const modal = useDisclosure()
   const toast = useToast()
 
-  // TODO: revalidates on every form onChange event
   const { data } = useSWR(`${API_URL}/api/auth/2fa`, fetchText)
 
-  console.log('data: ', data)
   const htmlText = data?.text
-
-  let qrCodeImage: string = null
-
+  let qrCodeUrl: string = null
   if (htmlText) {
     const re = /https:\/\/chart\.googleapis\.com[^']*/
     const match = htmlText.match(re)
     if (match[0]) {
-      qrCodeImage = match[0]
+      qrCodeUrl = match[0]
     }
-    console.log('match: ', match)
   }
 
   const validate = (values: { code: string }) => {
@@ -828,23 +823,6 @@ function TwoFactorAuth() {
     await mutateUser()
   }
 
-  const getTwoFactorAuth = async () => {
-    const res = await fetch(`${API_URL}/api/user/twoFactorAuth`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-    })
-
-    console.log(res)
-    console.log(await res.json())
-
-    if (!res.ok) {
-      console.error('Failed to set isFirstTime')
-    }
-  }
-
   const onCloseComplete = () => {
     formik.setFieldValue('code', '')
   }
@@ -871,7 +849,6 @@ function TwoFactorAuth() {
           </Button>
         </Stack>
       )}
-      <Button onClick={getTwoFactorAuth}>Get 2FA</Button>
       <Modal
         isOpen={modal.isOpen}
         onClose={modal.onClose}
@@ -886,14 +863,10 @@ function TwoFactorAuth() {
               <Text>
                 Open the Google Authenticator app and scan this QR code.
               </Text>
-              {qrCodeImage && (
-                <ChakraNextImage
-                  src={qrCodeImage}
-                  width='300px'
-                  height='300px'
-                />
+              {qrCodeUrl && (
+                <ChakraNextImage src={qrCodeUrl} width='300px' height='300px' />
               )}
-              {!qrCodeImage && <Text>{htmlText}</Text>}
+              {!qrCodeUrl && <Text>{htmlText}</Text>}
               <FormControl
                 mt={4}
                 isInvalid={
