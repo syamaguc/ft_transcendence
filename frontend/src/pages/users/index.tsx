@@ -20,7 +20,7 @@ import NextLink from 'next/link'
 import useSWR from 'swr'
 import { fetchUsers } from 'src/lib/fetchers'
 
-import { FiMessageSquare } from 'react-icons/fi'
+import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
 
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
@@ -101,11 +101,17 @@ function UserList() {
                           <Circle bg='gray.100' size='38px' mr='16px'>
                             <FiMessageSquare />
                           </Circle>
+                          <Circle bg='gray.100' size='38px' mr='16px'>
+                            <FiMoreVertical />
+                          </Circle>
                         </Flex>
                       </Stack>
                     </NextLink>
                   ))}
             </Stack>
+            <Heading as='h2' fontSize='2xl'>
+              Friends
+            </Heading>
           </Stack>
         </Box>
       </Container>
