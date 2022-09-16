@@ -11,7 +11,13 @@ type Props = {
   isJoined: boolean
 }
 
-const BottomBar = ({ inputText, setInputText, socket, currentRoom, isJoined }: Props) => {
+const BottomBar = ({
+  inputText,
+  setInputText,
+  socket,
+  currentRoom,
+  isJoined,
+}: Props) => {
   const onClickSubmit = useCallback(() => {
     if (!socket) return
     const message = {
@@ -47,9 +53,7 @@ const BottomBar = ({ inputText, setInputText, socket, currentRoom, isJoined }: P
   } else {
     return (
       <>
-        <Button onClick={onClickJoin}>
-          join
-        </Button>
+        <Button onClick={onClickJoin}>join</Button>
       </>
     )
   }
