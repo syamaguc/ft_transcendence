@@ -16,6 +16,7 @@ import {
 import { NextRouter } from 'next/router'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
+import { useUser } from 'src/lib/use-user'
 import { DMObject, MessageObject } from 'src/types/chat'
 import DMCreationForm from './dm-creation-form'
 
@@ -30,6 +31,7 @@ const DMSideBar = ({ socket, router }: Props) => {
   const [DMRooms, setDMRooms] = useState<DMObject[]>([])
   const [newDMRoom, setnewDMRoom] = useState<DMObject>()
   const didLogRef = useRef(false)
+  const { user } = useUser()
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -96,7 +98,7 @@ const DMSideBar = ({ socket, router }: Props) => {
                 }}
                 key={DMRoom.id}
               >
-                {DMRoom.toUserName}
+                {DMRoom.user1 == user.username ? DMRoom.user2 : DMRoom.user1}
               </Flex>
             ))
           : null}
