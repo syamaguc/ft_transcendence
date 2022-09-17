@@ -103,7 +103,7 @@ export class DMService {
 			.where('dm.id = :roomId', { roomId })
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
 			.innerJoin(User, 'userB', 'dm.memberB = userB.userId')
-			.getRawMany()
+			.getRawOne()
 		console.log(room)
 		return room
 	}

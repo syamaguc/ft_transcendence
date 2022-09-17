@@ -14,7 +14,6 @@ type DMTopBarProps = {
 }
 
 const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
-  console.log('currentRoom+++++++++', currentRoom)
   const [roomName, setRoomName] = useState<string>('')
 
   useEffect(() => {
@@ -24,7 +23,6 @@ const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
           ? currentRoom.user2
           : currentRoom.user1
       )
-      console.log('roomName=======', currentRoom.user1, currentRoom.user2)
     }
   }, [currentRoom, user])
 
@@ -36,7 +34,7 @@ const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
       p={4}
       align='center'
     >
-      <Text>@{roomName}</Text>
+      <Text>@ {roomName}</Text>
     </Flex>
   )
 }
