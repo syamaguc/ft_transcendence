@@ -12,6 +12,7 @@ import {
   ModalFooter,
   useDisclosure,
   useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
@@ -24,6 +25,7 @@ type Props = {
 const DMCreationForm = ({ socket }: Props) => {
   const userNameInputRef = useRef<HTMLInputElement>()
   const router = useRouter()
+  const toast = useToast()
 
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -33,8 +35,14 @@ const DMCreationForm = ({ socket }: Props) => {
   }
 
   useEffect(() => {
-    socket.on('exception', (status, message) => {
+    socket.on('exception', ({ status, message }) => {
       console.log(status, message)
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
