@@ -5,7 +5,7 @@ export class CreateChatRoomDto {
 }
 
 export class CreateDMRoomDto {
-	memberB: string
+	username: string
 }
 
 export class AddMessageDto {

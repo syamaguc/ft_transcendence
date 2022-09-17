@@ -14,7 +14,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 
 type Props = {
@@ -29,8 +29,15 @@ const DMCreationForm = ({ socket }: Props) => {
     event.preventDefault()
     const enteredUserName = userNameInputRef.current.value
     console.log('onClickCreate called', enteredUserName)
-    socket.emit('createRoom', { memberB: enteredUserName })
+    socket.emit('createRoom', { username: enteredUserName })
   }
+
+  useEffect(() => {
+    socket.on('exception', (status, message) => {
+      console.log(status, message)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (

@@ -8,6 +8,7 @@ import { Repository } from 'typeorm'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
+import { WsException } from '@nestjs/websockets'
 
 @Injectable()
 export class DMService {
@@ -48,10 +49,15 @@ export class DMService {
 		DMRoomData: CreateDMRoomDto,
 		userId: string,
 	): Promise<any> {
+		const friendUserId = await UsersRepository.findOne({
+			where: { username: DMRoomData.username },
+		})
+		console.log(friendUserId)
+		if (!friendUserId) throw new WsException('User Not Found')
 		const newDMRoom = {
-			...DMRoomData,
 			id: uuidv4(),
 			memberA: userId,
+			memberB: friendUserId.userId,
 		}
 		const DM = await this.DMRoomRepository.save(newDMRoom)
 
