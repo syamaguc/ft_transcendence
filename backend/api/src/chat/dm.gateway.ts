@@ -89,7 +89,7 @@ export class DMGateway {
 			createDMRoomDto,
 			socket.data.userId,
 		)
-		this.server.emit('updateRoom', newDMRoom)
+		socket.emit('updateRoom', newDMRoom)
 	}
 }
 

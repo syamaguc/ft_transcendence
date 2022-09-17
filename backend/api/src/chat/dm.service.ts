@@ -47,7 +47,7 @@ export class DMService {
 
 	async createRoom(
 		DMRoomData: CreateDMRoomDto,
-		userId: string,
+		selfUserId: string,
 	): Promise<any> {
 		const friendUserId = await UsersRepository.findOne({
 			where: { username: DMRoomData.username },
@@ -56,12 +56,18 @@ export class DMService {
 		if (!friendUserId) throw new WsException('User Not Found')
 		const newDMRoom = {
 			id: uuidv4(),
-			memberA: userId,
+			memberA: selfUserId,
 			memberB: friendUserId.userId,
 		}
 		const DM = await this.DMRoomRepository.save(newDMRoom)
 
-		return this.toDMFrontObject(DM, userId)
+		const DMFrontObject = {
+			id: DM.id,
+			toUserName: DMRoomData.username,
+			logs: DM.messages,
+		}
+
+		return DMFrontObject
 	}
 
 	async addMessage(

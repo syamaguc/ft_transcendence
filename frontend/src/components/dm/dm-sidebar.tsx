@@ -38,7 +38,7 @@ const DMSideBar = ({ socket, router }: Props) => {
         setDMRooms(rooms)
       })
       socket.on('updateRoom', (newDMRoom: DMObject) => {
-        console.log('updateRoom called', newDMRoom)
+        console.log('updateRoom called: ', newDMRoom)
         setnewDMRoom(newDMRoom)
       })
       socket.emit('getRooms')
