@@ -25,8 +25,8 @@ const API_URL = 'http://localhost:3000'
 
 function MemberList({ socket, currentRoom, members }) {
   const onClickMute = (userId: string) => {
-    socket.emit('muteMember', currentRoom.id, userId)
-    console.log(userId, ' has been muted from channel ' , currentRoom.id)
+    socket.emit('muteMember', userId)
+    console.log(userId, ' has been muted from the channel')
   }
 
   const onClickBan = (userId: string) => {
@@ -35,8 +35,8 @@ function MemberList({ socket, currentRoom, members }) {
   }
 
   const onClickAdmin = (userId: string) => {
-    socket.emit('addAdmin', currentRoom.id, userId)
-    console.log(userId, ' has been added to admin in channel ' , currentRoom.id)
+    socket.emit('addAdmin', userId)
+    console.log(userId, ' has been added to admin in channel')
   }
 
   if (!members || !members.length) return <Text>This room is empty</Text>
@@ -53,6 +53,7 @@ function MemberList({ socket, currentRoom, members }) {
             marginEnd={3}
             />
           <Text>{member.username}</Text>
+          {currentRoom.admins.indexOf(member.userId) != -1 ? <Text ml={1}>admin</Text> : null}
           <Box opacity='0' _hover={{ transition: '0.3s' , opacity: '1' }} p={2}>
             <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
             <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
@@ -87,14 +88,14 @@ function MemberListModal({ socket, currentRoom }) {
   }
 
   useEffect(() => {
+    if (!socket) return
     //load members in the channel
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      socket.on('getMembers', (users: User[]) => {
-        setMembers(users)
-        })
-    }
+    socket.on('getMembers', (users: User[]) => {
+      setMembers(users)
+      })
+  }, [socket])
 
+  useEffect(() => {
     //load friends
     fetch(`${API_URL}/api/user/friendList`, {
       credentials: 'include',
@@ -111,11 +112,12 @@ function MemberListModal({ socket, currentRoom }) {
     <>
       <IconButton
         size='sm'
+        mr={0} ml='auto'
         icon={<UsersIcon />}
         onClick={() => {
           onOpen()
           onClickGet(currentRoom.id)
-          }} />
+          }}/>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

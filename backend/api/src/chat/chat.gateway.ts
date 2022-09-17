@@ -43,6 +43,39 @@ export class ChatGateway {
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
+
+	@SubscribeMessage('addAdmin')
+	async addAdmin(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`addAdmin: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.addAdmin(
+			userId,
+			room,
+		)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	// @SubscribeMessage('banUser')
+	// async banUser(
+	// 	@MessageBody() userId: string,
+	// 	@ConnectedSocket() socket: Socket,
+	// ) {
+
+	// }
+
+	// @SubscribeMessage('muteUser')
+	// async muteUser(
+	// 	@MessageBody() addMessageDto: AddMessageDto,
+	// 	@ConnectedSocket() socket: Socket,
+	// ) {
+
+	// }
+
+
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
 		@MessageBody() roomId: string,

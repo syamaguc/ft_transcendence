@@ -69,6 +69,15 @@ export class ChatService {
 		return messageRepository.addMessage(message)
 	}
 
+	async addAdmin(userId: string, roomId: string): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		if (room.admins.indexOf(userId) === -1) {
+			console.log('=========admin is added=========')
+			room.admins.push(userId)
+			return chatRepository.save(room)
+		}
+	}
+
 	async getMessageLog(roomId: string): Promise<any> {
 		const messagesWithUserInfo = await messageRepository.getMessages(roomId)
 		return messagesWithUserInfo
