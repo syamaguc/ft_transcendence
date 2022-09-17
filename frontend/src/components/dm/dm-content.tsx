@@ -4,7 +4,6 @@ import { DMObject, MessageObject } from 'src/types/chat'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 import MiddleBar from '@components/chat/middlebar'
-import { NextRouter } from 'next/router'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
 

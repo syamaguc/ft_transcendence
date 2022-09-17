@@ -1,23 +1,9 @@
-import {
-  Box,
-  Stack,
-  Flex,
-  Text,
-  Button,
-  Input,
-  Radio,
-  RadioGroup,
-  FormControl,
-  FormLabel,
-  FormHelperText,
-  Link as ChakraLink,
-  useColorModeValue,
-} from '@chakra-ui/react'
+import { Flex, Text, useColorModeValue } from '@chakra-ui/react'
 import { NextRouter } from 'next/router'
-import { useState, useCallback, useEffect, useRef } from 'react'
-import { io, Socket } from 'socket.io-client'
+import { useState, useEffect, useRef } from 'react'
+import { Socket } from 'socket.io-client'
 import { useUser } from 'src/lib/use-user'
-import { DMObject, MessageObject } from 'src/types/chat'
+import { DMObject } from 'src/types/chat'
 import DMCreationForm from './dm-creation-form'
 
 const PREFIX_URL = '/dm'

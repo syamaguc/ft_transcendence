@@ -1,11 +1,7 @@
 import Layout from '@components/layout'
 import { Flex } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
-import { useState, useEffect, useCallback, useRef } from 'react'
-import { DMObject, MessageObject } from 'src/types/chat'
-import { FetchError } from 'src/lib/fetch-json'
-import { useUser } from 'src/lib/use-user'
-import { User } from 'src/types/user'
+import { useState, useEffect, useRef } from 'react'
 import DMSideBar from '@components/dm/dm-sidebar'
 import { useRouter } from 'next/router'
 import DMContent from '@components/dm/dm-content'
@@ -31,7 +27,6 @@ const Chat = () => {
       } else {
         setRoomId(tmpRoomId[0])
       }
-      console.log(tmpRoomId)
       socket.emit('watchRoom', tmpRoomId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
