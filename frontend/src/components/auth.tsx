@@ -23,7 +23,7 @@ export function AuthCard({ children, title = '' }: AuthCardProps) {
       <Stack spacing='8'>
         <Stack spacing='6'>
           <Stack spacing={{ base: '2', md: '3' }} textAlign='center'>
-            <Heading size={useBreakpointValue({ base: 'xs', md: 'xl' })}>
+            <Heading size={useBreakpointValue({ base: 'md', md: 'xl' })}>
               {title}
             </Heading>
           </Stack>
@@ -33,7 +33,7 @@ export function AuthCard({ children, title = '' }: AuthCardProps) {
           px={{ base: '4', sm: '10' }}
           bg={useBreakpointValue({
             base: 'transparent',
-            sm: 'inherit',
+            sm: useColorModeValue('whiteAlpha.900', 'inherit'),
           })}
           boxShadow={{
             base: 'none',
