@@ -22,7 +22,7 @@ export class ChatGateway {
 	private logger: Logger = new Logger('ChatGateway')
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		this.chatService.setUserIdToSocket(socket)
+		this.chatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 

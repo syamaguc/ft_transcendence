@@ -22,7 +22,7 @@ export class ChatService {
 		private jwtService: JwtService,
 	) {}
 
-	setUserIdToSocket(socket: Socket) {
+	setUserToSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
 		const { jwt: token } = parse(cookie)
 		if (!token) {
@@ -34,8 +34,9 @@ export class ChatService {
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
 		})
-		const { userid } = payload
+		const { userid, username } = payload
 		socket.data.userId = userid
+		socket.data.username = username
 	}
 
 	async createRoom(

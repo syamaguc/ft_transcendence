@@ -31,20 +31,6 @@ export class DMService {
 		return this.DMRoomRepository.save(selfDM)
 	}
 	*/
-	toDMFrontObject(DM: DMRoom, userId: string): any {
-		let otherMember = DM.memberA
-		if (DM.memberA == userId) {
-			otherMember = DM.memberB
-		}
-		const DMFrontObject = {
-			id: DM.id,
-			toUserName: otherMember,
-			logs: DM.messages,
-		}
-		console.log(DMFrontObject)
-		return DMFrontObject
-	}
-
 	async createRoom(
 		DMRoomData: CreateDMRoomDto,
 		selfUserId: string,
@@ -63,7 +49,7 @@ export class DMService {
 
 		const DMFrontObject = {
 			id: DM.id,
-			toUserName: DMRoomData.username,
+			user1: DMRoomData.username,
 			logs: DM.messages,
 		}
 

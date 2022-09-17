@@ -26,7 +26,7 @@ export class DMGateway {
 	private logger: Logger = new Logger('DMGateway')
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		this.ChatService.setUserIdToSocket(socket)
+		this.ChatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
 		// const room = await this.DMService.initRoom(socket.data.userId)
 		// socket.emit('initCurrentRoom', room)
@@ -91,6 +91,7 @@ export class DMGateway {
 			createDMRoomDto,
 			socket.data.userId,
 		)
+		newDMRoom = { ...newDMRoom, user2: socket.data.username }
 		socket.emit('updateRoom', newDMRoom)
 	}
 }
