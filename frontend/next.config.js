@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  images: {
+    domains: ['cdn.intra.42.fr', 'chart.googleapis.com'],
+  },
 }
 
 module.exports = nextConfig

@@ -1,18 +1,12 @@
 import { useState, ReactNode } from 'react'
 import {
-  Alert,
-  AlertIcon,
-  Box,
   Button,
-  Fade,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
-  Heading,
   Stack,
-  useBreakpointValue,
-  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
 import { FormikErrors, useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -21,6 +15,7 @@ import { AuthCard } from '@components/auth'
 import PasswordField from '@components/password-field'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { setIsFirstTime } from 'src/lib/session'
 
 interface FormValues {
   username: string
@@ -29,8 +24,7 @@ interface FormValues {
 
 export function LoginForm() {
   const { mutateUser } = useUser()
-  const [showAlert, setShowAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
+  const toast = useToast()
 
   const loginFormSchema = Yup.object({
     username: Yup.string()
@@ -41,7 +35,7 @@ export function LoginForm() {
       .required('Password is required')
       .min(8, 'Must be 8 characters minimum')
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/,
         'Must contain uppercase, lowercase, number and symbol chracter'
       ),
   })
@@ -63,7 +57,7 @@ export function LoginForm() {
     } else if (values.password.length > 30) {
       errors.password = 'Must be 30 characters or less'
     } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/.test(
         values.password
       )
     ) {
@@ -81,10 +75,8 @@ export function LoginForm() {
     },
     validate,
     onSubmit: async (values, actions) => {
-      setShowAlert(false)
-
       try {
-        let res = await fetch(`${API_URL}/api/user/signin`, {
+        const res = await fetch(`${API_URL}/api/user/signin`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -96,28 +88,41 @@ export function LoginForm() {
           }),
         })
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
-        const { accessToken } = await res.json()
+        const data = await res.json()
 
-        if (!res.ok) {
-          if (res.status === 401) {
-            setAlertMessage('Incorrect username or password')
-            setShowAlert(true)
+        if (res.ok) {
+          console.log('data: ', data)
+          await setIsFirstTime(false)
+          await mutateUser()
+          actions.setSubmitting(false)
+        } else {
+          if (res.status === 401 && typeof data.message === 'string') {
+            toast({
+              description: data.message,
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
           } else {
-            setAlertMessage('Unable to login')
-            setShowAlert(true)
+            toast({
+              description: 'Internal error occurred',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
           }
         }
-
-        console.log(accessToken)
       } catch (err) {
-        setAlertMessage('Unable to login')
-        setShowAlert(true)
+        console.log(err)
+        toast({
+          description: 'Internal error occurred',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
       }
-
-      mutateUser()
-      actions.setSubmitting(false)
     },
   })
 
@@ -149,7 +154,9 @@ export function LoginForm() {
               />
             </Stack>
             <Button
-              colorScheme='blue'
+              colorScheme='blackAlpha'
+              bg='blackAlpha.900'
+              _dark={{ bg: 'whiteAlpha.900', _hover: { bg: 'whiteAlpha.600' } }}
               type='submit'
               isLoading={formik.isSubmitting}
             >
@@ -157,14 +164,6 @@ export function LoginForm() {
             </Button>
           </Stack>
         </form>
-        {showAlert && (
-          <Fade in={showAlert}>
-            <Alert status='error'>
-              <AlertIcon />
-              {alertMessage}
-            </Alert>
-          </Fade>
-        )}
       </AuthCard>
     </>
   )

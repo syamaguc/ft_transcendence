@@ -6,6 +6,8 @@ import {
 	ConflictException,
 	ForbiddenException,
 	HttpStatus,
+	BadRequestException,
+	HttpException,
 	InternalServerErrorException,
 	UnauthorizedException,
 	UploadedFile,
@@ -120,7 +122,12 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 	},
 
 	async updateUser(updateUser: UpdateUserDto, user: User): Promise<boolean> {
-		const { username, email, password } = updateUser
+		const { currentPassword, username, email, password } = updateUser
+		if (!(await bcrypt.compare(currentPassword, user.password)))
+			throw new HttpException(
+				'password is incorrect',
+				HttpStatus.FORBIDDEN,
+			)
 
 		if (username) {
 			user.username = username
