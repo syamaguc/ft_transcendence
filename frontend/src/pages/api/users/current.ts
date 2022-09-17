@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { User, Session } from 'src/types/user'
-import { getSessionCookie } from 'src/lib/cookies'
+import { getSessionCookie, setSessionCookie } from 'src/lib/cookies'
 
 const API_URL = 'http://api:3000'
 
@@ -62,7 +62,8 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     if (stringValue) {
       session = JSON.parse(stringValue)
     } else {
-      session = null
+      session = { isFirstTime: true }
+      setSessionCookie(res, session)
     }
 
     if (apiResponse.ok) {

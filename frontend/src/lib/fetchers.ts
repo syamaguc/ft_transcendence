@@ -60,7 +60,7 @@ export async function fetchUser(
   const data = await res.json()
 
   if (res.ok) {
-    return { user: data?.user || null, session: data?.session }
+    return { user: data?.user || null, session: data?.session || null }
   }
 
   // TODO: throw
