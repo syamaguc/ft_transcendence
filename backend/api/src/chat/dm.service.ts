@@ -38,8 +38,14 @@ export class DMService {
 		const friendUserId = await UsersRepository.findOne({
 			where: { username: DMRoomData.username },
 		})
-		console.log(friendUserId)
 		if (!friendUserId) throw new WsException('User Not Found')
+		const existingRoom = await this.DMRoomRepository.findOne({
+			where: [
+				{ memberA: selfUserId, memberB: friendUserId.userId },
+				{ memberA: friendUserId.userId, memberB: selfUserId },
+			],
+		})
+		if (existingRoom) throw new WsException('Room Already Exist')
 		const newDMRoom = {
 			id: uuidv4(),
 			memberA: selfUserId,
