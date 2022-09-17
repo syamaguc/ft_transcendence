@@ -21,6 +21,8 @@ export class DMService {
 		DMRoomData: CreateDMRoomDto,
 		selfUserId: string,
 	): Promise<any> {
+		if (!selfUserId)
+			throw new WsException('Internal Server Error: userId is not passed')
 		const friendUserId = await UsersRepository.findOne({
 			where: { username: DMRoomData.username },
 		})

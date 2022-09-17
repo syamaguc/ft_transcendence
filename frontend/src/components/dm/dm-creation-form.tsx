@@ -43,7 +43,7 @@ const DMCreationForm = ({ socket }: Props) => {
         toast({
           description: message,
           status: status,
-          duration: 1000,
+          duration: 5000,
           isClosable: true,
         })
       })
