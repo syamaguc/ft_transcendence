@@ -23,8 +23,6 @@ const GameSettingForm = ({
   player2Name,
   remainSeconds,
 }: Props) => {
-  const didLogRef = useRef(false)
-
   const getRadioValue = (name: string) => {
     let elements = document.getElementsByName(
       name
@@ -71,8 +69,7 @@ const GameSettingForm = ({
   }
 
   useEffect(() => {
-    if (!didLogRef.current && server && roomId && playerRole != -1) {
-      didLogRef.current = true
+    if (server && roomId && playerRole != -1) {
       const addChangeEvent = (name: string) => {
         let elements = document.getElementsByName(
           name
