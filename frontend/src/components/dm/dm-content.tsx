@@ -51,21 +51,21 @@ const DMSendBox = ({ socket }) => {
 }
 
 type Props = {
-  //   router: NextRouter
-  currentRoom: DMObject
   socket: Socket
+  roomId: string
 }
 
-const DMContent = ({ currentRoom, socket }: Props) => {
+const DMContent = ({ socket, roomId }: Props) => {
   const didLogRef = useRef(false)
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
+  const [currentRoom, setCurrentRoom] = useState<DMObject>()
 
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
 
-      socket.emit('getMessageLog', currentRoom.id)
+      socket.emit('getMessageLog', roomId)
       socket.on('getMessageLog', (messageLog: MessageObject[]) => {
         console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
@@ -74,6 +74,10 @@ const DMContent = ({ currentRoom, socket }: Props) => {
       socket.on('updateNewMessage', (message: MessageObject) => {
         console.log('recieved : ', message)
         setMsg(message)
+      })
+      socket.on('watchRoom', (room: DMObject) => {
+        setCurrentRoom(room)
+        console.log('watchRoom:', room)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -88,7 +92,7 @@ const DMContent = ({ currentRoom, socket }: Props) => {
 
   return (
     <>
-      <DMTopBar roomDisplayName={currentRoom.toUserName} />
+      <DMTopBar roomDisplayName={currentRoom ? currentRoom.toUserName : ''} />
       <MiddleBar chatLog={chatLog} />
       <Flex p={4}>
         <DMSendBox socket={socket} />

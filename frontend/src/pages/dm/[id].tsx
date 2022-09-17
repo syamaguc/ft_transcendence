@@ -21,17 +21,20 @@ const ChatRoom = () => {
   )
   const didLogRef = useRef(false)
   const router = useRouter()
-  const [currentRoom, setCurrentRoom] = useState<DMObject>()
+  const [roomId, setRoomId] = useState<string>()
 
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      const roomId = router.query.id
-      socket.emit('watchRoom', roomId)
+      const tmpRoomId = router.query.id
+      if (typeof tmpRoomId === 'string') {
+        setRoomId(tmpRoomId)
+      } else {
+        setRoomId(tmpRoomId[0])
+      }
+      console.log(tmpRoomId)
+      socket.emit('watchRoom', tmpRoomId)
     }
-    socket.on('watchRoom', (room: DMObject) => {
-      setCurrentRoom(room)
-    })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -39,18 +42,10 @@ const ChatRoom = () => {
     <Layout>
       <Flex>
         <Flex w='300px' h='90vh' borderEnd='1px solid' borderColor='gray'>
-          <DMSideBar
-            socket={socket}
-            router={router}
-            currentRoom={currentRoom}
-          />
+          <DMSideBar socket={socket} router={router} />
         </Flex>
         <Flex h='90vh' w='100%' direction='column'>
-          <DMContent
-            // router={router}
-            socket={socket}
-            currentRoom={currentRoom}
-          />
+          <DMContent socket={socket} roomId={roomId} />
         </Flex>
       </Flex>
     </Layout>
