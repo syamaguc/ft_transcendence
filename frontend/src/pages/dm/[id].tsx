@@ -13,7 +13,7 @@ import DMContent from '@components/dm/dm-content'
 const socket = io('http://localhost:3000/dm', { transports: ['websocket'] })
 const API_URL = 'http://localhost:3000'
 
-const ChatRoom = () => {
+const Chat = () => {
   const [socket, setSocket] = useState(
     io(API_URL + '/dm', {
       transports: ['websocket'],
@@ -52,4 +52,7 @@ const ChatRoom = () => {
   )
 }
 
-export default ChatRoom
+export default function ChatRoom() {
+  const router = useRouter()
+  return <Chat key={router.asPath} />
+}
