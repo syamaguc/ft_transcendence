@@ -11,24 +11,17 @@ import { useRouter } from 'next/router'
 import DMContent from '@components/dm/dm-content'
 
 const API_URL = 'http://localhost:3000'
-const PREFIX_URL = '/dm/'
+const PREFIX_URL = '/dm'
 
 const Chat = () => {
   const [socket, setSocket] = useState(
-    io(API_URL + '/dm', {
+    io(API_URL + PREFIX_URL, {
       transports: ['websocket'],
     })
   )
   const router = useRouter()
-  const { user } = useUser()
-  const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
-  const [currentRoom, setCurrentRoom] = useState<DMObject>({
-    id: '3a970758-fc0d-4127-ac23-8327720bbb7b',
-    toUserName: user.username,
-    logs: [],
-  })
 
   const didLogRef = useRef(false)
 
@@ -38,9 +31,6 @@ const Chat = () => {
       socket.on('connect', () => {
         console.log('connection ID : ', socket.id)
       })
-      //   socket.on('initCurrentRoom', (room: DMObject) => {
-      //     setCurrentRoom(room)
-      //   })
       socket.on('updateNewMessage', (message: MessageObject) => {
         console.log('recieved : ', message)
         setMsg(message)
@@ -55,33 +45,14 @@ const Chat = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
 
-  useEffect(() => {
-    if (currentRoom.id != '3a970758-fc0d-4127-ac23-8327720bbb7b')
-      router.push(PREFIX_URL + currentRoom.id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRoom])
-
-  const onClickChannel = (DMRoom: DMObject) => {
-    if (currentRoom != DMRoom) {
-      setCurrentRoom(DMRoom)
-      socket.emit('watchRoom', DMRoom.id)
-      socket.emit('getMessageLog', DMRoom.id)
-      setInputText('')
-    }
-  }
-
   return (
     <Layout>
       <Flex>
         <Flex w='300px' h='90vh' borderEnd='1px solid' borderColor='gray'>
-          <DMSideBar
-            router={router}
-            socket={socket}
-            currentRoom={currentRoom}
-          />
+          <DMSideBar router={router} socket={socket} />
         </Flex>
         <Flex h='90vh' w='100%' direction='column'>
-          <DMContent socket={socket} currentRoom={currentRoom} />
+          {/* <Frends List /> display freinds list like discord does */}
         </Flex>
       </Flex>
     </Layout>
