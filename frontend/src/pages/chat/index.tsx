@@ -9,6 +9,7 @@ import {
   Stack,
   Flex,
   Text,
+  useControllableState,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -22,71 +23,7 @@ import SimpleSidebar from '@components/chat/simple-sidebar'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
 
-const socket = io('http://localhost:3000/chat', { transports: ['websocket'] })
-const API_URL = 'http://localhost:3000'
-
-const InputBody = ({ inputText, setInputText, onClickSubmit }) => {
-  return (
-    <>
-      <Input
-        type='text'
-        value={inputText}
-        onChange={(event) => {
-          setInputText(event.target.value)
-        }}
-      />
-      <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
-        Send
-      </Button>
-    </>
-  )
-}
-
-const onClickJoin = (roomId: String, setIsJoined) => {
-  socket.emit('joinRoom', roomId)
-  console.log('joinroom', roomId)
-}
-
-const JoinBody = ({ currentRoom, setIsJoined }) => {
-  return (
-    <>
-      <Button
-        onClick={() => {
-          onClickJoin(currentRoom.id, setIsJoined)
-        }}
-      >
-        join
-      </Button>
-    </>
-  )
-}
-
-const ShowContents = ({
-  isJoined,
-  setIsJoined,
-  inputText,
-  setInputText,
-  onClickSubmit,
-  currentRoom,
-}) => {
-  if (isJoined) {
-    return (
-      <>
-        <InputBody
-          inputText={inputText}
-          setInputText={setInputText}
-          onClickSubmit={onClickSubmit}
-        />
-      </>
-    )
-  } else {
-    return (
-      <>
-        <JoinBody currentRoom={currentRoom} setIsJoined={setIsJoined} />
-      </>
-    )
-  }
-}
+const API_URL = 'http://localhost:3000/chat'
 
 const Chat = () => {
   const { user } = useUser()
@@ -104,23 +41,30 @@ const Chat = () => {
     logs: [],
     password: '',
   })
-
-  const didLogRef = useRef(false)
+  const [socket, setSocket] = useState()
 
   useEffect(() => {
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      socket.on('connect', () => {
-        console.log('connection ID : ', socket.id)
-      })
-      socket.on('updateNewMessage', (message: MessageObject) => {
-        console.log('recieved : ', message)
-        setMsg(message)
-      })
+    const tempSocket = io(API_URL, { transports: ['websocket'] })
+    setSocket(tempSocket)
+
+    return () => {
+      tempSocket.disconnect()
     }
   }, [])
 
   useEffect(() => {
+    if (!socket) return
+    socket.on('connect', () => {
+      console.log('connection ID : ', socket.id)
+    })
+    socket.on('updateNewMessage', (message: MessageObject) => {
+      console.log('recieved : ', message)
+      setMsg(message)
+    })
+  }, [socket])
+
+  useEffect(() => {
+    if (!user) return
     console.log('check if joined')
     if (user) {
       console.log('effect user', user)
@@ -133,17 +77,7 @@ const Chat = () => {
         setIsJoined(false)
       }
     }
-  }, [currentRoom])
-
-  const onClickSubmit = useCallback(() => {
-    const message = {
-      message: inputText,
-      timestamp: new Date(),
-    }
-    console.log('send : ', message)
-    socket.emit('addMessage', message)
-    setInputText('')
-  }, [inputText])
+  }, [user, currentRoom])
 
   useEffect(() => {
     if (msg) {
@@ -167,15 +101,13 @@ const Chat = () => {
         <Flex h='90vh' w='100%' direction='column'>
           <TopBar socket={socket} currentRoom={currentRoom} />
           <MiddleBar chatLog={chatLog} />
-          {/* <BottomBar inputText={inputText} setInputText={setInputText} socket={socket}/> */}
           <Flex p={4}>
-            <ShowContents
-              isJoined={isJoined}
-              setIsJoined={setIsJoined}
+            <BottomBar
               inputText={inputText}
               setInputText={setInputText}
-              onClickSubmit={onClickSubmit}
+              socket={socket}
               currentRoom={currentRoom}
+              isJoined={isJoined}
             />
           </Flex>
         </Flex>

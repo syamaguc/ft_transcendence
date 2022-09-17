@@ -7,6 +7,7 @@ import Layout from '@components/layout'
 import Pong from '@components/game-pong'
 import GameSettingForm from '@components/game-setting'
 import GameResult from '@components/game-result'
+import DisplayNoRoom from '@components/game-noRoom'
 import { useUser } from '../../lib/use-user'
 
 const API_URL = 'http://localhost:3000'
@@ -24,10 +25,10 @@ export default function Game() {
     player1: { point: 0, name: '' },
     player2: { point: 0, name: '' },
     gameStatus: -1,
+    remainSeconds: 0,
     gameSetting: { point: 2, speed: 1 },
   })
   // reference: https://www.sunapro.com/react18-strict-mode/
-  const didLogRef = useRef(false)
   const keyStatus = useRef({ upPressed: false, downPressed: false })
   const router = useRouter()
   const [gameStatus, setGameStatus] = useState<number>(-1)
@@ -69,9 +70,10 @@ export default function Game() {
   }, [playerRole])
 
   useEffect(() => {
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      setServer(io(API_URL))
+    const tempServer = io(API_URL)
+    setServer(tempServer)
+    return () => {
+      tempServer.disconnect()
     }
   }, [])
 
@@ -81,7 +83,7 @@ export default function Game() {
     server.emit('connectServer', { roomId: roomId, userId: userId })
 
     server.on('noRoom', () => {
-      router.push('/404')
+      setGameStatus(-2)
     })
 
     server.on('connectClient', (data) => {
@@ -125,7 +127,7 @@ export default function Game() {
           gameSetting={gameObject.gameSetting}
           player1Name={gameObject.player1.name}
           player2Name={gameObject.player2.name}
-          gameObject={gameObject}
+          remainSeconds={gameObject.remainSeconds}
         />
         <Pong gameObject={gameObject} />
         <GameResult
@@ -136,7 +138,9 @@ export default function Game() {
           player1Name={gameObject.player1.name}
           player2Name={gameObject.player2.name}
           gameObject={gameObject}
+          userId={userId}
         />
+        <DisplayNoRoom status={gameStatus} />
       </div>
     </Layout>
   )

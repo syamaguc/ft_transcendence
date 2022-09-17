@@ -18,7 +18,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from '@chakra-ui/react'
-import { MutableRefObject, useRef } from 'react'
+import { MutableRefObject, useRef, useCallback } from 'react'
 import { Socket } from 'socket.io-client'
 
 type Props = {
@@ -82,30 +82,34 @@ const ChatCreationForm = ({ socket }: Props) => {
   const isProtectedInputRef = useRef<HTMLInputElement>()
   const passwordInputRef = useRef<HTMLInputElement>()
 
-  const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const enteredChannelName = channelNameInputRef.current.value
-    const enteredIsPrivate = isPrivateInputRef.current.checked
-    const enteredIsProtected = isProtectedInputRef.current.checked
-    let enteredPassword = ''
-    if (enteredIsProtected == true) {
-      enteredPassword = passwordInputRef.current.value
-    }
-    console.log(
-      'onClickCreate called',
-      enteredIsPrivate,
-      enteredIsProtected,
-      enteredPassword
-    )
-    const enterdData: CreateChatRoomDto = {
-      name: enteredChannelName,
-      // owner: 'user',
-      is_private: enteredIsPrivate,
-      password: enteredPassword,
-      time_created: new Date(),
-    }
-    socket.emit('createRoom', enterdData)
-  }
+  const onClickCreate = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      if (!socket) return
+      event.preventDefault()
+      const enteredChannelName = channelNameInputRef.current.value
+      const enteredIsPrivate = isPrivateInputRef.current.checked
+      const enteredIsProtected = isProtectedInputRef.current.checked
+      let enteredPassword = ''
+      if (enteredIsProtected == true) {
+        enteredPassword = passwordInputRef.current.value
+      }
+      console.log(
+        'onClickCreate called',
+        enteredIsPrivate,
+        enteredIsProtected,
+        enteredPassword
+      )
+      const enterdData: CreateChatRoomDto = {
+        name: enteredChannelName,
+        // owner: 'user',
+        is_private: enteredIsPrivate,
+        password: enteredPassword,
+        time_created: new Date(),
+      }
+      socket.emit('createRoom', enterdData)
+    },
+    [socket]
+  )
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (

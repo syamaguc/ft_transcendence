@@ -10,6 +10,7 @@ type Props = {
   player1Name: string
   player2Name: string
   gameObject: GameObject
+  userId: string
 }
 
 const GameResult = ({
@@ -20,11 +21,17 @@ const GameResult = ({
   player1Name,
   player2Name,
   gameObject,
+  userId,
 }: Props) => {
-  const start = useCallback(() => {
-    if (!server || !roomId) return
-    server.emit('retry', { id: roomId })
-  }, [roomId, server])
+  const retry = useCallback(() => {
+    if (!server || !roomId || !userId) return
+    server.emit('retry', { id: roomId, userId: userId })
+  }, [roomId, server, userId])
+
+  const retryCancel = useCallback(() => {
+    if (!server || !roomId || !userId) return
+    server.emit('retryCancel', { id: roomId, userId: userId })
+  }, [roomId, server, userId])
 
   const nop = () => {
     return
@@ -67,10 +74,20 @@ const GameResult = ({
         <button
           className={style.startButton}
           id='endButton'
-          onClick={playerRole == 0 ? start : nop}
-          disabled={playerRole != 0}
+          onClick={
+            (playerRole == 0 && gameObject.retryFlag.player1) ||
+            (playerRole == 1 && gameObject.retryFlag.player2)
+              ? retryCancel
+              : playerRole == 0 || playerRole == 1
+              ? retry
+              : nop
+          }
+          disabled={playerRole != 0 && playerRole != 1}
         >
-          retry
+          {(playerRole == 0 && gameObject.retryFlag.player1) ||
+          (playerRole == 1 && gameObject.retryFlag.player2)
+            ? 'cancel'
+            : 'retry'}
         </button>
       </div>
     </div>
