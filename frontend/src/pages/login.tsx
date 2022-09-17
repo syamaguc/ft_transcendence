@@ -34,11 +34,12 @@ function Login42(props: Login42Props) {
     <AuthCard title='ft_transcendence'>
       <Stack spacing={4} direction='column' align='center'>
         <ChakraLink
+          width='full'
           isExternal
           aria-label='Go to 42 OAuth'
           href={`${API_URL}/api/auth/redirect`}
         >
-          <Button variant='outline' width='full' onClick={onSubmit}>
+          <Button variant='outline' width='full'>
             <VisuallyHidden>Sign in with 42</VisuallyHidden>
             Sign in with 42
           </Button>
