@@ -28,8 +28,6 @@ export class DMGateway {
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		this.ChatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
-		// const room = await this.DMService.initRoom(socket.data.userId)
-		// socket.emit('initCurrentRoom', room)
 	}
 
 	/* add new message to the selected channel */
@@ -45,7 +43,6 @@ export class DMGateway {
 			socket.data.userId,
 			room,
 		)
-		console.log(socket.data.userId)
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
@@ -86,7 +83,6 @@ export class DMGateway {
 		@MessageBody() createDMRoomDto: CreateDMRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
-		console.log('called', createDMRoomDto)
 		let newDMRoom = await this.DMService.createRoom(
 			createDMRoomDto,
 			socket.data.userId,

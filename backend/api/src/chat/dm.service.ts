@@ -17,20 +17,6 @@ export class DMService {
 		private readonly DMRoomRepository: Repository<DMRoom>,
 	) {}
 
-	/*
-	async initRoom(userId: string): Promise<DMRoom> {
-		const room = await this.DMRoomRepository.findOne({
-			where: { memberA: userId, memberB: userId },
-		})
-		if (room) return room
-		const selfDM = {
-			id: uuidv4(),
-			memberA: userId,
-			memberB: userId,
-		}
-		return this.DMRoomRepository.save(selfDM)
-	}
-	*/
 	async createRoom(
 		DMRoomData: CreateDMRoomDto,
 		selfUserId: string,
@@ -98,7 +84,6 @@ export class DMService {
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
 			.innerJoin(User, 'userB', 'dm.memberB = userB.userId')
 			.getRawOne()
-		console.log(room)
 		return room
 	}
 
@@ -115,7 +100,6 @@ export class DMService {
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
 			.innerJoin(User, 'userB', 'dm.memberB = userB.userId')
 			.getRawMany()
-		console.log(rooms)
 		return rooms
 	}
 }
