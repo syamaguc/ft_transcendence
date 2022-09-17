@@ -10,12 +10,16 @@ import {
   FormControl,
   FormLabel,
   FormHelperText,
+  Link as ChakraLink,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { NextRouter } from 'next/router'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { DMObject, MessageObject } from 'src/types/chat'
 import DMCreationForm from './dm-creation-form'
+
+const PREFIX_URL = '/dm'
 
 type Props = {
   socket: Socket
@@ -51,24 +55,43 @@ const DMSideBar = ({ socket, router }: Props) => {
   }, [newDMRoom])
 
   return (
-    <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
-      <Flex
-        width='100%'
-        p={(5, 5, 2, 2)}
-        borderBottom='1px solid'
-        borderBottomColor='gray.200'
-      >
+    <Flex
+      width='100%'
+      direction='column'
+      bg={useColorModeValue('gray.200', 'gray.700')}
+      overflowX='scroll'
+      p={1}
+    >
+      <Flex width='100%' p={2}>
+        <Flex
+          as='button'
+          p={2}
+          rounded={'md'}
+          _hover={{ bg: useColorModeValue('gray.100', 'gray.800') }}
+          w='100%'
+          onClick={() => {
+            router.push(PREFIX_URL)
+          }}
+        >
+          <Text mr='auto' as='b'>
+            Friends
+          </Text>
+        </Flex>
+      </Flex>
+      <Flex width='100%' p={2}>
         <DMCreationForm socket={socket} />
       </Flex>
-      <Flex direction='column'>
+      <Flex width='100%' p={2} direction='column'>
         {DMRooms.length
           ? DMRooms.map((DMRoom: DMObject) => (
               <Flex
                 as='button'
-                p={4}
-                _hover={{ bgColor: '#00BABC' }}
+                p={2}
+                w='100%'
+                rounded={'md'}
+                _hover={{ bg: 'gray.100' }}
                 onClick={() => {
-                  router.push('/chat/' + DMRoom.id)
+                  router.push(PREFIX_URL + '/' + DMRoom.id)
                 }}
                 key={DMRoom.id}
               >

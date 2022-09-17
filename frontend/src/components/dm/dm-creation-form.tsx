@@ -11,6 +11,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  useColorModeValue,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { MutableRefObject, useRef } from 'react'
@@ -35,12 +36,21 @@ const DMCreationForm = ({ socket }: Props) => {
   return (
     <>
       <Flex w='100%'>
-        <Text p={2} as='b'>
-          Direct Messages
-        </Text>
-        <Button mr={0} ml='auto' onClick={onOpen}>
-          +
-        </Button>
+        <Flex
+          as='button'
+          p={1}
+          rounded={'md'}
+          w='100%'
+          onClick={onOpen}
+          _hover={{ bg: useColorModeValue('gray.100', 'gray.700') }}
+        >
+          <Text ml={0} mr='auto' fontSize='xs' as='b'>
+            DIRECT MESSAGES
+          </Text>
+          <Text mr={0} ml='auto' fontSize='xs' as='b'>
+            +
+          </Text>
+        </Flex>
       </Flex>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -53,7 +63,17 @@ const DMCreationForm = ({ socket }: Props) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme='blue' mr={3} type='submit' onClick={onClose}>
+              <Button
+                colorScheme='blackAlpha'
+                bg='blackAlpha.900'
+                _dark={{
+                  bg: 'whiteAlpha.900',
+                  _hover: { bg: 'whiteAlpha.600' },
+                }}
+                mr={3}
+                type='submit'
+                onClick={onClose}
+              >
                 Create DM
               </Button>
             </ModalFooter>
