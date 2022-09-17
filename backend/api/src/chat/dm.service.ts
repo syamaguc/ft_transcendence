@@ -75,7 +75,9 @@ export class DMService {
 	}
 
 	async getMessageLog(roomId: string): Promise<any> {
-		const messagesWithUserInfo = await messageRepository.getMessages(roomId)
+		const messagesWithUserInfo = await messageRepository.getDMMessages(
+			roomId,
+		)
 		return messagesWithUserInfo
 	}
 

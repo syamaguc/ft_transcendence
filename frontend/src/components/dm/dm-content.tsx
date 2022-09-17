@@ -85,12 +85,10 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
     if (didLogRef.current === false) {
       didLogRef.current = true
 
-      socket.emit('getMessageLog', roomId)
       socket.on('getMessageLog', (messageLog: MessageObject[]) => {
         console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
       })
-
       socket.on('updateNewMessage', (message: MessageObject) => {
         console.log('recieved : ', message)
         setMsg(message)
@@ -109,6 +107,13 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
+
+  useEffect(() => {
+    if (roomId) {
+      socket.emit('getMessageLog', roomId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [roomId])
 
   return (
     <>

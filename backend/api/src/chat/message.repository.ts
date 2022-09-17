@@ -16,6 +16,19 @@ export const messageRepository = AppDataSource.getRepository(Message).extend({
 			.getRawMany()
 	},
 
+	async getDMMessages(roomId: string): Promise<any> {
+		return this.createQueryBuilder('message')
+			.select([
+				'message.*',
+				'user.username AS username',
+				'user.profile_picture AS profile_picture',
+			])
+			.innerJoin(User, 'user', 'message.userId = user.userId')
+			.where('message.DMroom = :roomId', { roomId })
+			.orderBy('message.timestamp', 'ASC')
+			.getRawMany()
+	},
+
 	async addMessage(message: Partial<Message>): Promise<any> {
 		await this.save(message)
 		return this.createQueryBuilder('message')
