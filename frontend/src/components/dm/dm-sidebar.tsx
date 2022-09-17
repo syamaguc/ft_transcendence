@@ -51,7 +51,7 @@ const DMSideBar = ({ socket, router }: Props) => {
 
   useEffect(() => {
     if (newDMRoom) {
-      setDMRooms([...DMRooms, newDMRoom])
+      setDMRooms([newDMRoom, ...DMRooms])
       console.log(DMRooms)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

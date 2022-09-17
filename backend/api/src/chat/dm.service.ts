@@ -101,7 +101,7 @@ export class DMService {
 				'userA.username AS user1',
 				'userB.username AS user2',
 			])
-			.orderBy('dm.time_created', 'ASC')
+			.orderBy('dm.time_created', 'DESC')
 			.where('dm.memberA = :userId', { userId })
 			.orWhere('dm.memberB = :userId', { userId })
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
