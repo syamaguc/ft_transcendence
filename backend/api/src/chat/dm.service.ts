@@ -93,6 +93,21 @@ export class DMService {
 		return messagesWithUserInfo
 	}
 
+	async getRoom(roomId: string): Promise<any[]> {
+		const room = await this.DMRoomRepository.createQueryBuilder('dm')
+			.select([
+				'dm.id AS id',
+				'userA.username AS user1',
+				'userB.username AS user2',
+			])
+			.where('dm.id = :roomId', { roomId })
+			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
+			.innerJoin(User, 'userB', 'dm.memberB = userB.userId')
+			.getRawMany()
+		console.log(room)
+		return room
+	}
+
 	async getRooms(userId: string): Promise<any[]> {
 		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([

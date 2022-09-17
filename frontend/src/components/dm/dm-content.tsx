@@ -5,8 +5,29 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 import MiddleBar from '@components/chat/middlebar'
 import { NextRouter } from 'next/router'
+import { useUser } from 'src/lib/use-user'
+import { User } from 'src/types/user'
 
-const DMTopBar = ({ roomDisplayName }) => {
+type DMTopBarProps = {
+  currentRoom: DMObject
+  user: User
+}
+
+const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
+  console.log('currentRoom+++++++++', currentRoom)
+  const [roomName, setRoomName] = useState<string>('')
+
+  useEffect(() => {
+    if (currentRoom) {
+      setRoomName(
+        currentRoom.user1 == user.username
+          ? currentRoom.user2
+          : currentRoom.user1
+      )
+      console.log('roomName=======', currentRoom.user1, currentRoom.user2)
+    }
+  }, [currentRoom, user])
+
   return (
     <Flex
       h='55px'
@@ -15,7 +36,7 @@ const DMTopBar = ({ roomDisplayName }) => {
       p={4}
       align='center'
     >
-      <Text>@ {roomDisplayName}</Text>
+      <Text>@{roomName}</Text>
     </Flex>
   )
 }
@@ -50,16 +71,17 @@ const DMSendBox = ({ socket }) => {
   )
 }
 
-type Props = {
+type DMContentProps = {
   socket: Socket
   roomId: string
 }
 
-const DMContent = ({ socket, roomId }: Props) => {
+const DMContent = ({ socket, roomId }: DMContentProps) => {
   const didLogRef = useRef(false)
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
   const [currentRoom, setCurrentRoom] = useState<DMObject>()
+  const { user } = useUser()
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -92,7 +114,7 @@ const DMContent = ({ socket, roomId }: Props) => {
 
   return (
     <>
-      <DMTopBar roomDisplayName={currentRoom ? currentRoom.toUserName : ''} />
+      <DMTopBar currentRoom={currentRoom} user={user} />
       <MiddleBar chatLog={chatLog} />
       <Flex p={4}>
         <DMSendBox socket={socket} />

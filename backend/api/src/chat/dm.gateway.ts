@@ -68,7 +68,7 @@ export class DMGateway {
 
 	// room which user is watching
 	@SubscribeMessage('watchRoom')
-	watchOrSwitchRoom(
+	async watchOrSwitchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
@@ -76,6 +76,8 @@ export class DMGateway {
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 		socket.join(roomId)
+		const room = await this.DMService.getRoom(roomId)
+		socket.emit('watchRoom', room)
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
