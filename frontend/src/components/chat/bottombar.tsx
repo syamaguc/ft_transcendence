@@ -36,7 +36,7 @@ const BottomBar = ({
   }, [currentRoom, socket])
 
   if (currentRoom.id == 'default-channel') {
-    <></>
+    return <></>
   } else if (isJoined) {
     return (
       <>

@@ -13,13 +13,14 @@ const TopBar = ({ currentRoom }) => {
       p={4}
       align='center'
     >
-      { currentRoom.id == 'default-channel'?
+      {currentRoom.id == 'default-channel' ? (
         <></>
-        :<>
+      ) : (
+        <>
           <Text>Current Channel : {currentRoom.name}</Text>
           <MemberListModal currentRoom={currentRoom} />
         </>
-      }
+      )}
     </Flex>
   )
 }
