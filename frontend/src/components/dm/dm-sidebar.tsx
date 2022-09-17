@@ -35,6 +35,7 @@ const DMSideBar = ({ socket, router }: Props) => {
     if (didLogRef.current === false) {
       didLogRef.current = true
       socket.on('getRooms', (rooms: DMObject[]) => {
+        console.log('getRooms received: ', rooms)
         setDMRooms(rooms)
       })
       socket.on('updateRoom', (newDMRoom: DMObject) => {
@@ -86,7 +87,7 @@ const DMSideBar = ({ socket, router }: Props) => {
           ? DMRooms.map((DMRoom: DMObject) => (
               <Flex
                 as='button'
-                p={2}
+                p={3}
                 w='100%'
                 rounded={'md'}
                 _hover={{ bg: 'gray.100' }}

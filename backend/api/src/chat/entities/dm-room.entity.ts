@@ -6,10 +6,10 @@ export class DMRoom {
 	@PrimaryGeneratedColumn('uuid')
 	id: string
 
-	@Column('text', { default: '' })
+	@Column('uuid')
 	memberA: string
 
-	@Column('text', { default: '' })
+	@Column('uuid')
 	memberB: string
 
 	@OneToMany(() => Message, (msg) => msg.room)

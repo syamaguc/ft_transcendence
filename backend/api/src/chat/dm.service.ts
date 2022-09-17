@@ -95,10 +95,16 @@ export class DMService {
 
 	async getRooms(userId: string): Promise<any[]> {
 		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
+			.select([
+				'dm.id AS id',
+				'userA.username AS user1',
+				'userB.username AS user2',
+			])
+			.orderBy('dm.time_created', 'ASC')
 			.where('dm.memberA = :userId', { userId })
 			.orWhere('dm.memberB = :userId', { userId })
-			.innerJoinAndSelect(User, 'user', 'dm.memberA = user.userId')
-			.innerJoinAndSelect(User, 'user', 'dm.memberB = user.userId')
+			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
+			.innerJoin(User, 'userB', 'dm.memberB = userB.userId')
 			.getRawMany()
 		console.log(rooms)
 		return rooms
