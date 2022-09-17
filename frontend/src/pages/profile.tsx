@@ -1,6 +1,7 @@
 import {
   Avatar,
   AvatarBadge,
+  AvatarBadgeProps,
   Badge,
   Box,
   Button,
@@ -53,12 +54,23 @@ import { User, UserPartialInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
 
-type ThumbnailProps = {
+function StatusBadge(props: { user: User } & AvatarBadgeProps) {
+  const bgColor =
+    props.user.status === 'Online'
+      ? 'green.500'
+      : 'In Game'
+      ? 'red.500'
+      : 'gray.400'
+
+  return <AvatarBadge {...props} bg={bgColor} />
+}
+
+type PreviewProps = {
   user: User
   file: File
 }
 
-function Preview({ user, file }: ThumbnailProps) {
+function Preview({ user, file }: PreviewProps) {
   const [loading, setLoading] = useState<boolean>(false)
   const [data, setData] = useState<string>()
 
@@ -382,7 +394,7 @@ function BasicInfo() {
           size='xl'
           src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
         >
-          <AvatarBadge boxSize='0.9em' bg='green.500' />
+          <StatusBadge boxSize='0.9em' user={user} />
         </Avatar>
         <Stack direction='column' spacing='2'>
           <Text fontWeight='600' fontSize='2xl' mt='2'>
