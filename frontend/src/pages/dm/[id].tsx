@@ -10,7 +10,6 @@ import DMSideBar from '@components/dm/dm-sidebar'
 import { useRouter } from 'next/router'
 import DMContent from '@components/dm/dm-content'
 
-const socket = io('http://localhost:3000/dm', { transports: ['websocket'] })
 const API_URL = 'http://localhost:3000'
 
 const Chat = () => {
