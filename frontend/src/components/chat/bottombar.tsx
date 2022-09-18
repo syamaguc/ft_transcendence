@@ -1,7 +1,7 @@
 import { Button, Textarea } from '@chakra-ui/react'
 import { useCallback } from 'react'
 import { Socket } from 'socket.io-client'
-import ResizeTextarea from "react-textarea-autosize";
+import ResizeTextarea from 'react-textarea-autosize'
 import { ChannelObject } from 'src/types/chat'
 
 type Props = {
@@ -46,9 +46,9 @@ const BottomBar = ({
           onChange={(event) => {
             setInputText(event.target.value)
           }}
-          minH="unset"
-          overflow="hidden"
-          w="100%"
+          minH='unset'
+          overflow='hidden'
+          w='100%'
           minRows={1}
           maxRows={10}
           as={ResizeTextarea}
