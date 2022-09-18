@@ -22,10 +22,17 @@ const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.is_private) {
     return (
       <Flex align='center'>
-        <Tooltip label='private channel'>
-          <AtSignIcon mr={2} color='gray.600' />
-        </Tooltip>
-        <Text>{roomInfo.name} </Text>
+        <Box
+          maxW='90%'
+          overflow='hidden'
+          whiteSpace='nowrap'
+          textOverflow='ellipsis'
+        >
+          <Tooltip label='private channel'>
+            <AtSignIcon mr={2} color='gray.600' />
+          </Tooltip>
+          {roomInfo.name}
+        </Box>
       </Flex>
     )
   }
@@ -33,17 +40,31 @@ const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.password != '') {
     return (
       <Flex align='center'>
-        <Tooltip label='protected channel'>
-          <LockIcon mr={2} color='gray.600' />
-        </Tooltip>
-        <Text>{roomInfo.name} </Text>
+        <Box
+          maxW='90%'
+          overflow='hidden'
+          whiteSpace='nowrap'
+          textOverflow='ellipsis'
+        >
+          <Tooltip label='protected channel'>
+            <LockIcon mr={2} color='gray.600' />
+          </Tooltip>
+          {roomInfo.name}
+        </Box>
       </Flex>
     )
   }
 
   return (
     <>
-      <Text>{roomInfo.name} </Text>
+      <Box
+        maxW='90%'
+        overflow='hidden'
+        whiteSpace='nowrap'
+        textOverflow='ellipsis'
+      >
+        {roomInfo.name}
+      </Box>
     </>
   )
 }
@@ -160,7 +181,6 @@ const SideBar = ({
             }}
             key={chatRoom.id}
           >
-            {/* <Text>{chatRoom.name}</Text> */}
             <ChannelOne roomInfo={chatRoom} />
           </Flex>
         ))}
