@@ -5,7 +5,7 @@ import { Center, Flex } from '@chakra-ui/react'
 import Layout from '@components/layout'
 import GameMatchList from '@components/game-matchlist'
 import { useUser } from '../../lib/use-user'
-import { GameRoom, GamePlayer } from '../../types/game'
+import { GameRoom } from '../../types/game'
 
 const API_URL = 'http://localhost:3000'
 
@@ -61,23 +61,6 @@ export default function GameMatching() {
   }, [])
 
   useEffect(() => {
-    // const cookie = document.cookie
-    // console.log(cookie)
-
-    // var cookiesArray = cookie.split(';');
-
-    // for(var c of cookiesArray){
-    //     var cArray = c.split('=');
-    //     console.log(cArray);
-    // }
-
-    // setServer(io(API_URL, { transports: ['websocket'] }))
-    // setServer(io(API_URL, {
-    //   extraHeaders: {
-    //     jwt: cookie
-    //   }
-    // }))
-    // const tempServer = io(API_URL)
     const tempServer = io(API_URL, { transports: ['websocket'] })
     setServer(tempServer)
 
