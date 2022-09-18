@@ -61,7 +61,11 @@ export class UserService {
 		user = await UsersRepository.findOne({
 			where: { login42: login42 },
 		})
-		if (user) return user
+		if (user) {
+			user.login_count += 1
+			UsersRepository.save(user)
+			return user
+		}
 		let { username } = userData
 		user = await UsersRepository.findOne({
 			where: { username: username },
@@ -94,6 +98,7 @@ export class UserService {
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
 			user.status = UserStatus.ONLINE
+			user.login_count += 1
 			try {
 				await UsersRepository.save(user)
 			} catch (e) {
