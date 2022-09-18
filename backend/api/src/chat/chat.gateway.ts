@@ -106,6 +106,7 @@ export class ChatGateway {
 		this.logger.log(newChatRoom)
 		this.server.emit('updateRoom', newChatRoom)
 		this.server.to(socket.id).emit('updateCurrentRoom', newChatRoom.id)
+		this.getMessageLog(newChatRoom.id, socket)
 	}
 
 	async joinRoom(roomId: string, socket: Socket) {
