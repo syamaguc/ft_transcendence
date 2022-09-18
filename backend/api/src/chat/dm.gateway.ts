@@ -28,6 +28,15 @@ export class DMGateway {
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		this.ChatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
+		console.log('===================sockets test==========================')
+		/* 表示されるが、どうやってイテレートするのかわからない*/
+		console.log(this.server.sockets) // この中のsocketをloopに入れて一つ一つ条件にマッチするか確認したい
+		// console.log(this.server.sockets.sockets) // undefined
+		// console.log(this.server.allSockets()) // 動くけど、これだとsocketIdしか取ってこれない、Socketが必要
+		// console.log(this.server.sockets.size) // compile error
+		// this.server.sockets.map((s) => console.log('a')) // compile error
+		// this.server.sockets.forEach((value: Socket, key: string) => {}) // compile error
+		console.log('=========================================================')
 	}
 
 	/* add new message to the selected channel */
