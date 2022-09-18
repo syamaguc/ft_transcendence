@@ -57,7 +57,7 @@ const ChannelOne = ({ roomInfo }) => {
 
   return (
     <>
-    <Box
+      <Box
         maxW='90%'
         overflow='hidden'
         whiteSpace='nowrap'
