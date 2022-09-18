@@ -19,6 +19,12 @@ export class ChatRoom {
 	@Column('text', { array: true, default: {} })
 	admins: string[]
 
+	@Column('text', { array: true, default: {} })
+	banned: string[]
+
+	@Column('text', { array: true, default: {} })
+	muted: string[]
+
 	@Column('boolean', { default: false })
 	is_private: boolean
 

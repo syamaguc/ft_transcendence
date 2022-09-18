@@ -72,7 +72,7 @@ function Game() {
   }, [playerRole])
 
   useEffect(() => {
-    const tempServer = io(API_URL)
+    const tempServer = io(API_URL, { transports: ['websocket'] })
     setServer(tempServer)
     console.log('connect', tempServer.id)
     return () => {

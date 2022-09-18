@@ -6,7 +6,9 @@ import {
 	ConnectedSocket,
 } from '@nestjs/websockets'
 import { Logger } from '@nestjs/common'
+import { UseGuards } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
+import { SocketGuard } from '../user/guards/socketAuth.guard'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
@@ -27,6 +29,7 @@ export class ChatGateway {
 	}
 
 	/* add new message to the selected channel */
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('addMessage')
 	async handleMessage(
 		@MessageBody() addMessageDto: AddMessageDto,
@@ -43,6 +46,46 @@ export class ChatGateway {
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('addAdmin')
+	async addAdmin(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`addAdmin: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.addAdmin(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('banMember')
+	async banUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.banUser(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('muteMember')
+	async muteUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`muteUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.muteUser(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
 		@MessageBody() roomId: string,
@@ -53,6 +96,7 @@ export class ChatGateway {
 		socket.emit('getMessageLog', messageLog)
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getRooms')
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`)
@@ -60,17 +104,19 @@ export class ChatGateway {
 		socket.emit('getRooms', rooms)
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMembers')
 	async getMembers(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMembers: for ${socket.id}`)
-		const rooms = await this.chatService.getMembers(roomId)
-		socket.emit('getMembers', rooms)
+		const users = await this.chatService.getMembers(roomId)
+		socket.emit('getMembers', users)
 	}
 
 	// room which user is watching
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('watchRoom')
 	watchOrSwitchRoom(
 		@MessageBody() roomId: string,
@@ -83,16 +129,21 @@ export class ChatGateway {
 	}
 
 	// join room to be a member
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinRoom')
 	async joinAndUpdateRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
+		//banの場合
+
+		//privateの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('createRoom')
 	async createRoom(
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
