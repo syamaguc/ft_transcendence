@@ -18,17 +18,40 @@ import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
 import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { Socket } from 'socket.io-client'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
-function DMFriendsList() {
+type Props = {
+  socket: Socket
+}
+
+const PREFIX_URL = '/dm'
+
+function DMFriendsList({ socket }: Props) {
   const { user: currentUser } = useUser()
   const { data: users, error } = useSWR(
     `${API_URL}/api/user/search`,
     fetchUsers
   )
+  const router = useRouter()
 
   const isLoading = !users && !error
   console.log(users)
   console.log('isLoading: ', isLoading)
+
+  const onClickDM = (userId: string) => {
+    socket.emit('getRoomIdByUserIds', userId)
+    console.log('getRoomIdByUserIds')
+  }
+
+  useEffect(() => {
+    socket.on('getRoomIdByUserIds', (id: string) => {
+      console.log('getRoomIdByUserIds get = ', id)
+      router.push(PREFIX_URL + '/' + id)
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <>
@@ -48,48 +71,45 @@ function DMFriendsList() {
               users
                 .filter((user) => user.userId !== currentUser.userId)
                 .map((user: User) => (
-                  <NextLink
-                    key={user.username}
-                    href={`/users/${user.username}`}
+                  <Stack
+                    key={user.userId}
+                    w='100%'
+                    direction='row'
+                    align='center'
+                    py='2'
+                    px='8'
+                    borderRadius='md'
+                    transition='color 0.2s'
+                    _hover={{ bg: 'gray.50', cursor: 'pointer' }}
                   >
-                    <Stack
+                    <Avatar
                       key={user.userId}
-                      w='100%'
-                      direction='row'
-                      align='center'
-                      py='2'
-                      px='8'
-                      borderRadius='md'
-                      transition='color 0.2s'
-                      _hover={{ bg: 'gray.50', cursor: 'pointer' }}
+                      size='sm'
+                      src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                      mr='12px'
                     >
-                      <Avatar
-                        key={user.userId}
-                        size='sm'
-                        src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                        mr='12px'
-                      >
-                        <AvatarBadge boxSize='1.25em' bg='green.500' />
-                      </Avatar>
-                      <Flex direction='row' align='center' w='full'>
-                        <Stack direction='column' spacing='0'>
-                          <Text fontWeight='800' fontSize='md'>
-                            {user.username}
-                          </Text>
-                          <Text fontWeight='600' color='gray.400' fontSize='sm'>
-                            {user.status}
-                          </Text>
-                        </Stack>
-                        <Spacer />
-                        <Circle bg='gray.100' size='38px' mr='16px'>
-                          <FiMessageSquare />
-                        </Circle>
-                        <Circle bg='gray.100' size='38px' mr='16px'>
-                          <FiMoreVertical />
-                        </Circle>
-                      </Flex>
-                    </Stack>
-                  </NextLink>
+                      <AvatarBadge boxSize='1.25em' bg='green.500' />
+                    </Avatar>
+                    <Flex direction='row' align='center' w='full'>
+                      <Stack direction='column' spacing='0'>
+                        <Text fontWeight='800' fontSize='md'>
+                          {user.username}
+                        </Text>
+                        <Text fontWeight='600' color='gray.400' fontSize='sm'>
+                          {user.status}
+                        </Text>
+                      </Stack>
+                      <Spacer />
+                      <Circle bg='gray.100' size='38px' mr='16px'>
+                        <FiMessageSquare
+                          onClick={() => onClickDM(user.userId)}
+                        />
+                      </Circle>
+                      <Circle bg='gray.100' size='38px' mr='16px'>
+                        <FiMoreVertical />
+                      </Circle>
+                    </Flex>
+                  </Stack>
                 ))}
           </Stack>
         </Box>

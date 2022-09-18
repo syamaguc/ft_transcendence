@@ -111,4 +111,14 @@ export class DMService {
 			.getRawMany()
 		return rooms
 	}
+
+	async getRoomIdByUserIds(user1: string, user2: string): Promise<string> {
+		const room: DMRoom = await this.DMRoomRepository.findOne({
+			where: [
+				{ memberA: user1, memberB: user2 },
+				{ memberA: user2, memberB: user1 },
+			],
+		})
+		return room.id
+	}
 }

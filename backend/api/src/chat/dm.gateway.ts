@@ -90,6 +90,19 @@ export class DMGateway {
 		newDMRoom = { ...newDMRoom, user2: socket.data.username }
 		socket.emit('updateRoom', newDMRoom)
 	}
+
+	@SubscribeMessage('getRoomIdByUserIds')
+	async getRoomIdByUserIds(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`getRoom: for ${socket.data.userId} and ${userId}`)
+		const roomId = await this.DMService.getRoomIdByUserIds(
+			socket.data.userId,
+			userId,
+		)
+		socket.emit('getRoomIdByUserIds', roomId)
+	}
 }
 
 // handleDisconnect(@ConnectedSocket() socket: Socket) {

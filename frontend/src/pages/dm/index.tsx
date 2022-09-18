@@ -49,7 +49,7 @@ const Chat = () => {
           <DMSideBar router={router} socket={socket} />
         </Flex>
         <Flex h='90vh' w='100%' direction='column'>
-          <DMFriendsList />
+          <DMFriendsList socket={socket} />
         </Flex>
       </Flex>
     </Layout>
