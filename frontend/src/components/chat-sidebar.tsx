@@ -1,4 +1,6 @@
 import {
+  Tooltip,
+  Text,
   Box,
   Stack,
   Flex,
@@ -10,10 +12,62 @@ import {
   FormLabel,
   FormHelperText,
 } from '@chakra-ui/react'
+import { AtSignIcon, LockIcon } from '@chakra-ui/icons'
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 import ChatCreationForm from './chat-creation-form'
+
+const ChannelOne = ({ roomInfo }) => {
+  if (roomInfo.is_private) {
+    return (
+      <Flex align='center'>
+        <Box
+          maxW='90%'
+          overflow='hidden'
+          whiteSpace='nowrap'
+          textOverflow='ellipsis'
+        >
+          <Tooltip label='private channel'>
+            <AtSignIcon mr={2} color='gray.600' />
+          </Tooltip>
+          {roomInfo.name}
+        </Box>
+      </Flex>
+    )
+  }
+
+  if (roomInfo.password != '') {
+    return (
+      <Flex align='center'>
+        <Box
+          maxW='90%'
+          overflow='hidden'
+          whiteSpace='nowrap'
+          textOverflow='ellipsis'
+        >
+          <Tooltip label='protected channel'>
+            <LockIcon mr={2} color='gray.600' />
+          </Tooltip>
+          {roomInfo.name}
+        </Box>
+      </Flex>
+    )
+  }
+
+  return (
+    <>
+      <Box
+        maxW='90%'
+        overflow='hidden'
+        whiteSpace='nowrap'
+        textOverflow='ellipsis'
+      >
+        {roomInfo.name}
+      </Box>
+    </>
+  )
+}
 
 type Props = {
   socket: Socket
@@ -127,7 +181,7 @@ const SideBar = ({
             }}
             key={chatRoom.id}
           >
-            {chatRoom.name}
+            <ChannelOne roomInfo={chatRoom} />
           </Flex>
         ))}
       </Flex>

@@ -17,7 +17,7 @@ export interface KeyStatus {
   downPressed: boolean
 }
 
-export default function Game() {
+function Game() {
   const [gameObject, setGameObject] = useState<GameObject>({
     bar1: { top: 0, left: 0 },
     bar2: { top: 0, left: 0 },
@@ -60,22 +60,26 @@ export default function Game() {
   }, [user])
 
   useEffect(() => {
-    if (0 <= playerRole && playerRole <= 1) {
-      const screen = document.getElementById('screen')
-      if (screen) {
-        screen.addEventListener('keydown', keyDownHandler)
-        screen.addEventListener('keyup', keyUpHandler)
-      }
+    if (playerRole != 0 && playerRole != 1) return
+    const downHandler = keyDownHandler
+    const upHandler = keyUpHandler
+    document.addEventListener('keydown', downHandler)
+    document.addEventListener('keyup', upHandler)
+    return () => {
+      document.removeEventListener('keydown', downHandler)
+      document.removeEventListener('keyup', upHandler)
     }
   }, [playerRole])
 
   useEffect(() => {
-    const tempServer = io(API_URL)
+    const tempServer = io(API_URL, { transports: ['websocket'] })
     setServer(tempServer)
+    console.log('connect', tempServer.id)
     return () => {
+      console.log('disconnect', tempServer.id)
       tempServer.disconnect()
     }
-  }, [])
+  }, [router])
 
   useEffect(() => {
     if (!server || !router.isReady || !userId) return
@@ -144,4 +148,9 @@ export default function Game() {
       </div>
     </Layout>
   )
+}
+
+export default function GameRoom() {
+  const router = useRouter()
+  return <Game key={router.asPath} />
 }

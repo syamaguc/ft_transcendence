@@ -3,6 +3,7 @@ import { Avatar } from '@chakra-ui/avatar'
 import { MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from './profile-modal'
+import AlwaysScrollToBottom from './always-scroll-bottom'
 
 const API_URL = 'http://localhost:3000'
 
@@ -22,13 +23,12 @@ const timestampToTime = (timestamp) => {
 }
 
 const MiddleBar = ({ chatLog }) => {
-  // const user = useUser()
   return (
     <Flex
       direction='column'
       p={4}
       flex={1}
-      overflowX='scroll'
+      overflowY='scroll'
       sx={{ scrollbarWidth: 'none' }}
     >
       {chatLog.length
@@ -40,7 +40,7 @@ const MiddleBar = ({ chatLog }) => {
               align='flex-start'
             >
               <ProfileModal message={message} />
-              <Flex direction='column'>
+              <Flex direction='column' maxW='90%'>
                 <Flex direction='horizontal' align='flex-end'>
                   <Text as='b' marginEnd={2}>
                     {message.username}
@@ -56,6 +56,7 @@ const MiddleBar = ({ chatLog }) => {
             </Flex>
           ))
         : null}
+      <AlwaysScrollToBottom />
     </Flex>
   )
 }
