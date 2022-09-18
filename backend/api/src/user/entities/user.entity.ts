@@ -30,6 +30,9 @@ export class User {
 
 	@Column('text', { default: 'empty' })
 	profile_picture: string
+	
+  @Column('int', { default: 1 })
+	login_count: number
 
 	@Column('int', { default: 1000 })
 	elo: number
