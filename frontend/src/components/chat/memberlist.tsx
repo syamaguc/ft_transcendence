@@ -26,21 +26,25 @@ import { useUser } from 'src/lib/use-user'
 
 const API_URL = 'http://localhost:3000'
 
-function MemberStatus({user, currentRoom, member}) {
+function MemberStatus({ user, currentRoom, member }) {
   if (user.user.userId == member.userId) {
     return (
-      <><Text ml={1}>me</Text></>
+      <>
+        <Text ml={1}>me</Text>
+      </>
     )
   }
   if (currentRoom.admins.indexOf(member.userId) != -1) {
     return (
-      <><Text ml={1}>admin</Text></>
+      <>
+        <Text ml={1}>admin</Text>
+      </>
     )
   }
   return null
 }
 
-function MemberMenu({socket, user, currentRoom, member}) {
+function MemberMenu({ socket, user, currentRoom, member }) {
   const onClickMute = (userId: string) => {
     socket.emit('muteMember', userId)
     console.log(userId, ' has been muted from the channel')
@@ -58,29 +62,35 @@ function MemberMenu({socket, user, currentRoom, member}) {
 
   //if the member was the current user
   if (user.user.userId == member.userId) {
-    return (
-      <></>
-    )
+    return <></>
   }
 
   //if the user was not admin
   if (currentRoom.admins.indexOf(user.user.userId) == -1) {
-    return (
-      <></>
-    )
+    return <></>
   }
 
   return (
     <>
       <Menu>
-        <MenuButton mr={0} ml='auto' as={IconButton} icon={<ChevronDownIcon />}/>
+        <MenuButton
+          mr={0}
+          ml='auto'
+          as={IconButton}
+          icon={<ChevronDownIcon />}
+        />
         <MenuList>
-          <MenuItem onClick={() => onClickMute(member.userId)}>mute user</MenuItem>
-          <MenuItem onClick={() => onClickBan(member.userId)}>ban user</MenuItem>
-          {currentRoom.admins.indexOf(member.userId) == -1
-            ? <MenuItem onClick={() => onClickAdmin(member.userId)}>add admin</MenuItem>
-            : null
-          }
+          <MenuItem onClick={() => onClickMute(member.userId)}>
+            mute user
+          </MenuItem>
+          <MenuItem onClick={() => onClickBan(member.userId)}>
+            ban user
+          </MenuItem>
+          {currentRoom.admins.indexOf(member.userId) == -1 ? (
+            <MenuItem onClick={() => onClickAdmin(member.userId)}>
+              add admin
+            </MenuItem>
+          ) : null}
           {/* <MenuItem>see profile</MenuItem> */}
         </MenuList>
       </Menu>
@@ -116,11 +126,7 @@ function MemberList({ socket, currentRoom, members }) {
             marginEnd={3}
           />
           <Text>{member.username}</Text>
-          <MemberStatus
-            user={user}
-            currentRoom={currentRoom}
-            member={member}
-          />
+          <MemberStatus user={user} currentRoom={currentRoom} member={member} />
           {/* {currentRoom.admins.indexOf(member.userId) != -1 ? (
             <Text ml={1}>admin</Text>
           ) : null} */}
