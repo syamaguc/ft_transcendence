@@ -60,12 +60,14 @@ function Game() {
   }, [user])
 
   useEffect(() => {
-    if (0 <= playerRole && playerRole <= 1) {
-      const screen = document.getElementById('screen')
-      if (screen) {
-        screen.addEventListener('keydown', keyDownHandler)
-        screen.addEventListener('keyup', keyUpHandler)
-      }
+    if (playerRole != 0 && playerRole != 1) return
+    const downHandler = keyDownHandler
+    const upHandler = keyUpHandler
+    document.addEventListener('keydown', downHandler)
+    document.addEventListener('keyup', upHandler)
+    return () => {
+      document.removeEventListener('keydown', downHandler)
+      document.removeEventListener('keyup', upHandler)
     }
   }, [playerRole])
 
