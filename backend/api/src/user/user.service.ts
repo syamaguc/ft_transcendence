@@ -377,5 +377,4 @@ export class UserService {
 		)
 		return elo.playerRating - parseInt(eloPlayerWin)
 	}
-
 }
