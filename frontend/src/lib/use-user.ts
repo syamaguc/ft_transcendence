@@ -25,7 +25,6 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
   }, [redirectTo, redirectIfFound, finished, hasUser])
 
   const isLoading = !error && !data
-  const session = data?.session
 
   return {
     user: error ? null : user,
@@ -35,6 +34,6 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
     isAuthenticated: hasUser,
     isUnauthenticated: !hasUser,
     status: isLoading ? 'loading' : user ? 'authenticated' : 'unauthenticated',
-    isFirstTime: session ? session.isFirstTime : false,
+    isFirstTime: data?.session?.isFirstTime && user?.login_count === 1,
   }
 }
