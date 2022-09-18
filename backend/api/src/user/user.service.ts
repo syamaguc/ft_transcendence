@@ -62,6 +62,7 @@ export class UserService {
 			where: { login42: login42 },
 		})
 		if (user) {
+			user.status = UserStatus.ONLINE
 			user.login_count += 1
 			UsersRepository.save(user)
 			return user
