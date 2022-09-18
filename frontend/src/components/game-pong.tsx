@@ -127,11 +127,11 @@ const Pong = ({ gameObject }: Props) => {
 
     const stageLeftBottom: Position = {
       top: stagePosition.top + stageHeight,
-      left: stagePosition.left
+      left: stagePosition.left,
     }
     const stageRightBottom: Position = {
       top: stagePosition.top + stageHeight,
-      left: stagePosition.left + stageWidth
+      left: stagePosition.left + stageWidth,
     }
 
     const nameFontSize = Math.ceil(fontSize / 2)
