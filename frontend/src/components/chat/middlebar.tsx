@@ -1,9 +1,9 @@
-import { useEffect, useRef } from 'react'
 import { Text, Box, Flex } from '@chakra-ui/layout'
 import { Avatar } from '@chakra-ui/avatar'
 import { MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from './profile-modal'
+import AlwaysScrollToBottom from './always-scroll-bottom'
 
 const API_URL = 'http://localhost:3000'
 
@@ -23,15 +23,6 @@ const timestampToTime = (timestamp) => {
 }
 
 const MiddleBar = ({ chatLog }) => {
-  // reference:
-  // https://ordinarycoders.com/blog/article/react-chakra-ui
-  // https://qiita.com/tonio0720/items/c265b9b65db3bb76f2d3
-  const AlwaysScrollToBottom = () => {
-    const elementRef = useRef()
-    useEffect(() => elementRef.current.scrollIntoView())
-    return <div ref={elementRef} />
-  }
-
   return (
     <Flex
       direction='column'
