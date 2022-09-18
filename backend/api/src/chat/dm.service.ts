@@ -57,6 +57,16 @@ export class DMService {
 		return DMFrontObject
 	}
 
+	async createRoomByUserIds(user1: string, user2: string): Promise<DMRoom> {
+		const newDMRoom = {
+			id: uuidv4(),
+			memberA: user1,
+			memberB: user2,
+		}
+		const DM = await this.DMRoomRepository.save(newDMRoom)
+		return DM
+	}
+
 	async addMessage(
 		addMessageDto: AddMessageDto,
 		userId: uuidv4,
@@ -119,6 +129,7 @@ export class DMService {
 				{ memberA: user2, memberB: user1 },
 			],
 		})
+		if (!room) return ''
 		return room.id
 	}
 }

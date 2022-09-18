@@ -101,6 +101,14 @@ export class DMGateway {
 			socket.data.userId,
 			userId,
 		)
+		if (roomId == '') {
+			let newDMRoom = await this.DMService.createRoomByUserIds(
+				userId,
+				socket.data.userId,
+			)
+			socket.emit('getRoomIdByUserIds', newDMRoom.id)
+			return
+		}
 		socket.emit('getRoomIdByUserIds', roomId)
 	}
 }
