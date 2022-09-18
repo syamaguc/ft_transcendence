@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import { Text, Box, Flex } from '@chakra-ui/layout'
 import { Avatar } from '@chakra-ui/avatar'
 import { MessageObject } from 'src/types/chat'
@@ -22,13 +23,21 @@ const timestampToTime = (timestamp) => {
 }
 
 const MiddleBar = ({ chatLog }) => {
-  // const user = useUser()
+  // reference:
+  // https://ordinarycoders.com/blog/article/react-chakra-ui
+  // https://qiita.com/tonio0720/items/c265b9b65db3bb76f2d3
+  const AlwaysScrollToBottom = () => {
+    const elementRef = useRef()
+    useEffect(() => elementRef.current.scrollIntoView())
+    return <div ref={elementRef} />
+  }
+
   return (
     <Flex
       direction='column'
       p={4}
       flex={1}
-      overflowX='scroll'
+      overflowY='scroll'
       sx={{ scrollbarWidth: 'none' }}
     >
       {chatLog.length
@@ -40,7 +49,7 @@ const MiddleBar = ({ chatLog }) => {
               align='flex-start'
             >
               <ProfileModal message={message} />
-              <Flex direction='column'>
+              <Flex direction='column' maxW='90%'>
                 <Flex direction='horizontal' align='flex-end'>
                   <Text as='b' marginEnd={2}>
                     {message.username}
@@ -56,6 +65,7 @@ const MiddleBar = ({ chatLog }) => {
             </Flex>
           ))
         : null}
+    <AlwaysScrollToBottom />
     </Flex>
   )
 }
