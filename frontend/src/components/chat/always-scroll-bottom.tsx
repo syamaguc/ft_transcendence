@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 const AlwaysScrollToBottom = () => {
   const elementRef = useRef()
   useEffect(() => elementRef.current.scrollIntoView())
-  return <dev ref={elementRef} />
+  return <div ref={elementRef} />
 }
 
 export default AlwaysScrollToBottom
