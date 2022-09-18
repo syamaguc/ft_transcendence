@@ -10,13 +10,13 @@ import {
 	NotFoundException,
 	InternalServerErrorException,
 } from '@nestjs/common'
-// import { Logger, NotFoundException, UseGuards } from '@nestjs/common'
+import { SocketGuard } from '../user/guards/socketAuth.guard'
+import { UseGuards } from '@nestjs/common'
 // import { AuthGuard } from '@nestjs/passport'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
 import { User } from '../user/entities/user.entity'
 import { UsersRepository } from '../user/user.repository'
-// import { UserAuth } from '../user/guards/userAuth.guard'
 import { GameRoom } from './game.lib'
 import {
 	socketData,
@@ -302,7 +302,7 @@ export class GameGateway {
 		client.join('readyIndex')
 	}
 
-	// @UseGuards(AuthGuard('jwt'), UserAuth)
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('registerMatch')
 	handleRegisterMatch(
 		@MessageBody() data: any,
