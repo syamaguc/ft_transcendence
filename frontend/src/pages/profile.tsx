@@ -58,7 +58,7 @@ function StatusBadge(props: { user: User } & AvatarBadgeProps) {
   const bgColor =
     props.user.status === 'Online'
       ? 'green.500'
-      : 'In Game'
+      : props.user.status === 'In Game'
       ? 'red.500'
       : 'gray.400'
 
