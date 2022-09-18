@@ -1,19 +1,67 @@
 import {
   Box,
+  Button,
+  CloseButton,
   Heading,
   Flex,
-  Spacer,
+  Stack,
+  Text,
   Link as ChakraLink,
 } from '@chakra-ui/react'
 
+import { useState } from 'react'
+import { useUser } from 'src/lib/use-user'
+
 import NextLink from 'next/link'
+import { useRouter } from 'next/router'
 
 import Layout from '@components/layout'
-import Deadline from '@components/deadline'
+
+import { setIsFirstTime } from 'src/lib/session'
+
+function Prompt() {
+  const [isOpen, setIsOpen] = useState(true)
+  const router = useRouter()
+
+  const handleClose = async () => {
+    setIsOpen(false)
+    await setIsFirstTime(false)
+  }
+
+  const handleClick = async () => {
+    router.push('/profile')
+    await setIsFirstTime(false)
+  }
+
+  return (
+    <>
+      {isOpen ? (
+        <Stack w='full' direction='row' align='center' justify='center'>
+          <Box borderRadius='lg' boxShadow='md'>
+            <Stack direction='row' p='4' align='center' spacing='4'>
+              <Text fontWeight='semibold'>
+                Welcome! Setup your profile here 👉
+              </Text>
+              <Button size='sm' variant='outline' onClick={handleClick}>
+                Go to profile
+              </Button>
+              <CloseButton onClick={handleClose} />
+            </Stack>
+          </Box>
+        </Stack>
+      ) : (
+        <></>
+      )}
+    </>
+  )
+}
 
 function Index() {
+  const { isFirstTime } = useUser()
+
   return (
     <Layout>
+      {isFirstTime && <Prompt />}
       <Flex
         direction='column'
         alignItems='center'
@@ -23,15 +71,7 @@ function Index() {
         mb={8}
         w='full'
       >
-        <Box my={8}>
-          <Deadline />
-        </Box>
-        <Flex
-          w='full'
-          direction='row'
-          alignItems='center'
-          justifyContent='space-around'
-        >
+        <Flex w='full' alignItems='center' justifyContent='space-around'>
           <NextLink href='/users'>
             <Box
               as='button'
@@ -41,7 +81,7 @@ function Index() {
               borderWidth='1px'
               _hover={{ borderColor: '#00BABC' }}
             >
-              <Heading fontSize='xl'>User</Heading>
+              <Heading fontSize='xl'>Users</Heading>
             </Box>
           </NextLink>
           <NextLink href='/chat'>

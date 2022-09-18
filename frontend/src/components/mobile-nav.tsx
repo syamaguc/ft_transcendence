@@ -15,6 +15,7 @@ import {
   useColorModeValue,
   useBreakpointValue,
   useUpdateEffect,
+  useColorMode,
 } from '@chakra-ui/react'
 import { AnimatePresence, motion, useScroll } from 'framer-motion'
 import { AiOutlineMenu } from 'react-icons/ai'
@@ -23,6 +24,7 @@ import { RemoveScroll } from 'react-remove-scroll'
 
 import { Logo } from '@components/logo'
 import { mainNavLinks } from '@components/header'
+import { LogoutButton } from '@components/logout'
 
 import useRouteChanged from 'src/lib/use-route-changed'
 
@@ -33,7 +35,12 @@ type NavLinkProps = {
 
 const NavLink = ({ href, children }: NavLinkProps) => {
   const router = useRouter()
-  const bgActiveHoverColor = useColorModeValue('gray.100', 'whiteAlpha.100')
+  const bgActiveColor = useColorModeValue('blackAlpha.800', 'whiteAlpha.300')
+  const bgActiveHoverColor = useColorModeValue(
+    'blackAlpha.900',
+    'whiteAlpha.100'
+  )
+  const bgHoverColor = useColorModeValue('gray.100', 'whiteAlpha.100')
 
   const isActive = router.asPath.startsWith(href)
 
@@ -46,11 +53,11 @@ const NavLink = ({ href, children }: NavLinkProps) => {
         rounded='md'
         transition='0.2s all'
         fontWeight={isActive ? 'semibold' : 'medium'}
-        bg={isActive ? 'blackAlpha.800' : undefined}
+        bg={isActive ? bgActiveColor : undefined}
         borderWidth={isActive ? undefined : '1px'}
         color={isActive ? 'white' : undefined}
         _hover={{
-          bg: isActive ? 'blackAlpha.900' : bgActiveHoverColor,
+          bg: isActive ? bgActiveHoverColor : bgHoverColor,
         }}
       >
         {children}
@@ -132,6 +139,9 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   templateColumns='repeat(2, 1fr)'
                   gap='2'
                 >
+                  <NavLink href='/profile' key='Profile'>
+                    Profile
+                  </NavLink>
                   {mainNavLinks.map((item) => (
                     <NavLink href={item.href} key={item.label}>
                       {item.label}
@@ -144,7 +154,16 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   setShadow(scrolled ? 'md' : undefined)
                 }}
               >
-                more nav content
+                <Flex
+                  direction='column'
+                  alignItems='center'
+                  justifyContent='center'
+                  gap='4'
+                  pt='4'
+                >
+                  <LogoutButton colorScheme='gray' w='50%' />
+                  more nav content...
+                </Flex>
               </ScrollView>
             </Flex>
           </motion.div>

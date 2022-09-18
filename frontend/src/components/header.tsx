@@ -27,6 +27,7 @@ import { useScroll } from 'framer-motion'
 
 import { MobileNavButton, MobileNavContent } from '@components/mobile-nav'
 import { Logo } from '@components/logo'
+import { LogoutMenuItem } from '@components/logout'
 
 import { SunIcon, MoonIcon, HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { GithubIcon } from '@components/icons'
@@ -87,18 +88,6 @@ const HeaderContent = () => {
   useUpdateEffect(() => {
     mobileNavBtnRef.current?.focus()
   }, [mobileNav.isOpen])
-
-  const handleLogout = async () => {
-    let res = await fetch(`${API_URL}/api/user/logout`, {
-      method: 'DELETE',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-
-    mutateUser()
-  }
 
   return (
     <>
@@ -183,10 +172,9 @@ const HeaderContent = () => {
                     <NextLink href='/profile' passHref>
                       <MenuItem as='a'>Profile</MenuItem>
                     </NextLink>
-                    <MenuItem>Link 1</MenuItem>
-                    <MenuItem>Link 2</MenuItem>
+                    <MenuItem>Friends</MenuItem>
                     <MenuDivider />
-                    <MenuItem onClick={handleLogout}>Logout</MenuItem>
+                    <LogoutMenuItem />
                   </MenuList>
                 </Menu>
               </Flex>

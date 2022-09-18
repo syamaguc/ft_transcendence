@@ -138,10 +138,11 @@ export class GameGateway {
 		const id = uuidv4()
 		this.disconnectAllRooms(player1.userId)
 		this.disconnectAllRooms(player2.userId)
-		const gameRoom = new GameRoom(id, this.server, player1, player2, this)
+		const gameRoom = new GameRoom(id, this.server, player1, player2)
 		if (gameSetting) {
 			gameRoom.gameObject.gameSetting = gameSetting
 		}
+		gameRoom.settingStart(this)
 		this.gameRooms.push(gameRoom)
 		const gameRoomInfo = {
 			id: id,

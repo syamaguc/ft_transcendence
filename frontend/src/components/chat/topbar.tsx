@@ -13,9 +13,14 @@ const TopBar = ({ socket, currentRoom }) => {
       p={4}
       align='center'
     >
-      <Text>Current Channel : {currentRoom.name}</Text>
-      {/* <IconButton size='sm' icon={<UsersIcon/>}/> */}
-      <MemberListModal socket={socket} currentRoom={currentRoom} />
+      {currentRoom.id == 'default-channel' ? (
+        <></>
+      ) : (
+        <>
+          <Text>Current Channel : {currentRoom.name}</Text>
+          <MemberListModal socket={socket} currentRoom={currentRoom} />
+        </>
+      )}
     </Flex>
   )
 }

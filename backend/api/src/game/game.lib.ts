@@ -83,7 +83,6 @@ export class GameRoom {
 		server: Server,
 		player1: socketData,
 		player2: socketData,
-		gameGateWay,
 	) {
 		this.id = id
 		this.server = server
@@ -95,7 +94,6 @@ export class GameRoom {
 		}
 		this.socketDatas = [player1, player2]
 		this.logger = new Logger('GameRoom Log')
-		this.settingStart(gameGateWay)
 	}
 
 	gameSave() {

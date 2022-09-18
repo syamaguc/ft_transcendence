@@ -4,6 +4,17 @@ export enum UserStatus {
   OFFLINE = 'Offline',
 }
 
+export interface GameHistory {
+  gameId: string
+  playerOne: string
+  playerTwo: string
+  playerOneScore: number
+  playerTwoScore: number
+  playerWin: string
+  playerLoose: string
+  // users: User[]
+}
+
 export interface User {
   userId: string
   username: string
@@ -23,4 +34,16 @@ export interface User {
   isBan: boolean
   isAdmin: boolean
   blockedUsers: string[]
+  game_history: GameHistory[]
+}
+
+export interface UserPartialInfo {
+  userId: string
+  username: string
+  elo: number
+  profile_picture: string
+}
+
+export interface Session {
+  isFirstTime: boolean
 }

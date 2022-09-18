@@ -1,19 +1,11 @@
-import { useState, ReactNode } from 'react'
 import {
-  Alert,
-  AlertIcon,
-  Box,
   Button,
-  Container,
-  Fade,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
-  Heading,
   Stack,
-  useBreakpointValue,
-  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
 import { FormikErrors, useFormik } from 'formik'
 import * as Yup from 'yup'
@@ -22,6 +14,7 @@ import { AuthCard } from '@components/auth'
 import PasswordField from '@components/password-field'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { setIsFirstTime } from 'src/lib/session'
 
 interface FormValues {
   username: string
@@ -31,8 +24,7 @@ interface FormValues {
 
 export function SignupForm() {
   const { mutateUser } = useUser()
-  const [showAlert, setShowAlert] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
+  const toast = useToast()
 
   const signupFormSchema = Yup.object({
     username: Yup.string()
@@ -46,7 +38,7 @@ export function SignupForm() {
       .required('Password is required')
       .min(8, 'Must be 8 characters minimum')
       .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/,
         'Must contain uppercase, lowercase, number and symbol chracter'
       ),
   })
@@ -76,7 +68,7 @@ export function SignupForm() {
     } else if (values.password.length > 30) {
       errors.password = 'Must be 30 characters or less'
     } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])/.test(
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/.test(
         values.password
       )
     ) {
@@ -95,10 +87,8 @@ export function SignupForm() {
     },
     validate,
     onSubmit: async (values, actions) => {
-      setShowAlert(false)
-
       try {
-        let res = await fetch(`${API_URL}/api/user/signup`, {
+        const res = await fetch(`${API_URL}/api/user/signup`, {
           method: 'POST',
           credentials: 'include',
           headers: {
@@ -112,28 +102,50 @@ export function SignupForm() {
           }),
         })
 
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 500))
 
-        const { accessToken } = await res.json()
+        const data = await res.json()
 
-        if (!res.ok) {
-          if (res.status === 409) {
-            setAlertMessage('Username or email aready exists')
-            setShowAlert(true)
+        if (res.ok) {
+          console.log('data: ', data)
+          await setIsFirstTime(true)
+          await mutateUser()
+          actions.setSubmitting(false)
+        } else {
+          if (res.status === 409 && typeof data.message === 'string') {
+            toast({
+              description: data.message,
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
+          } else if (res.status === 400 && typeof data.message === 'object') {
+            data.message.forEach((m: string) => {
+              toast({
+                description: m,
+                status: 'error',
+                duration: 5000,
+                isClosable: true,
+              })
+            })
           } else {
-            setAlertMessage('Invalid inputs')
-            setShowAlert(true)
+            toast({
+              description: 'Invalid inputs',
+              status: 'error',
+              duration: 5000,
+              isClosable: true,
+            })
           }
         }
-
-        console.log('accessToken: ', accessToken)
       } catch (err) {
-        setAlertMessage('Invalid inputs')
-        setShowAlert(true)
+        console.log(err)
+        toast({
+          description: 'Internal error occurred',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
       }
-
-      mutateUser()
-      actions.setSubmitting(false)
     },
   })
 
@@ -181,7 +193,9 @@ export function SignupForm() {
             />
           </Stack>
           <Button
-            colorScheme='blue'
+            colorScheme='blackAlpha'
+            bg='blackAlpha.900'
+            _dark={{ bg: 'whiteAlpha.900', _hover: { bg: 'whiteAlpha.600' } }}
             type='submit'
             isLoading={formik.isSubmitting}
           >
@@ -189,14 +203,6 @@ export function SignupForm() {
           </Button>
         </Stack>
       </form>
-      {showAlert && (
-        <Fade in={showAlert}>
-          <Alert status='error'>
-            <AlertIcon />
-            {alertMessage}
-          </Alert>
-        </Fade>
-      )}
     </AuthCard>
   )
 }

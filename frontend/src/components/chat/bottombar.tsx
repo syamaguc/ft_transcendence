@@ -35,7 +35,9 @@ const BottomBar = ({
     console.log('joinroom', currentRoom.id)
   }, [currentRoom, socket])
 
-  if (isJoined) {
+  if (currentRoom.id == 'default-channel') {
+    return <></>
+  } else if (isJoined) {
     return (
       <>
         <Input
