@@ -124,6 +124,33 @@ const Pong = ({ gameObject }: Props) => {
       player2PointBox.left,
       player2PointBox.top
     )
+
+    const stageLeftBottom: Position = {
+      top: stagePosition.top + stageHeight,
+      left: stagePosition.left
+    }
+    const stageRightBottom: Position = {
+      top: stagePosition.top + stageHeight,
+      left: stagePosition.left + stageWidth
+    }
+
+    const nameFontSize = Math.ceil(fontSize / 2)
+    context.font = nameFontSize + 'vh sans-serif'
+    context.textBaseline = 'top'
+
+    context.textAlign = 'left'
+    context.fillText(
+      gameObject.player1.name,
+      stageLeftBottom.left,
+      stageLeftBottom.top
+    )
+
+    context.textAlign = 'right'
+    context.fillText(
+      gameObject.player2.name,
+      stageRightBottom.left,
+      stageRightBottom.top
+    )
   }
 
   const clearCanvas = (screenWidth: number, screenHeight: number) => {
