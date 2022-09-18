@@ -33,7 +33,14 @@ export class DMService {
 				{ memberA: friendUserId.userId, memberB: selfUserId },
 			],
 		})
-		if (existingRoom) throw new WsException('Room Already Exist')
+		if (existingRoom) {
+			const DMFrontObject = {
+				id: existingRoom.id,
+				user1: DMRoomData.username,
+				logs: existingRoom.messages,
+			}
+			return DMFrontObject
+		}
 		const newDMRoom = {
 			id: uuidv4(),
 			memberA: selfUserId,
