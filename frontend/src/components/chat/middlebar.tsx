@@ -65,7 +65,7 @@ const MiddleBar = ({ chatLog }) => {
             </Flex>
           ))
         : null}
-    <AlwaysScrollToBottom />
+      <AlwaysScrollToBottom />
     </Flex>
   )
 }
