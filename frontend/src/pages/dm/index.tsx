@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react'
 import { MessageObject } from 'src/types/chat'
 import DMSideBar from '@components/dm/dm-sidebar'
 import { useRouter } from 'next/router'
+import DMFriendsList from '@components/dm/dm-friendslist'
 
 const API_URL = 'http://localhost:3000'
 const PREFIX_URL = '/dm'
@@ -48,7 +49,7 @@ const Chat = () => {
           <DMSideBar router={router} socket={socket} />
         </Flex>
         <Flex h='90vh' w='100%' direction='column'>
-          {/* <Frends List /> display freinds list like discord does */}
+          <DMFriendsList />
         </Flex>
       </Flex>
     </Layout>
