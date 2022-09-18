@@ -12,7 +12,6 @@ import {
 } from '@nestjs/common'
 import { SocketGuard } from '../user/guards/socketAuth.guard'
 import { UseGuards } from '@nestjs/common'
-// import { AuthGuard } from '@nestjs/passport'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
 import { User } from '../user/entities/user.entity'
@@ -99,6 +98,7 @@ export class GameGateway {
 			})
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('connectServer')
 	handleConnect(@MessageBody() data, @ConnectedSocket() client: Socket) {
 		const roomId = data['roomId']
@@ -180,6 +180,7 @@ export class GameGateway {
 		this.deleteGameRoom(roomIndex)
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('start')
 	handleStart(@MessageBody() data: any) {
 		const roomId = data['id']
@@ -190,6 +191,7 @@ export class GameGateway {
 		this.gameRooms[roomIndex].start(point, speed)
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('retry')
 	handleRetry(@MessageBody() data: any) {
 		const roomId = data['id']
@@ -203,7 +205,6 @@ export class GameGateway {
 		}
 		const socketDatas = this.gameRooms[roomIndex].socketDatas
 		this.deleteGameRoom(roomIndex)
-		// 検索失敗時のエラー処理追加予定
 		const newRoomId = this.makeGameRoom(
 			player1,
 			player2,
@@ -216,6 +217,7 @@ export class GameGateway {
 		}
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('retryCancel')
 	handleRetryCancel(@MessageBody() data: any) {
 		const roomId = data['id']
@@ -225,6 +227,7 @@ export class GameGateway {
 		this.gameRooms[roomIndex].retryCancel(userId)
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('quit')
 	handleQuit(@MessageBody() data: any) {
 		const roomId = data['id']
@@ -278,6 +281,7 @@ export class GameGateway {
 		}
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('readyGameIndex')
 	handleReadyGameIndex(
 		@MessageBody() data: any,
@@ -309,8 +313,6 @@ export class GameGateway {
 		@ConnectedSocket() client: Socket,
 	) {
 		const userId = data['userId']
-		// this.logger.log(client.handshake.headers['cookie']);
-		// this.logger.log(client.handshake.headers);
 		const user = this.currentUser(userId)
 		user.then((user) => {
 			const userName = user['username']
@@ -345,6 +347,7 @@ export class GameGateway {
 		})
 	}
 
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('cancelMatch')
 	handleCancelMatch(
 		@MessageBody() data: any,
