@@ -17,7 +17,14 @@ const TopBar = ({ currentRoom }) => {
         <></>
       ) : (
         <>
-          <Text>Current Channel : {currentRoom.name}</Text>
+          <Text
+            maxW='90%'
+            overflow='hidden'
+            whiteSpace='nowrap'
+            textOverflow='ellipsis'
+          >
+            Current Channel : {currentRoom.name}
+          </Text>
           <MemberListModal currentRoom={currentRoom} />
         </>
       )}

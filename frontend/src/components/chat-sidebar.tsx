@@ -127,7 +127,14 @@ const SideBar = ({
             }}
             key={chatRoom.id}
           >
-            {chatRoom.name}
+            <Box
+              maxW='90%'
+              overflow='hidden'
+              whiteSpace='nowrap'
+              textOverflow='ellipsis'
+            >
+              {chatRoom.name}
+            </Box>
           </Flex>
         ))}
       </Flex>
