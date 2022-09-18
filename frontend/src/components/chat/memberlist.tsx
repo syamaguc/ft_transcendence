@@ -80,17 +80,17 @@ function MemberMenu({ socket, user, currentRoom, member }) {
           icon={<ChevronDownIcon />}
         />
         <MenuList>
-          <MenuItem onClick={() => onClickMute(member.userId)}>
-            mute user
-          </MenuItem>
-          <MenuItem onClick={() => onClickBan(member.userId)}>
-            ban user
-          </MenuItem>
           {currentRoom.admins.indexOf(member.userId) == -1 ? (
             <MenuItem onClick={() => onClickAdmin(member.userId)}>
               add admin
             </MenuItem>
           ) : null}
+          <MenuItem onClick={() => onClickMute(member.userId)}>
+            mute user
+          </MenuItem>
+          <MenuItem color='red.500' onClick={() => onClickBan(member.userId)}>
+            ban user
+          </MenuItem>
           {/* <MenuItem>see profile</MenuItem> */}
         </MenuList>
       </Menu>

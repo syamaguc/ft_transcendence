@@ -9,6 +9,7 @@ import {
   Stack,
   Flex,
   Text,
+  useToast,
   useControllableState,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
@@ -27,6 +28,7 @@ const API_URL = 'http://localhost:3000/chat'
 
 const Chat = () => {
   const { user } = useUser()
+  const toast = useToast()
   const [isJoined, setIsJoined] = useState(false)
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
@@ -60,6 +62,15 @@ const Chat = () => {
     socket.on('updateNewMessage', (message: MessageObject) => {
       console.log('recieved : ', message)
       setMsg(message)
+    })
+    socket.on('exception', ({ status, message }) => {
+      console.log(status, message)
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
     })
   }, [socket])
 

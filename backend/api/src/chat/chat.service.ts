@@ -84,6 +84,20 @@ export class ChatService {
 		const room = await chatRepository.findId(roomId)
 		if (room.banned.indexOf(userId) === -1) {
 			console.log('=========user is banned=========')
+			//delete from members
+			const index = room.members.indexOf(userId)
+			room.members.splice(index, 1)
+
+			//delete from admin
+			const index2 = room.admins.indexOf(userId)
+			if (index2 != -1)
+				room.admins.splice(index2, 1)
+
+			//delete from muted
+			const index3 = room.muted.indexOf(userId)
+			if (index3 != -1)
+				room.muted.splice(index3, 1)
+
 			room.banned.push(userId)
 			return chatRepository.save(room)
 		}
