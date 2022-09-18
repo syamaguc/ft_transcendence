@@ -25,10 +25,8 @@ export class SocketGuard implements CanActivate {
 			const user: User = await UsersRepository.findOne({
 				where: { userId: decode['userid'] },
 			})
-      if (user)
-			  return true
-      else
-        return false
+			if (user) return true
+			else return false
 		} catch (err) {
 			throw new WsException(err.message)
 		}
