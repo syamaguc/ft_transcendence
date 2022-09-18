@@ -124,6 +124,9 @@ export class ChatGateway {
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
+		//banの場合
+
+		//privateの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
 	}

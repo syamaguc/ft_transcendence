@@ -1,4 +1,8 @@
 import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Box,
   Flex,
   Text,
@@ -13,15 +17,30 @@ import {
   useDisclosure,
   IconButton,
 } from '@chakra-ui/react'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 import { Avatar } from '@chakra-ui/avatar'
 import { UsersIcon } from '@components/icons/users'
 import { useState, useEffect, useRef } from 'react'
 import { User } from 'src/types/user'
-import { generateKey } from 'crypto'
+import { useUser } from 'src/lib/use-user'
 
 const API_URL = 'http://localhost:3000'
 
-function MemberList({ socket, currentRoom, members }) {
+function MemberStatus({user, currentRoom, member}) {
+  if (user.user.userId == member.userId) {
+    return (
+      <><Text ml={1}>me</Text></>
+    )
+  }
+  if (currentRoom.admins.indexOf(member.userId) != -1) {
+    return (
+      <><Text ml={1}>admin</Text></>
+    )
+  }
+  return null
+}
+
+function MemberMenu({socket, user, currentRoom, member}) {
   const onClickMute = (userId: string) => {
     socket.emit('muteMember', userId)
     console.log(userId, ' has been muted from the channel')
@@ -37,6 +56,56 @@ function MemberList({ socket, currentRoom, members }) {
     console.log(userId, ' has been added to admin in channel')
   }
 
+  //if the member was the current user
+  if (user.user.userId == member.userId) {
+    return (
+      <></>
+    )
+  }
+
+  //if the user was not admin
+  if (currentRoom.admins.indexOf(user.user.userId) == -1) {
+    return (
+      <></>
+    )
+  }
+
+  return (
+    <>
+      <Menu>
+        <MenuButton mr={0} ml='auto' as={IconButton} icon={<ChevronDownIcon />}/>
+        <MenuList>
+          <MenuItem onClick={() => onClickMute(member.userId)}>mute user</MenuItem>
+          <MenuItem onClick={() => onClickBan(member.userId)}>ban user</MenuItem>
+          {currentRoom.admins.indexOf(member.userId) == -1
+            ? <MenuItem onClick={() => onClickAdmin(member.userId)}>add admin</MenuItem>
+            : null
+          }
+          {/* <MenuItem>see profile</MenuItem> */}
+        </MenuList>
+      </Menu>
+    </>
+  )
+}
+
+function MemberList({ socket, currentRoom, members }) {
+  const user = useUser()
+
+  // const onClickMute = (userId: string) => {
+  //   socket.emit('muteMember', userId)
+  //   console.log(userId, ' has been muted from the channel')
+  // }
+
+  // const onClickBan = (userId: string) => {
+  //   socket.emit('banMember', userId)
+  //   console.log(userId, ' has been banned from the channel')
+  // }
+
+  // const onClickAdmin = (userId: string) => {
+  //   socket.emit('addAdmin', userId)
+  //   console.log(userId, ' has been added to admin in channel')
+  // }
+
   if (!members || !members.length) return <Text>This room is empty</Text>
   return (
     <>
@@ -47,14 +116,25 @@ function MemberList({ socket, currentRoom, members }) {
             marginEnd={3}
           />
           <Text>{member.username}</Text>
-          {currentRoom.admins.indexOf(member.userId) != -1 ? (
+          <MemberStatus
+            user={user}
+            currentRoom={currentRoom}
+            member={member}
+          />
+          {/* {currentRoom.admins.indexOf(member.userId) != -1 ? (
             <Text ml={1}>admin</Text>
-          ) : null}
-          <Box opacity='0' _hover={{ transition: '0.3s', opacity: '1' }} p={2}>
+          ) : null} */}
+          {/* <Box opacity='0' _hover={{ transition: '0.3s', opacity: '1' }} p={2}>
             <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
             <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
             <Button onClick={() => onClickAdmin(member.userId)}>ADMIN</Button>
-          </Box>
+          </Box> */}
+          <MemberMenu
+            socket={socket}
+            user={user}
+            currentRoom={currentRoom}
+            member={member}
+          />
         </Flex>
       ))}
     </>
