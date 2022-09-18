@@ -21,8 +21,6 @@ import { generateKey } from 'crypto'
 
 const API_URL = 'http://localhost:3000'
 
-
-
 function MemberList({ socket, currentRoom, members }) {
   const onClickMute = (userId: string) => {
     socket.emit('muteMember', userId)
@@ -43,18 +41,16 @@ function MemberList({ socket, currentRoom, members }) {
   return (
     <>
       {members.map((member) => (
-        <Flex
-          key={member.userId}
-          p={2}
-          align='center'
-        >
+        <Flex key={member.userId} p={2} align='center'>
           <Avatar
             src={`${API_URL}/api/user/avatar/${member.profile_picture}`}
             marginEnd={3}
-            />
+          />
           <Text>{member.username}</Text>
-          {currentRoom.admins.indexOf(member.userId) != -1 ? <Text ml={1}>admin</Text> : null}
-          <Box opacity='0' _hover={{ transition: '0.3s' , opacity: '1' }} p={2}>
+          {currentRoom.admins.indexOf(member.userId) != -1 ? (
+            <Text ml={1}>admin</Text>
+          ) : null}
+          <Box opacity='0' _hover={{ transition: '0.3s', opacity: '1' }} p={2}>
             <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
             <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
             <Button onClick={() => onClickAdmin(member.userId)}>ADMIN</Button>
@@ -65,7 +61,7 @@ function MemberList({ socket, currentRoom, members }) {
   )
 }
 
-function FriendList({friends}) {
+function FriendList({ friends }) {
   if (!friends || !friends.length) return <Text>You have no friends</Text>
   return (
     <>
@@ -92,7 +88,7 @@ function MemberListModal({ socket, currentRoom }) {
     //load members in the channel
     socket.on('getMembers', (users: User[]) => {
       setMembers(users)
-      })
+    })
   }, [socket])
 
   useEffect(() => {
@@ -103,8 +99,8 @@ function MemberListModal({ socket, currentRoom }) {
       .then((r) => r.json())
       .then((data) => {
         setFriends(data)
-        console.log("get Friends")
-        console.log(data);
+        console.log('get Friends')
+        console.log(data)
       })
   }, [])
 
@@ -117,7 +113,8 @@ function MemberListModal({ socket, currentRoom }) {
         onClick={() => {
           onOpen()
           onClickGet(currentRoom.id)
-          }}/>
+        }}
+      />
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -126,15 +123,21 @@ function MemberListModal({ socket, currentRoom }) {
           <ModalCloseButton />
           <ModalBody>
             <Text>Members</Text>
-            <MemberList socket={socket} currentRoom={currentRoom} members={members} />
+            <MemberList
+              socket={socket}
+              currentRoom={currentRoom}
+              members={members}
+            />
             <Text>Friends</Text>
-            <FriendList friends={friends}/>
+            <FriendList friends={friends} />
           </ModalBody>
           <ModalFooter>
             <Button mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button colorScheme='blue' variant='ghost'>Invite User</Button>
+            <Button colorScheme='blue' variant='ghost'>
+              Invite User
+            </Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

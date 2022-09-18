@@ -23,7 +23,7 @@ const ChannelOne = ({ roomInfo }) => {
     return (
       <Flex align='center'>
         <Tooltip label='private channel'>
-          <AtSignIcon mr={2} color='gray.600'/>
+          <AtSignIcon mr={2} color='gray.600' />
         </Tooltip>
         <Text>{roomInfo.name} </Text>
       </Flex>
@@ -34,7 +34,7 @@ const ChannelOne = ({ roomInfo }) => {
     return (
       <Flex align='center'>
         <Tooltip label='protected channel'>
-          <LockIcon mr={2} color='gray.600'/>
+          <LockIcon mr={2} color='gray.600' />
         </Tooltip>
         <Text>{roomInfo.name} </Text>
       </Flex>
@@ -46,9 +46,7 @@ const ChannelOne = ({ roomInfo }) => {
       <Text>{roomInfo.name} </Text>
     </>
   )
-
 }
-
 
 type Props = {
   socket: Socket
@@ -163,7 +161,7 @@ const SideBar = ({
             key={chatRoom.id}
           >
             {/* <Text>{chatRoom.name}</Text> */}
-            <ChannelOne roomInfo={chatRoom}/>
+            <ChannelOne roomInfo={chatRoom} />
           </Flex>
         ))}
       </Flex>

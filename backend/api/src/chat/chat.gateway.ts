@@ -43,7 +43,6 @@ export class ChatGateway {
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
-
 	@SubscribeMessage('addAdmin')
 	async addAdmin(
 		@MessageBody() userId: string,
@@ -51,10 +50,7 @@ export class ChatGateway {
 	) {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`addAdmin: recieved [${userId}] to room[${room}]`)
-		const newRoom = await this.chatService.addAdmin(
-			userId,
-			room,
-		)
+		const newRoom = await this.chatService.addAdmin(userId, room)
 		//update the channel info
 		this.updateRoom(newRoom)
 	}
@@ -66,10 +62,7 @@ export class ChatGateway {
 	) {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
-		const newRoom = await this.chatService.banUser(
-			userId,
-			room,
-		)
+		const newRoom = await this.chatService.banUser(userId, room)
 		//update the channel info
 		this.updateRoom(newRoom)
 	}
@@ -81,10 +74,7 @@ export class ChatGateway {
 	) {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`muteUser: recieved [${userId}] to room[${room}]`)
-		const newRoom = await this.chatService.muteUser(
-			userId,
-			room,
-		)
+		const newRoom = await this.chatService.muteUser(userId, room)
 		//update the channel info
 		this.updateRoom(newRoom)
 	}
