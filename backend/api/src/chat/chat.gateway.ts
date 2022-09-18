@@ -47,6 +47,45 @@ export class ChatGateway {
 	}
 
 	@UseGuards(SocketGuard)
+	@SubscribeMessage('addAdmin')
+	async addAdmin(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`addAdmin: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.addAdmin(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('banMember')
+	async banUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.banUser(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('muteMember')
+	async muteUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`muteUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.muteUser(userId, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
 		@MessageBody() roomId: string,
@@ -72,8 +111,8 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMembers: for ${socket.id}`)
-		const rooms = await this.chatService.getMembers(roomId)
-		socket.emit('getMembers', rooms)
+		const users = await this.chatService.getMembers(roomId)
+		socket.emit('getMembers', users)
 	}
 
 	// room which user is watching
@@ -96,6 +135,9 @@ export class ChatGateway {
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
+		//banの場合
+
+		//privateの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
 	}

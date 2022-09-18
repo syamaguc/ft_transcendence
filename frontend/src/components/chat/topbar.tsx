@@ -4,7 +4,7 @@ import { ChannelObject, MessageObject } from 'src/types/chat'
 import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
 
-const TopBar = ({ currentRoom }) => {
+const TopBar = ({ socket, currentRoom }) => {
   return (
     <Flex
       h='55px'
@@ -18,7 +18,7 @@ const TopBar = ({ currentRoom }) => {
       ) : (
         <>
           <Text>Current Channel : {currentRoom.name}</Text>
-          <MemberListModal currentRoom={currentRoom} />
+          <MemberListModal socket={socket} currentRoom={currentRoom} />
         </>
       )}
     </Flex>
