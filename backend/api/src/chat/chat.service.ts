@@ -76,6 +76,30 @@ export class ChatService {
 			room.admins.push(userId)
 			return chatRepository.save(room)
 		}
+		//not found
+		return room
+	}
+
+	async banUser(userId: string, roomId: string): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		if (room.banned.indexOf(userId) === -1) {
+			console.log('=========user is banned=========')
+			room.banned.push(userId)
+			return chatRepository.save(room)
+		}
+		//not found
+		return room
+	}
+
+	async muteUser(userId: string, roomId: string): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		if (room.muted.indexOf(userId) === -1) {
+			console.log('=========user is muted=========')
+			room.muted.push(userId)
+			return chatRepository.save(room)
+		}
+		//not found
+		return room
 	}
 
 	async getMessageLog(roomId: string): Promise<any> {

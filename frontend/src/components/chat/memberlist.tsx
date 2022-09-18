@@ -30,8 +30,8 @@ function MemberList({ socket, currentRoom, members }) {
   }
 
   const onClickBan = (userId: string) => {
-    socket.emit('banMember', currentRoom.id, userId)
-    console.log(userId, ' has been banned from channel ' , currentRoom.id)
+    socket.emit('banMember', userId)
+    console.log(userId, ' has been banned from the channel')
   }
 
   const onClickAdmin = (userId: string) => {

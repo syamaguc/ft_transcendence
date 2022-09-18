@@ -59,22 +59,35 @@ export class ChatGateway {
 		this.updateRoom(newRoom)
 	}
 
-	// @SubscribeMessage('banUser')
-	// async banUser(
-	// 	@MessageBody() userId: string,
-	// 	@ConnectedSocket() socket: Socket,
-	// ) {
+	@SubscribeMessage('banMember')
+	async banUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.banUser(
+			userId,
+			room,
+		)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
 
-	// }
-
-	// @SubscribeMessage('muteUser')
-	// async muteUser(
-	// 	@MessageBody() addMessageDto: AddMessageDto,
-	// 	@ConnectedSocket() socket: Socket,
-	// ) {
-
-	// }
-
+	@SubscribeMessage('muteMember')
+	async muteUser(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`muteUser: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.muteUser(
+			userId,
+			room,
+		)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
 
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
