@@ -160,9 +160,7 @@ export class ChatGateway {
 			this.updateRoom(room)
 			this.getMessageLog(roomId, socket)
 		} else {
-			this.server
-				.to(socket.id)
-				.emit('toastMessage', 'Password is incorrect.')
+			throw new WsException('Password is incorrect.')
 		}
 	}
 

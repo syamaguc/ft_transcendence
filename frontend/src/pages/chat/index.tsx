@@ -11,7 +11,6 @@ import {
   Text,
   useToast,
   useControllableState,
-  useToast,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -29,7 +28,6 @@ const API_URL = 'http://localhost:3000/chat'
 
 const Chat = () => {
   const { user } = useUser()
-  const toast = useToast()
   const [isJoined, setIsJoined] = useState(false)
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
@@ -66,9 +64,6 @@ const Chat = () => {
       console.log('recieved : ', message)
       setMsg(message)
     })
-    socket.on('toastMessage', (message: string) => {
-      setToastMessage(message)
-    })
     socket.on('exception', ({ status, message }) => {
       console.log(status, message)
       toast({
@@ -102,17 +97,6 @@ const Chat = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
-
-  useEffect(() => {
-    if (!toastMessage) return
-    toast({
-      description: toastMessage,
-      status: 'error',
-      duration: 5000,
-      isClosable: true,
-    })
-    setToastMessage('')
-  }, [toastMessage])
 
   return (
     <Layout>
