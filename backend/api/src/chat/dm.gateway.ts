@@ -9,8 +9,6 @@ import { Logger } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
 import { AddMessageDto, CreateDMRoomDto } from './dto/chat-property.dto'
 import { DMService } from './dm.service'
-import { Message } from './entities/message.entity'
-import { DMRoom } from './entities/dm-room.entity'
 import { ChatService } from './chat.service'
 
 @WebSocketGateway({ namespace: '/dm', cors: { origin: '*' } })
@@ -28,15 +26,6 @@ export class DMGateway {
 	async handleConnection(@ConnectedSocket() socket: Socket) {
 		this.ChatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
-		console.log('===================sockets test==========================')
-		/* 表示されるが、どうやってイテレートするのかわからない*/
-		console.log(this.server.sockets) // この中のsocketをloopに入れて一つ一つ条件にマッチするか確認したい
-		// console.log(this.server.sockets.sockets) // undefined
-		// console.log(this.server.allSockets()) // 動くけど、これだとsocketIdしか取ってこれない、Socketが必要
-		// console.log(this.server.sockets.size) // compile error
-		// this.server.sockets.map((s) => console.log('a')) // compile error
-		// this.server.sockets.forEach((value: Socket, key: string) => {}) // compile error
-		console.log('=========================================================')
 	}
 
 	/* add new message to the selected channel */
@@ -92,12 +81,14 @@ export class DMGateway {
 		@MessageBody() createDMRoomDto: CreateDMRoomDto,
 		@ConnectedSocket() socket: Socket,
 	) {
+		this.logger.log('createRoom called')
 		let newDMRoom = await this.DMService.createRoom(
 			createDMRoomDto,
 			socket.data.userId,
 		)
 		newDMRoom = { ...newDMRoom, user2: socket.data.username }
 		socket.emit('updateRoom', newDMRoom)
+		this.notifyUpdateRoomToUser(socket, newDMRoom.user1, newDMRoom)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -116,9 +107,22 @@ export class DMGateway {
 				socket.data.userId,
 			)
 			socket.emit('getRoomIdByUserIds', newDMRoom.id)
+			this.notifyUpdateRoomToUser(socket, userId, newDMRoom)
 			return
 		}
 		socket.emit('getRoomIdByUserIds', roomId)
+	}
+
+	notifyUpdateRoomToUser(socket: Socket, userId: string, newDMRoom: any) {
+		this.logger.log('notifyUpdateRoomToUser called')
+		if (socket.nsp.sockets) {
+			socket.nsp.sockets.forEach((value: Socket) => {
+				if (value.data.userId == userId) {
+					console.log(value)
+					value.emit('updateRoom', newDMRoom)
+				}
+			})
+		}
 	}
 }
 
