@@ -15,6 +15,7 @@ import {
   Skeleton,
   Text,
   Tab,
+  TabProps,
   Tabs,
   TabList,
   TabPanels,
@@ -22,9 +23,13 @@ import {
   Tooltip,
   useBreakpointValue,
   useColorModeValue,
+  useTab,
+  useStyleConfig,
+  useMultiStyleConfig,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import UserStatusBadge from '@components/user-status-badge'
+import { useRef, forwardRef } from 'react'
 
 import useSWR from 'swr'
 import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
@@ -135,6 +140,40 @@ function UserList() {
   console.log('/users friendsData: ', friendsData)
   console.log('/users isLoading: ', !friendsData && !friendsError)
 
+  const SecondaryTab = (props: TabProps) => {
+    const selectedBgColor = useColorModeValue('gray.100', 'gray.500')
+    const hoverBgColor = useColorModeValue('gray.50', 'inherit')
+
+    return (
+      <Tab
+        {...props}
+        borderRadius='md'
+        px='2'
+        py='1'
+        _hover={{ bg: hoverBgColor }}
+        _selected={{ bg: selectedBgColor }}
+      />
+    )
+  }
+
+  const PrimaryTab = (props: TabProps) => {
+    const textColor = useColorModeValue('whiteAlpha.900', 'inherit')
+    const bgColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.400')
+    const selectedColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.900')
+
+    return (
+      <Tab
+        {...props}
+        color={textColor}
+        bg={bgColor}
+        borderRadius='md'
+        px='2'
+        py='1'
+        _selected={{ color: selectedColor, bg: 'inherit' }}
+      />
+    )
+  }
+
   return (
     <Layout>
       <Container maxW='2xl'>
@@ -142,22 +181,22 @@ function UserList() {
           <Stack spacing='12'>
             <Tabs variant='soft-rounded' colorScheme='gray'>
               <Stack>
-                <Flex>
+                <Flex align='center'>
                   <Stack direction='row' align='center' spacing='4'>
                     <Heading as='h1' fontSize='xl'>
                       Friends
                     </Heading>
-                    <Box h='100%'>
+                    <Box h='24px'>
                       <Divider orientation='vertical' />
                     </Box>
                     <TabList>
-                      <Tab>Online</Tab>
-                      <Tab>All</Tab>
-                      <Tab>Blocked</Tab>
+                      <SecondaryTab mr='2'>Online</SecondaryTab>
+                      <SecondaryTab mr='2'>All</SecondaryTab>
+                      <SecondaryTab mr='2'>Blocked</SecondaryTab>
                     </TabList>
                   </Stack>
                   <Spacer />
-                  <Button>Add Friend</Button>
+                  <PrimaryTab>Add Friend</PrimaryTab>
                 </Flex>
                 <TabPanels>
                   <TabPanel>
@@ -229,6 +268,9 @@ function UserList() {
                   </TabPanel>
                   <TabPanel>
                     <Text>Blocked Users</Text>
+                  </TabPanel>
+                  <TabPanel>
+                    <Text>Add Friend</Text>
                   </TabPanel>
                 </TabPanels>
               </Stack>
