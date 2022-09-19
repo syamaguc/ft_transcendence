@@ -187,6 +187,8 @@ export class GameRoom {
 				this.gameObject.ball.top + ballBaseSize &&
 			this.gameObject.ball.top <=
 				this.gameObject.bar1.top + barBaseHeight &&
+			this.gameObject.bar1.left <=
+				this.gameObject.ball.left &&
 			this.gameObject.ball.left <=
 				this.gameObject.bar1.left + barBaseWidth &&
 			this.ballDirection.moveX < 0
@@ -201,6 +203,8 @@ export class GameRoom {
 				this.gameObject.bar2.top + barBaseHeight &&
 			this.gameObject.bar2.left <=
 				this.gameObject.ball.left + ballBaseSize &&
+			this.gameObject.ball.left + ballBaseSize <=
+				this.gameObject.bar2.left + barBaseWidth &&
 			this.ballDirection.moveX > 0
 		) {
 			this.setBallBounce(this.gameObject.bar2.top)
