@@ -169,4 +169,22 @@ export class ChatService {
 			}
 		}
 	}
+
+	async leaveRoom(userId: string, roomId: string): Promise<ChatRoom> {
+		let room: ChatRoom = await chatRepository.findId(roomId)
+
+		const membersIndex = room.members.indexOf(userId)
+		if (membersIndex != -1) {
+			console.log(userId)
+			room.members.splice(membersIndex, 1)
+		}
+
+		const adminsIndex = room.admins.indexOf(userId)
+		if (adminsIndex != -1) {
+			console.log(userId)
+			room.admins.splice(adminsIndex, 1)
+		}
+		console.log(room)
+		return chatRepository.save(room)
+	}
 }
