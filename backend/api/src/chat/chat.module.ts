@@ -6,10 +6,13 @@ import { ChatRoom } from './entities/chat-room.entity'
 import { JwtModule } from '@nestjs/jwt'
 import { Message } from './entities/message.entity'
 import { UserService } from 'src/user/user.service'
+import { DMRoom } from './entities/dm-room.entity'
+import { DMGateway } from './dm.gateway'
+import { DMService } from './dm.service'
 
 @Module({
 	imports: [
-		TypeOrmModule.forFeature([ChatRoom, Message]),
+		TypeOrmModule.forFeature([ChatRoom, DMRoom, Message]),
 		JwtModule.register({
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
@@ -19,6 +22,6 @@ import { UserService } from 'src/user/user.service'
 		}),
 	],
 
-	providers: [ChatGateway, ChatService, UserService],
+	providers: [ChatGateway, ChatService, DMGateway, DMService, UserService],
 })
 export class ChatModule {}
