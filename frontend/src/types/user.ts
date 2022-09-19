@@ -47,4 +47,5 @@ export interface UserPartialInfo {
 
 export interface Session {
   isFirstTime: boolean
+  didTwoFactorAuth: boolean
 }
