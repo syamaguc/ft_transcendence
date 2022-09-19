@@ -42,7 +42,8 @@ import {
   useImperativeHandle,
 } from 'react'
 import { FiFile } from 'react-icons/fi'
-import ChakraNextImage from 'src/components/chakra-next-image'
+import ChakraNextImage from '@components/chakra-next-image'
+import UserStatusBadge from '@components/user-status-badge'
 import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
@@ -53,17 +54,6 @@ import Layout from '@components/scrollable-layout'
 import { User, PartialUserInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
-
-function StatusBadge(props: { user: User } & AvatarBadgeProps) {
-  const bgColor =
-    props.user.status === 'Online'
-      ? 'green.500'
-      : 'In Game'
-      ? 'red.500'
-      : 'gray.400'
-
-  return <AvatarBadge {...props} bg={bgColor} />
-}
 
 type PreviewProps = {
   user: User
@@ -394,7 +384,7 @@ function BasicInfo() {
           size='xl'
           src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
         >
-          <StatusBadge boxSize='0.9em' user={user} />
+          <UserStatusBadge boxSize='0.9em' status={user.status} />
         </Avatar>
         <Stack direction='column' spacing='2'>
           <Text fontWeight='600' fontSize='2xl' mt='2'>
