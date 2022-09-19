@@ -10,6 +10,8 @@ import { Server, Socket } from 'socket.io'
 import { AddMessageDto } from './dto/chat-property.dto'
 import { DMService } from './dm.service'
 import { ChatService } from './chat.service'
+import { UseGuards } from '@nestjs/common'
+import { SocketGuard } from 'src/user/guards/socketAuth.guard'
 
 @WebSocketGateway({ namespace: '/dm', cors: { origin: '*' } })
 export class DMGateway {
@@ -30,6 +32,7 @@ export class DMGateway {
 
 	/* add new message to the selected channel */
 	@SubscribeMessage('addMessage')
+	@UseGuards(SocketGuard)
 	async handleMessage(
 		@MessageBody() addMessageDto: AddMessageDto,
 		@ConnectedSocket() socket: Socket,
@@ -45,6 +48,7 @@ export class DMGateway {
 	}
 
 	@SubscribeMessage('getMessageLog')
+	@UseGuards(SocketGuard)
 	async getMessageLog(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
@@ -55,6 +59,7 @@ export class DMGateway {
 	}
 
 	@SubscribeMessage('getRooms')
+	@UseGuards(SocketGuard)
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
 		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
@@ -63,6 +68,7 @@ export class DMGateway {
 
 	// room which user is watching
 	@SubscribeMessage('watchRoom')
+	@UseGuards(SocketGuard)
 	async watchOrSwitchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
@@ -77,6 +83,7 @@ export class DMGateway {
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@SubscribeMessage('createRoom')
+	@UseGuards(SocketGuard)
 	async createRoom(
 		@MessageBody() username: string,
 		@ConnectedSocket() socket: Socket,
@@ -94,6 +101,7 @@ export class DMGateway {
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
+	@UseGuards(SocketGuard)
 	async getRoomIdByUserIds(
 		@MessageBody() userId: string,
 		@ConnectedSocket() socket: Socket,
