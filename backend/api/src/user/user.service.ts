@@ -61,7 +61,11 @@ export class UserService {
 		user = await UsersRepository.findOne({
 			where: { login42: login42 },
 		})
-		if (user) return user
+		if (user) {
+			user.login_count += 1
+			UsersRepository.save(user)
+			return user
+		}
 		let { username } = userData
 		user = await UsersRepository.findOne({
 			where: { username: username },
@@ -94,6 +98,7 @@ export class UserService {
 		}
 		if (user && (await bcrypt.compare(password, user.password))) {
 			user.status = UserStatus.ONLINE
+			user.login_count += 1
 			try {
 				await UsersRepository.save(user)
 			} catch (e) {
@@ -222,6 +227,28 @@ export class UserService {
 				join(process.cwd(), '../upload/image/' + profilePicture),
 			),
 		)
+	}
+
+	blockFriend(friend: string, user: User): Promise<void> {
+		return UsersRepository.blockFriend(friend, user)
+	}
+
+	unblockFriend(friend: string, user: User): Promise<void> {
+		return UsersRepository.unblockFriend(friend, user)
+	}
+
+	async getBlockedList(user: User): Promise<object> {
+		let i = 0
+		const blockedList = []
+		while (user.blockedUsers[i]) {
+			await this.getPartialUserInfo(user.blockedUsers[i]).then(function (
+				result,
+			) {
+				blockedList.push(result)
+				i++
+			})
+		}
+		return blockedList
 	}
 
 	addFriend(friend: string, user: User): Promise<void> {
@@ -354,13 +381,5 @@ export class UserService {
 			parseInt(eloPlayerLoose),
 		)
 		return elo.playerRating - parseInt(eloPlayerWin)
-	}
-
-	updateBlockUser(
-		block: boolean,
-		user: User,
-		userToBlock: User,
-	): Promise<User> {
-		return UsersRepository.updateBlockUser(block, user, userToBlock)
 	}
 }
