@@ -142,6 +142,21 @@ export class ChatGateway {
 		this.updateRoom(room)
 	}
 
+	// leave a room by roomId
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	async leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log('leaveRoom called')
+		const room: ChatRoom = await this.chatService.leaveRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
+	}
+
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('createRoom')
