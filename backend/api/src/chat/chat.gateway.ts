@@ -192,6 +192,9 @@ export class ChatGateway {
 			roomId,
 		)
 		this.updateRoom(room)
+		if (room.password) {
+			this.unwatchRoom(roomId, socket)
+		}
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
