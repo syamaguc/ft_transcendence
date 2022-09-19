@@ -30,6 +30,10 @@ const DMSideBar = ({ socket, router }: Props) => {
         console.log('updateRoom called: ', newDMRoom)
         router.push(PREFIX_URL + '/' + newDMRoom.id)
       })
+      socket.on('addRoom', (newDMRoom: DMObject) => {
+        console.log('addRoom called: ', newDMRoom)
+        setnewDMRoom(newDMRoom)
+      })
       socket.emit('getRooms')
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

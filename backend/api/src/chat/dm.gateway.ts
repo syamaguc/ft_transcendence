@@ -88,7 +88,7 @@ export class DMGateway {
 		)
 		newDMRoom = { ...newDMRoom, user2: socket.data.username }
 		socket.emit('updateRoom', newDMRoom)
-		this.notifyUpdateRoomToUser(socket, newDMRoom.user1, newDMRoom)
+		this.notifyAddRoomToUser(socket, newDMRoom.user1, newDMRoom)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -107,19 +107,19 @@ export class DMGateway {
 				socket.data.userId,
 			)
 			socket.emit('getRoomIdByUserIds', newDMRoom.id)
-			this.notifyUpdateRoomToUser(socket, userId, newDMRoom)
+			this.notifyAddRoomToUser(socket, userId, newDMRoom)
 			return
 		}
 		socket.emit('getRoomIdByUserIds', roomId)
 	}
 
-	notifyUpdateRoomToUser(socket: Socket, userId: string, newDMRoom: any) {
-		this.logger.log('notifyUpdateRoomToUser called')
+	notifyAddRoomToUser(socket: Socket, userId: string, newDMRoom: any) {
+		this.logger.log('notifyAddRoomToUser called')
 		if (socket.nsp.sockets) {
 			socket.nsp.sockets.forEach((value: Socket) => {
 				if (value.data.userId == userId) {
 					console.log(value)
-					value.emit('updateRoom', newDMRoom)
+					value.emit('addRoom', newDMRoom)
 				}
 			})
 		}
