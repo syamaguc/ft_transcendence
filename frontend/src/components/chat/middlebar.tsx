@@ -27,11 +27,10 @@ const MessageFilter = ({ currentRoom, message }) => {
   const mute = currentRoom.muted.indexOf(message.userId)
   const block = currentUser.blockedUsers.indexOf(message.userId)
   //muted && not own message
-  if (mute != -1 && currentUser.userId != message.userId)
-    return null
-    // <Box bg='gray.100'>
-    //   <Text>Muted message</Text>
-    // </Box>
+  if (mute != -1 && currentUser.userId != message.userId) return null
+  // <Box bg='gray.100'>
+  //   <Text>Muted message</Text>
+  // </Box>
   //blocked
   if (block != -1) return null
   //else
