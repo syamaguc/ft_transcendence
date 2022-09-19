@@ -5,7 +5,7 @@ import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
 import ButtonLeave from './button-leave'
 
-const TopBar = ({ socket, currentRoom }) => {
+const TopBar = ({ socket, currentRoom, isJoined }) => {
   return (
     <Flex
       h='55px'
@@ -27,7 +27,11 @@ const TopBar = ({ socket, currentRoom }) => {
             # {currentRoom.name}
           </Text>
           <MemberListModal socket={socket} currentRoom={currentRoom} />
-          <ButtonLeave socket={socket} currentRoom={currentRoom} />
+          <ButtonLeave
+            socket={socket}
+            currentRoom={currentRoom}
+            isJoined={isJoined}
+          />
         </>
       )}
     </Flex>

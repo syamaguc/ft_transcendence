@@ -5,14 +5,17 @@ import { ChannelObject } from 'src/types/chat'
 type Props = {
   socket: Socket
   currentRoom: ChannelObject
+  isJoined: boolean
 }
 
-const ButtonLeave = ({ socket, currentRoom }: Props) => {
+const ButtonLeave = ({ socket, currentRoom, isJoined }: Props) => {
   return (
     <>
-      <Button size='sm' m={2}>
-        leave
-      </Button>
+      {isJoined ? (
+        <Button size='sm' m={2}>
+          leave
+        </Button>
+      ) : null}
     </>
   )
 }
