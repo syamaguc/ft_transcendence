@@ -149,4 +149,24 @@ export class ChatService {
 		// 	)
 		// }
 	}
+
+	async joinProtectedRoom(
+		userId: uuidv4,
+		roomId: string,
+		password: string,
+	): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		console.log(room)
+		if (room.members.indexOf(userId) === -1) {
+			// 暗号化される予定なのでデコードする必要がある
+			const roomPassword = room.password
+			if (roomPassword == password) {
+				console.log('=========new member joined the channel=========')
+				room.members.push(userId)
+				return chatRepository.save(room)
+			} else {
+				return null
+			}
+		}
+	}
 }
