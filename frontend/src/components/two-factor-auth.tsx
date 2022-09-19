@@ -94,12 +94,6 @@ export function TwoFactorAuthForm() {
 
       if (res.ok) {
         await mutateUser()
-        toast({
-          description: 'Successfully logged out.',
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-        })
       } else {
         toast({
           description: 'Internal error occurred',

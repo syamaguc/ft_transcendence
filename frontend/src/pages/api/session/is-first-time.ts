@@ -11,7 +11,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         return res.status(400).end()
       }
 
-      const session: Session = { isFirstTime: isFirstTime }
+      let didTwoFactorAuth: boolean
+      const stringValue = getSessionCookie(req)
+      if (stringValue) {
+        const session = JSON.parse(stringValue)
+        if (typeof session.didTwoFactorAuth === 'boolean') {
+          didTwoFactorAuth = session.didTwoFactorAuth
+        } else {
+          didTwoFactorAuth = false
+        }
+      }
+
+      const session: Session = { isFirstTime, didTwoFactorAuth }
       setSessionCookie(res, session)
 
       return res.status(200).end(res.getHeader('Set-Cookie'))

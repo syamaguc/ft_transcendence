@@ -8,7 +8,6 @@ import {
   Stack,
   VisuallyHidden,
   Spinner,
-  Text,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
@@ -79,7 +78,7 @@ function LoginPage() {
   const admin = useDisclosure()
   const bgColor = useColorModeValue('gray.50', 'inherit')
 
-  if (status === 'loading') {
+  if (status === 'loading' || status === 'authenticated') {
     return (
       <Box w='100%' h='100vh'>
         <Box
@@ -93,10 +92,6 @@ function LoginPage() {
         </Box>
       </Box>
     )
-  }
-
-  if (status === 'authenticated') {
-    return <div>Authenticated</div>
   }
 
   return (
