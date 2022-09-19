@@ -7,7 +7,7 @@ import {
 } from '@nestjs/websockets'
 import { Logger } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
-import { AddMessageDto, CreateDMRoomDto } from './dto/chat-property.dto'
+import { AddMessageDto } from './dto/chat-property.dto'
 import { DMService } from './dm.service'
 import { ChatService } from './chat.service'
 
@@ -78,12 +78,12 @@ export class DMGateway {
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@SubscribeMessage('createRoom')
 	async createRoom(
-		@MessageBody() createDMRoomDto: CreateDMRoomDto,
+		@MessageBody() username: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log('createRoom called')
+		this.logger.log(`createRoom called for ${username}`)
 		let newDMRoom = await this.DMService.createRoom(
-			createDMRoomDto,
+			username,
 			socket.data.userId,
 		)
 		newDMRoom = { ...newDMRoom, user2: socket.data.username }

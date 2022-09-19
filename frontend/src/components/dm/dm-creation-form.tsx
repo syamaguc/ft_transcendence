@@ -32,7 +32,7 @@ const DMCreationForm = ({ socket }: Props) => {
     event.preventDefault()
     const enteredUserName = userNameInputRef.current.value
     console.log('onClickCreate called', enteredUserName)
-    socket.emit('createRoom', { username: enteredUserName })
+    socket.emit('createRoom', enteredUserName)
   }
 
   useEffect(() => {

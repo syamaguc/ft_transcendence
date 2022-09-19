@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
-import { AddMessageDto, CreateDMRoomDto } from './dto/chat-property.dto'
+import { AddMessageDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
 import { v4 as uuidv4 } from 'uuid'
 import { DMRoom } from './entities/dm-room.entity'
@@ -17,14 +17,11 @@ export class DMService {
 		private readonly DMRoomRepository: Repository<DMRoom>,
 	) {}
 
-	async createRoom(
-		DMRoomData: CreateDMRoomDto,
-		selfUserId: string,
-	): Promise<any> {
+	async createRoom(username: string, selfUserId: string): Promise<any> {
 		if (!selfUserId)
 			throw new WsException('Internal Server Error: userId is not passed')
 		const friendUserId = await UsersRepository.findOne({
-			where: { username: DMRoomData.username },
+			where: { username: username },
 		})
 		if (!friendUserId) throw new WsException('User Not Found')
 		const existingRoom = await this.DMRoomRepository.findOne({
@@ -36,7 +33,7 @@ export class DMService {
 		if (existingRoom) {
 			const DMFrontObject = {
 				id: existingRoom.id,
-				user1: DMRoomData.username,
+				user1: username,
 				logs: existingRoom.messages,
 			}
 			return DMFrontObject
