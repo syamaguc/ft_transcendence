@@ -83,7 +83,6 @@ export class UserController {
 	})
 	@ApiOkResponse({ description: 'access token' })
 	@ApiConflictResponse({ description: 'Username or email already exist' })
-	/*******/
 	@Post('/signup')
 	async signUp(
 		@Body() userData: CreateUserDto,
@@ -97,7 +96,6 @@ export class UserController {
 	@ApiUnauthorizedResponse({
 		description: 'Please check your login credentials',
 	})
-	/*******/
 	@Post('/signin')
 	async signIn(
 		@Body() userData: SigInUserDto,
@@ -114,7 +112,6 @@ export class UserController {
 	@ApiOkResponse({ description: 'True is a user is log in' })
 	@ApiUnauthorizedResponse({ description: 'Unauthorized if no cookie found' })
 	@UseGuards(AuthGuard('jwt'), UserAuth)
-	/*******/
 	@Get('/isLogin')
 	isLogin(@Req() req: Request): boolean {
 		const token = req.cookies['jwt']
@@ -123,7 +120,6 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: 'Get all info of current user' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/currentUser')
 	currentUser(@Req() req): Promise<Partial<User>> {
@@ -133,7 +129,6 @@ export class UserController {
 
 	@ApiOperation({ summary: 'User Informations' })
 	@ApiOkResponse({ description: 'User Informations' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/userInfo')
 	userInfo(@Query('username') username: string): Promise<Partial<User>> {
@@ -142,7 +137,6 @@ export class UserController {
 
 	@ApiOperation({ summary: 'Partial User Information' })
 	@ApiOkResponse({ description: 'Partial User Information' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/partialInfo')
 	getPartialUserInfo(
@@ -153,7 +147,6 @@ export class UserController {
 
 	@ApiOperation({ summary: 'Search User by name or email' })
 	@ApiQuery({ name: 'username', required: false })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/search')
 	getUserWithFilters(
@@ -167,7 +160,6 @@ export class UserController {
 		description: 'Update username, email or password',
 	})
 	@ApiOkResponse({ description: 'User account' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Patch('/settings')
 	updateUser(
@@ -184,7 +176,6 @@ export class UserController {
 		description: 'Delete : User who wants to delete is account',
 	})
 	@ApiOkResponse({ description: 'User Delete' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Delete('/delete')
 	deleteUser(
@@ -208,7 +199,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Post('/upload/avatar')
 	@UseInterceptors(FileInterceptor('file', storage))
@@ -224,7 +214,6 @@ export class UserController {
 		required: true,
 		description: 'Profile Picture',
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/avatar/:profilePicture')
 	getProfilePicture(
@@ -234,6 +223,7 @@ export class UserController {
 		return this.userService.getProfilePicture(res, profilePicture)
 	}
 
+	//friend関連
 	@ApiOperation({ summary: 'User Add Friend' })
 	@ApiConsumes('application/json')
 	@ApiBody({
@@ -245,7 +235,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Patch('/addFriend')
 	addFriend(@Body('userId') friend: string, @Req() req): Promise<void> {
@@ -264,7 +253,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Delete('/deleteFriend')
 	deleteFriend(@Body('userId') friend: string, @Req() req): Promise<void> {
@@ -274,7 +262,6 @@ export class UserController {
 
 	@ApiOperation({ summary: 'Show Friends' })
 	@ApiOkResponse({ description: 'Friends List' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/friendList')
 	getFriendList(@Req() req): Promise<object> {
@@ -282,8 +269,53 @@ export class UserController {
 		return this.userService.getFriendList(user)
 	}
 
+	//block関連
+	@ApiOperation({ summary: 'User Block friend' })
+	@ApiConsumes('application/json')
+	@ApiBody({
+		schema: {
+			properties: {
+				userId: {
+					type: 'string',
+				},
+			},
+		},
+	})
+	@UseGuards(AuthGuard('jwt'), UserAuth)
+	@Patch('/blockFriend')
+	blockFriend(@Body('userId') friend: string, @Req() req): Promise<void> {
+		const user: User = req.user
+		return this.userService.blockFriend(friend, user)
+	}
+
+	@ApiOperation({ summary: 'User unblock Friend' })
+	@ApiConsumes('application/json')
+	@ApiBody({
+		schema: {
+			properties: {
+				userId: {
+					type: 'string',
+				},
+			},
+		},
+	})
+	@UseGuards(AuthGuard('jwt'), UserAuth)
+	@Delete('/unblockFriend')
+	unblockFriend(@Body('userId') friend: string, @Req() req): Promise<void> {
+		const user: User = req.user
+		return this.userService.unblockFriend(friend, user)
+	}
+
+	@ApiOperation({ summary: 'Show blocked list' })
+	@ApiOkResponse({ description: 'Blocked List' })
+	@UseGuards(AuthGuard('jwt'), UserAuth)
+	@Get('/blockedList')
+	getBlockedList(@Req() req): Promise<object> {
+		const user: User = req.user
+		return this.userService.getBlockedList(user)
+	}
+
 	@ApiOperation({ summary: 'Logout the user' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'))
 	@Delete('/logout')
 	logout(@Req() req, @Res({ passthrough: true }) res: Response) {
@@ -293,7 +325,6 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: 'Get Boolean TwoFactorAuth' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Get('/twoFactorAuth')
 	getTwoFactorAuth(@Req() req): boolean {
@@ -312,7 +343,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth)
 	@Patch('/updateTwoFactorAuth')
 	updateTwoFactorAuth(
@@ -325,7 +355,6 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: 'Get Boolean isBan' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth, AdminGuard)
 	@Get('/isBan')
 	getIsBan(@Query('userId') userId: string, @Req() req): Promise<boolean> {
@@ -344,7 +373,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth, AdminGuard)
 	@Patch('/updateIsBan')
 	updateIsBan(
@@ -357,7 +385,6 @@ export class UserController {
 	}
 
 	@ApiOperation({ summary: 'Get Boolean isAdmin' })
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth, AdminGuard)
 	@Get('/isAdmin')
 	getIsAdmin(@Query('userId') userId: string, @Req() req): Promise<boolean> {
@@ -376,7 +403,6 @@ export class UserController {
 			},
 		},
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'), UserAuth, AdminGuard)
 	@Patch('/updateIsAdmin')
 	updateIsAdmin(
@@ -400,7 +426,6 @@ export class UserController {
 		required: true,
 		description: 'EloPlayerLoose',
 	})
-	/*******/
 	@UseGuards(AuthGuard('jwt'))
 	@Get('/calculElo/:eloPlayerWin/:eloPlayerLoose')
 	calculElo(
