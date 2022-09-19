@@ -140,12 +140,14 @@ export class ChatGateway {
 		const room: ChatRoom = await this.chatService.joinProtectedRoom(
 			userId,
 			roomId,
-			password
+			password,
 		)
 		if (room) {
 			this.updateRoom(room)
 		} else {
-			this.server.to(socket.id).emit('toastMessage', 'Password is incorrect.')
+			this.server
+				.to(socket.id)
+				.emit('toastMessage', 'Password is incorrect.')
 		}
 	}
 

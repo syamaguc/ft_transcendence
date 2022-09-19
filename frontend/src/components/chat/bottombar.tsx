@@ -13,7 +13,7 @@ import {
   ModalFooter,
   Input,
   MutableRefObject,
-  FormControl
+  FormControl,
 } from '@chakra-ui/react'
 import React, { useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
@@ -37,7 +37,7 @@ const BottomBar = ({
 }: Props) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
-  const AskPassword = ({isOpen, onClose, socket}) => {
+  const AskPassword = ({ isOpen, onClose, socket }) => {
     const channelPasswordRef = useRef<HTMLInputElement>()
 
     const onClickPassword = useCallback(
@@ -46,8 +46,13 @@ const BottomBar = ({
         if (!socket || !currentRoom) return
         event.preventDefault()
         const password = channelPasswordRef.current.value
-        socket.emit('joinProtectedRoom', {roomId: currentRoom.id, password: password})
-    }, [socket, currentRoom])
+        socket.emit('joinProtectedRoom', {
+          roomId: currentRoom.id,
+          password: password,
+        })
+      },
+      [socket, currentRoom]
+    )
 
     return (
       <Modal isOpen={isOpen} onClose={onClose}>
@@ -115,12 +120,10 @@ const BottomBar = ({
   } else {
     return (
       <>
-        <Button onClick={currentRoom.password ? onOpen : onClickJoin}>join</Button>
-        <AskPassword
-          isOpen={isOpen}
-          onClose={onClose}
-          socket={socket}
-        />
+        <Button onClick={currentRoom.password ? onOpen : onClickJoin}>
+          join
+        </Button>
+        <AskPassword isOpen={isOpen} onClose={onClose} socket={socket} />
       </>
     )
   }

@@ -149,7 +149,11 @@ export class ChatService {
 		// }
 	}
 
-	async joinProtectedRoom(userId: uuidv4, roomId: string, password: string): Promise<ChatRoom> {
+	async joinProtectedRoom(
+		userId: uuidv4,
+		roomId: string,
+		password: string,
+	): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
 		console.log(room)
 		if (room.members.indexOf(userId) === -1) {

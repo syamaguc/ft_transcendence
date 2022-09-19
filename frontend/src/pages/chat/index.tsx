@@ -10,7 +10,7 @@ import {
   Flex,
   Text,
   useControllableState,
-  useToast
+  useToast,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
