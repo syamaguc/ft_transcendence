@@ -46,7 +46,7 @@ export class DMService {
 		return DM
 	}
 
-	async addMessage(
+	async addMessageByRoomId(
 		addMessageDto: AddMessageDto,
 		userId: uuidv4,
 		roomId: string,
@@ -64,14 +64,14 @@ export class DMService {
 		return messageRepository.addMessage(message)
 	}
 
-	async getMessageLog(roomId: string): Promise<any> {
+	async getMessageLogByRoomId(roomId: string): Promise<any> {
 		const messagesWithUserInfo = await messageRepository.getDMMessages(
 			roomId,
 		)
 		return messagesWithUserInfo
 	}
 
-	async getRoom(roomId: string): Promise<any[]> {
+	async getRoomByRoomId(roomId: string): Promise<any[]> {
 		const room = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
@@ -85,7 +85,7 @@ export class DMService {
 		return room
 	}
 
-	async getRooms(userId: string): Promise<any[]> {
+	async getRoomsByUserId(userId: string): Promise<any[]> {
 		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',

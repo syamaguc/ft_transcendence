@@ -36,7 +36,7 @@ export class DMGateway {
 	) {
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`)
 		const room = [...socket.rooms].slice(0)[1]
-		const newMessage = await this.DMService.addMessage(
+		const newMessage = await this.DMService.addMessageByRoomId(
 			addMessageDto,
 			socket.data.userId,
 			room,
@@ -50,14 +50,14 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`)
-		const messageLog = await this.DMService.getMessageLog(roomId)
+		const messageLog = await this.DMService.getMessageLogByRoomId(roomId)
 		socket.emit('getMessageLog', messageLog)
 	}
 
 	@SubscribeMessage('getRooms')
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
-		const rooms = await this.DMService.getRooms(socket.data.userId)
+		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
 		socket.emit('getRooms', rooms)
 	}
 
@@ -71,7 +71,7 @@ export class DMGateway {
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 		socket.join(roomId)
-		const room = await this.DMService.getRoom(roomId)
+		const room = await this.DMService.getRoomByRoomId(roomId)
 		socket.emit('watchRoom', room)
 	}
 
@@ -88,9 +88,9 @@ export class DMGateway {
 		if (!room) {
 			room = await this.DMService.createRoomByUserIds(userId, selfUserId)
 		}
-		const newDMRoom = await this.DMService.getRoom(room.id)
+		const newDMRoom = await this.DMService.getRoomByRoomId(room.id)
 		socket.emit('updateRoom', newDMRoom)
-		this.notifyAddRoomToUser(socket, userId, newDMRoom)
+		this.sendAddRoomByUserId(socket, userId, newDMRoom)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -98,7 +98,9 @@ export class DMGateway {
 		@MessageBody() userId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`getRoom: for ${socket.data.userId} and ${userId}`)
+		this.logger.log(
+			`getRoomIdByUserIds: for ${socket.data.userId} and ${userId}`,
+		)
 		const room = await this.DMService.getRoomByUserIds(
 			socket.data.userId,
 			userId,
@@ -109,14 +111,14 @@ export class DMGateway {
 				socket.data.userId,
 			)
 			socket.emit('getRoomIdByUserIds', newDMRoom.id)
-			this.notifyAddRoomToUser(socket, userId, newDMRoom)
+			this.sendAddRoomByUserId(socket, userId, newDMRoom)
 			return
 		}
 		socket.emit('getRoomIdByUserIds', room.id)
 	}
 
-	notifyAddRoomToUser(socket: Socket, userId: string, newDMRoom: any) {
-		this.logger.log('notifyAddRoomToUser called')
+	sendAddRoomByUserId(socket: Socket, userId: string, newDMRoom: any) {
+		this.logger.log('sendAddRoomByUserId called')
 		if (socket.nsp.sockets) {
 			socket.nsp.sockets.forEach((value: Socket) => {
 				if (value.data.userId == userId) {
