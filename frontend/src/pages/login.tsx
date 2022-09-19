@@ -33,7 +33,6 @@ function Login42(props: Login42Props) {
       <Stack spacing={4} direction='column' align='center'>
         <ChakraLink
           width='full'
-          isExternal
           aria-label='Go to 42 OAuth'
           href={`${API_URL}/api/auth/redirect`}
         >
