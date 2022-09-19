@@ -17,41 +17,23 @@ export class DMService {
 		private readonly DMRoomRepository: Repository<DMRoom>,
 	) {}
 
-	async createRoom(username: string, selfUserId: string): Promise<any> {
-		if (!selfUserId)
-			throw new WsException('Internal Server Error: userId is not passed')
-		const friendUserId = await UsersRepository.findOne({
+	async getUserIdByUsername(username: string) {
+		const user = await UsersRepository.findOne({
 			where: { username: username },
 		})
-		if (!friendUserId) throw new WsException('User Not Found')
-		const existingRoom = await this.DMRoomRepository.findOne({
+		if (!user) {
+			throw new WsException('User Not Found')
+		}
+		return user.id
+	}
+
+	async getRoomByUserIds(userId1: string, userId2: string): Promise<DMRoom> {
+		return this.DMRoomRepository.findOne({
 			where: [
-				{ memberA: selfUserId, memberB: friendUserId.userId },
-				{ memberA: friendUserId.userId, memberB: selfUserId },
+				{ memberA: userId1, memberB: userId2 },
+				{ memberA: userId2, memberB: userId1 },
 			],
 		})
-		if (existingRoom) {
-			const DMFrontObject = {
-				id: existingRoom.id,
-				user1: username,
-				logs: existingRoom.messages,
-			}
-			return DMFrontObject
-		}
-		const newDMRoom = {
-			id: uuidv4(),
-			memberA: selfUserId,
-			memberB: friendUserId.userId,
-		}
-		const DM = await this.DMRoomRepository.save(newDMRoom)
-
-		const DMFrontObject = {
-			id: DM.id,
-			user1: DMRoomData.username,
-			logs: DM.messages,
-		}
-
-		return DMFrontObject
 	}
 
 	async createRoomByUserIds(user1: string, user2: string): Promise<DMRoom> {
