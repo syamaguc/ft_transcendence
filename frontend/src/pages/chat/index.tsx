@@ -11,6 +11,7 @@ import {
   Text,
   useToast,
   useControllableState,
+  useToast,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -44,6 +45,8 @@ const Chat = () => {
     password: '',
   })
   const [socket, setSocket] = useState()
+  const [toastMessage, setToastMessage] = useState()
+  const toast = useToast()
 
   useEffect(() => {
     const tempSocket = io(API_URL, { transports: ['websocket'] })
@@ -62,6 +65,9 @@ const Chat = () => {
     socket.on('updateNewMessage', (message: MessageObject) => {
       console.log('recieved : ', message)
       setMsg(message)
+    })
+    socket.on('toastMessage', (message: string) => {
+      setToastMessage(message)
     })
     socket.on('exception', ({ status, message }) => {
       console.log(status, message)
@@ -97,6 +103,17 @@ const Chat = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
 
+  useEffect(() => {
+    if (!toastMessage) return
+    toast({
+      description: toastMessage,
+      status: 'error',
+      duration: 5000,
+      isClosable: true,
+    })
+    setToastMessage('')
+  }, [toastMessage])
+
   return (
     <Layout>
       <Flex>
@@ -107,6 +124,7 @@ const Chat = () => {
             setCurrentRoom={setCurrentRoom}
             setChatLog={setChatLog}
             setInputMessage={setInputText}
+            user={user}
           />
         </Flex>
         <Flex h='90vh' w='80%' direction='column'>
