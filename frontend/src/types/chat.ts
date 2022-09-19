@@ -17,3 +17,10 @@ export interface ChannelObject {
   logs: MessageObject[]
   password: string
 }
+
+export interface DMObject {
+  id: string
+  user1: string
+  user2: string
+  logs: MessageObject[]
+}
