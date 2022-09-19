@@ -2,11 +2,13 @@ import Head from 'next/head'
 import {
   Box,
   Button,
+  Container,
   Link as ChakraLink,
   Flex,
   Stack,
   VisuallyHidden,
   Spinner,
+  Text,
   useBreakpointValue,
   useColorModeValue,
   useDisclosure,
@@ -16,6 +18,7 @@ import { useUser } from 'src/lib/use-user'
 import { AuthCard } from '@components/auth'
 import { SignupForm } from '@components/signup'
 import { LoginForm } from '@components/login'
+import { TwoFactorAuthForm } from '@components/two-factor-auth'
 import { API_URL } from 'src/constants'
 
 type Login42Props = {
@@ -25,10 +28,6 @@ type Login42Props = {
 
 function Login42(props: Login42Props) {
   const { onOpen } = props
-
-  const onSubmit = async () => {
-    alert('wip')
-  }
 
   return (
     <AuthCard title='ft_transcendence'>
@@ -73,7 +72,10 @@ function LoginAdmin(props: LoginAdminProps) {
 }
 
 function LoginPage() {
-  const { status } = useUser({ redirectTo: '/', redirectIfFound: true })
+  const { status, needTwoFactorAuth, didTwoFactorAuth } = useUser({
+    redirectTo: '/',
+    redirectIfFound: true,
+  })
   const admin = useDisclosure()
   const bgColor = useColorModeValue('gray.50', 'inherit')
 
@@ -113,10 +115,18 @@ function LoginPage() {
             w='full'
             h='full'
           >
-            {admin.isOpen ? (
-              <LoginAdmin onClose={admin.onClose} />
+            {needTwoFactorAuth && !didTwoFactorAuth ? (
+              <>
+                <TwoFactorAuthForm />
+              </>
             ) : (
-              <Login42 onOpen={admin.onOpen} />
+              <>
+                {admin.isOpen ? (
+                  <LoginAdmin onClose={admin.onClose} />
+                ) : (
+                  <Login42 onOpen={admin.onOpen} />
+                )}
+              </>
             )}
           </Flex>
         </Box>
