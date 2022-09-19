@@ -22,7 +22,45 @@ const timestampToTime = (timestamp) => {
   return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
-const MiddleBar = ({ chatLog }) => {
+const MessageFilter = ({ currentRoom, message }) => {
+  const currentUser = useUser().user
+  const mute = currentRoom.muted.indexOf(message.userId)
+  const block = currentUser.blockedUsers.indexOf(message.userId)
+  //muted && not own message
+  if (mute != -1 && currentUser.userId != message.userId)
+    return (
+      null
+      // <Box bg='gray.100'>
+      //   <Text>Muted message</Text>
+      // </Box>
+    )
+  //blocked
+  if (block != -1)
+    return null
+  //else
+  return (
+    <Flex
+      key={message.id}
+      m={4}
+      direction='horizontal'
+      align='flex-start'>
+      <ProfileModal message={message} />
+      <Flex direction='column' maxW='90%'>
+        <Flex direction='horizontal' align='flex-end'>
+          <Text as='b' marginEnd={2}>
+            {message.username}
+          </Text>
+          <Text fontSize='xs' pb='1px'>
+            {timestampToTime(message.timestamp)}
+          </Text>
+        </Flex>
+        <Text>{message.message}</Text>
+      </Flex>
+    </Flex>
+  )
+}
+
+const MiddleBar = ({ currentRoom, chatLog }) => {
   return (
     <Flex
       direction='column'
@@ -33,28 +71,11 @@ const MiddleBar = ({ chatLog }) => {
     >
       {chatLog.length
         ? chatLog.map((message: MessageObject) => (
-            <Flex
-              key={message.id}
-              m={4}
-              direction='horizontal'
-              align='flex-start'
-            >
-              <ProfileModal message={message} />
-              <Flex direction='column' maxW='90%'>
-                <Flex direction='horizontal' align='flex-end'>
-                  <Text as='b' marginEnd={2}>
-                    {message.username}
-                  </Text>
-                  <Text fontSize='xs' pb='1px'>
-                    {timestampToTime(message.timestamp)}
-                  </Text>
-                </Flex>
-                {/* <Box bg="blue.100" w="fit-content" minWidth="100px" borderRadius="10px" p={3} m={1}> */}
-                <Text>{message.message}</Text>
-                {/* </Box> */}
-              </Flex>
-            </Flex>
-          ))
+              <MessageFilter
+                currentRoom={currentRoom}
+                message={message}
+              />
+        ))
         : null}
       <AlwaysScrollToBottom />
     </Flex>

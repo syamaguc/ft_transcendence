@@ -85,13 +85,21 @@ function MemberMenu({ socket, user, currentRoom, member }) {
               add admin
             </MenuItem>
           ) : null}
-          <MenuItem onClick={() => onClickMute(member.userId)}>
+          {currentRoom.muted.indexOf(member.userId) == -1 ? (
+            <MenuItem onClick={() => onClickMute(member.userId)}>
             mute user
-          </MenuItem>
+            </MenuItem>
+          ) :
+            <MenuItem onClick={() => onClickMute(member.userId)}>
+            unmute
+            </MenuItem>
+          }
+          {/* // <MenuItem onClick={() => onClickMute(member.userId)}>
+          //   mute user
+          // </MenuItem> */}
           <MenuItem color='red.500' onClick={() => onClickBan(member.userId)}>
             ban user
           </MenuItem>
-          {/* <MenuItem>see profile</MenuItem> */}
         </MenuList>
       </Menu>
     </>
