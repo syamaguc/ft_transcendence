@@ -99,11 +99,11 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getRoom: for ${socket.data.userId} and ${userId}`)
-		const roomId = await this.DMService.getRoomIdByUserIds(
+		const room = await this.DMService.getRoomByUserIds(
 			socket.data.userId,
 			userId,
 		)
-		if (roomId == '') {
+		if (!room) {
 			let newDMRoom = await this.DMService.createRoomByUserIds(
 				userId,
 				socket.data.userId,
@@ -112,7 +112,7 @@ export class DMGateway {
 			this.notifyAddRoomToUser(socket, userId, newDMRoom)
 			return
 		}
-		socket.emit('getRoomIdByUserIds', roomId)
+		socket.emit('getRoomIdByUserIds', room.id)
 	}
 
 	notifyAddRoomToUser(socket: Socket, userId: string, newDMRoom: any) {
