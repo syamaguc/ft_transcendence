@@ -49,6 +49,11 @@ export const mainNavLinks = [
   },
   {
     icon: null,
+    label: 'DM',
+    href: '/dm',
+  },
+  {
+    icon: null,
     label: 'Game',
     href: '/game',
   },

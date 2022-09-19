@@ -213,33 +213,38 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 		}
 	},
 
-	async updateBlockUser(
-		block: boolean,
-		user: User,
-		userToBlock: User,
-	): Promise<User> {
-		const userFound = user.blockedUsers.find(
-			(element) => element === userToBlock.userId,
-		)
-		if (block === true && !userFound) {
-			user.blockedUsers.push(userToBlock.userId)
-			try {
-				await this.save(user)
-			} catch (error) {
-				console.log(error)
-				throw new InternalServerErrorException('add blocked user')
-			}
+	async blockFriend(friend: string, user: User): Promise<void> {
+		const found = user.blockedUsers.find((element) => element === friend)
+		if (found != undefined) {
+			throw new UnauthorizedException({
+				status: HttpStatus.FORBIDDEN,
+				error: 'the user is already in your blocked list',
+			})
 		}
-		if (block === false && userFound) {
-			const index = user.blockedUsers.indexOf(userToBlock.userId)
+		user.blockedUsers.push(friend)
+		try {
+			await this.save(user)
+		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException()
+		}
+	},
+
+	async unblockFriend(friend: string, user: User): Promise<void> {
+		const index = user.blockedUsers.indexOf(friend)
+		if (index !== -1) {
 			user.blockedUsers.splice(index, 1)
-			try {
-				await this.save(user)
-			} catch (error) {
-				console.log(error)
-				throw new InternalServerErrorException('add blocked user')
-			}
+		} else {
+			throw new UnauthorizedException({
+				status: HttpStatus.FORBIDDEN,
+				error: "user id isn't in your blocked list",
+			})
 		}
-		return user
+		try {
+			await this.save(user)
+		} catch (e) {
+			console.log(e)
+			throw new InternalServerErrorException()
+		}
 	},
 })

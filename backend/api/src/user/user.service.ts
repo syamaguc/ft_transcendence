@@ -230,6 +230,28 @@ export class UserService {
 		)
 	}
 
+	blockFriend(friend: string, user: User): Promise<void> {
+		return UsersRepository.blockFriend(friend, user)
+	}
+
+	unblockFriend(friend: string, user: User): Promise<void> {
+		return UsersRepository.unblockFriend(friend, user)
+	}
+
+	async getBlockedList(user: User): Promise<object> {
+		let i = 0
+		const blockedList = []
+		while (user.blockedUsers[i]) {
+			await this.getPartialUserInfo(user.blockedUsers[i]).then(function (
+				result,
+			) {
+				blockedList.push(result)
+				i++
+			})
+		}
+		return blockedList
+	}
+
 	addFriend(friend: string, user: User): Promise<void> {
 		return UsersRepository.addFriend(friend, user)
 	}
@@ -360,13 +382,5 @@ export class UserService {
 			parseInt(eloPlayerLoose),
 		)
 		return elo.playerRating - parseInt(eloPlayerWin)
-	}
-
-	updateBlockUser(
-		block: boolean,
-		user: User,
-		userToBlock: User,
-	): Promise<User> {
-		return UsersRepository.updateBlockUser(block, user, userToBlock)
 	}
 }
