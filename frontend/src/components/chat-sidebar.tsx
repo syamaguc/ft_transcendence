@@ -21,36 +21,36 @@ import ChatCreationForm from './chat-creation-form'
 const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.is_private) {
     return (
-      <Flex align='center'>
-        <Box
-          maxW='90%'
+      <Flex align='center' overflow='hidden'>
+        <Tooltip label='private channel'>
+          <AtSignIcon mr={2} color='gray.600' />
+        </Tooltip>
+        <Text
+          maxW='80%'
           overflow='hidden'
           whiteSpace='nowrap'
           textOverflow='ellipsis'
         >
-          <Tooltip label='private channel'>
-            <AtSignIcon mr={2} color='gray.600' />
-          </Tooltip>
           {roomInfo.name}
-        </Box>
+        </Text>
       </Flex>
     )
   }
 
   if (roomInfo.password != '') {
     return (
-      <Flex align='center'>
-        <Box
-          maxW='90%'
+      <Flex align='center' overflow='hidden'>
+        <Tooltip label='protected channel'>
+          <LockIcon mr={2} color='gray.600' />
+        </Tooltip>
+        <Text
+          maxW='80%'
           overflow='hidden'
           whiteSpace='nowrap'
           textOverflow='ellipsis'
         >
-          <Tooltip label='protected channel'>
-            <LockIcon mr={2} color='gray.600' />
-          </Tooltip>
           {roomInfo.name}
-        </Box>
+        </Text>
       </Flex>
     )
   }
