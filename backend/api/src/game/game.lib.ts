@@ -187,8 +187,7 @@ export class GameRoom {
 				this.gameObject.ball.top + ballBaseSize &&
 			this.gameObject.ball.top <=
 				this.gameObject.bar1.top + barBaseHeight &&
-			this.gameObject.bar1.left <=
-				this.gameObject.ball.left &&
+			this.gameObject.bar1.left <= this.gameObject.ball.left &&
 			this.gameObject.ball.left <=
 				this.gameObject.bar1.left + barBaseWidth &&
 			this.ballDirection.moveX < 0
