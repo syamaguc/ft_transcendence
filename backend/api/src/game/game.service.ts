@@ -27,6 +27,18 @@ export class GameService {
 		userOne.game_history.push(gameHistory)
 		userTwo.game_history.push(gameHistory)
 
+		if (info.player1Score > info.player2Score) {
+			userOne.game_won += 1
+			userTwo.lost_game += 1
+			userOne.elo += 10
+			userTwo.elo -= 10
+		} else {
+			userTwo.game_won += 1
+			userOne.lost_game += 1
+			userTwo.elo += 10
+			userOne.elo -= 10
+		}
+
 		try {
 			await UsersRepository.save(userOne)
 			await UsersRepository.save(userTwo)
