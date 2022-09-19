@@ -144,7 +144,6 @@ export class ChatGateway {
 
 		//privateの場合
 
-
 		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)

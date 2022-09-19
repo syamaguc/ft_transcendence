@@ -28,22 +28,15 @@ const MessageFilter = ({ currentRoom, message }) => {
   const block = currentUser.blockedUsers.indexOf(message.userId)
   //muted && not own message
   if (mute != -1 && currentUser.userId != message.userId)
-    return (
-      null
-      // <Box bg='gray.100'>
-      //   <Text>Muted message</Text>
-      // </Box>
-    )
-  //blocked
-  if (block != -1)
     return null
+    // <Box bg='gray.100'>
+    //   <Text>Muted message</Text>
+    // </Box>
+  //blocked
+  if (block != -1) return null
   //else
   return (
-    <Flex
-      key={message.id}
-      m={4}
-      direction='horizontal'
-      align='flex-start'>
+    <Flex key={message.id} m={4} direction='horizontal' align='flex-start'>
       <ProfileModal message={message} />
       <Flex direction='column' maxW='90%'>
         <Flex direction='horizontal' align='flex-end'>
@@ -71,11 +64,8 @@ const MiddleBar = ({ currentRoom, chatLog }) => {
     >
       {chatLog.length
         ? chatLog.map((message: MessageObject) => (
-              <MessageFilter
-                currentRoom={currentRoom}
-                message={message}
-              />
-        ))
+            <MessageFilter currentRoom={currentRoom} message={message} />
+          ))
         : null}
       <AlwaysScrollToBottom />
     </Flex>

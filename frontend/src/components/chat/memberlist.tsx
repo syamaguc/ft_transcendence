@@ -87,13 +87,13 @@ function MemberMenu({ socket, user, currentRoom, member }) {
           ) : null}
           {currentRoom.muted.indexOf(member.userId) == -1 ? (
             <MenuItem onClick={() => onClickMute(member.userId)}>
-            mute user
+              mute user
             </MenuItem>
-          ) :
+          ) : (
             <MenuItem onClick={() => onClickMute(member.userId)}>
-            unmute
+              unmute
             </MenuItem>
-          }
+          )}
           {/* // <MenuItem onClick={() => onClickMute(member.userId)}>
           //   mute user
           // </MenuItem> */}

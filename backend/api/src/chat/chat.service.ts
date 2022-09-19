@@ -90,13 +90,11 @@ export class ChatService {
 
 			//delete from admin
 			const index2 = room.admins.indexOf(userId)
-			if (index2 != -1)
-				room.admins.splice(index2, 1)
+			if (index2 != -1) room.admins.splice(index2, 1)
 
 			//delete from muted
 			const index3 = room.muted.indexOf(userId)
-			if (index3 != -1)
-				room.muted.splice(index3, 1)
+			if (index3 != -1) room.muted.splice(index3, 1)
 
 			room.banned.push(userId)
 			return chatRepository.save(room)
