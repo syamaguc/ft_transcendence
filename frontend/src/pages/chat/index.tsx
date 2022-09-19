@@ -113,6 +113,7 @@ const Chat = () => {
             setCurrentRoom={setCurrentRoom}
             setChatLog={setChatLog}
             setInputMessage={setInputText}
+            user={user}
           />
         </Flex>
         <Flex h='90vh' w='80%' direction='column'>

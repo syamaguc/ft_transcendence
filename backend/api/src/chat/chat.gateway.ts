@@ -128,6 +128,18 @@ export class ChatGateway {
 		socket.join(roomId)
 	}
 
+	// room which user is watching
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`leaveRoom: ${socket.id} watched ${roomId}`)
+		const rooms = [...socket.rooms].slice(0)
+		if (rooms.length == 2) socket.leave(rooms[1])
+	}
+
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinProtectedRoom')
 	async joinProtectedRoom(
@@ -143,7 +155,9 @@ export class ChatGateway {
 			password,
 		)
 		if (room) {
+			this.watchOrSwitchRoom(roomId, socket)
 			this.updateRoom(room)
+			this.getMessageLog(roomId, socket)
 		} else {
 			this.server
 				.to(socket.id)

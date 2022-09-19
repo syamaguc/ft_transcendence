@@ -75,6 +75,7 @@ type Props = {
   setCurrentRoom: (room: ChannelObject) => void
   setChatLog: (chatLog: MessageObject[]) => void
   setInputMessage: (input: string) => void
+  user
 }
 
 const SideBar = ({
@@ -83,17 +84,28 @@ const SideBar = ({
   setCurrentRoom,
   setChatLog,
   setInputMessage,
+  user,
 }: Props) => {
   const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
   const [room, setRoom] = useState<ChannelObject>()
   const [moveChannelId, setMoveChannelId] = useState()
 
-  const onClickChannel = (chatRoom: ChannelObject) => {
+  const onClickChannel = (chatRoom: ChannelObject, user) => {
     if (currentRoom != chatRoom) {
       setCurrentRoom(chatRoom)
-      socket.emit('watchRoom', chatRoom.id)
-      socket.emit('getMessageLog', chatRoom.id)
-      setInputMessage('')
+      const members = chatRoom.members
+      let joined = false
+      if (members.indexOf(user.userId) != -1) {
+        joined = true
+      }
+      if (!chatRoom.password || joined) {
+        socket.emit('watchRoom', chatRoom.id)
+        socket.emit('getMessageLog', chatRoom.id)
+        setInputMessage('')
+      } else {
+        socket.emit('leaveRoom', chatRoom.id)
+        setChatLog([])
+      }
     }
   }
 
@@ -177,7 +189,7 @@ const SideBar = ({
             p={4}
             _hover={{ bgColor: '#00BABC' }}
             onClick={() => {
-              onClickChannel(chatRoom)
+              onClickChannel(chatRoom, user)
             }}
             key={chatRoom.id}
           >
