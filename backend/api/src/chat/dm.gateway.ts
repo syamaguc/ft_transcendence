@@ -88,9 +88,9 @@ export class DMGateway {
 		if (!room) {
 			room = await this.DMService.createRoomByUserIds(userId, selfUserId)
 		}
-		newDMRoom = { ...newDMRoom, user2: socket.data.username }
+		const newDMRoom = await this.DMService.getRoom(room.id)
 		socket.emit('updateRoom', newDMRoom)
-		this.notifyAddRoomToUser(socket, newDMRoom.user1, newDMRoom)
+		this.notifyAddRoomToUser(socket, userId, newDMRoom)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
