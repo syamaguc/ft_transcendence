@@ -128,6 +128,27 @@ export class ChatGateway {
 		socket.join(roomId)
 	}
 
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('joinProtectedRoom')
+	async joinProtectedRoom(
+		@MessageBody() data,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const roomId = data['roomId']
+		const password = data['password']
+		const userId = socket.data.userId
+		const room: ChatRoom = await this.chatService.joinProtectedRoom(
+			userId,
+			roomId,
+			password
+		)
+		if (room) {
+			this.updateRoom(room)
+		} else {
+			this.server.to(socket.id).emit('toastMessage', 'Password is incorrect.')
+		}
+	}
+
 	// join room to be a member
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinRoom')
