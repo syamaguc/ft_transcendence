@@ -1,4 +1,4 @@
-import { User, UserPartialInfo, Session } from 'src/types/user'
+import { User, PartialUserInfo, Session } from 'src/types/user'
 
 export class FetchError extends Error {
   response: Response
@@ -91,9 +91,23 @@ export async function fetchUserInfo(url: string): Promise<{ user: User }> {
   return { user: null }
 }
 
-export async function fetchUserPartialInfo(
+export async function fetchPartialUserInfos(
   url: string
-): Promise<{ user: UserPartialInfo }> {
+): Promise<PartialUserInfo[]> {
+  const res = await fetch(url, { credentials: 'include' })
+  const data = await res.json()
+
+  if (res.ok) {
+    return data
+  }
+
+  // TODO: throw
+  return []
+}
+
+export async function fetchPartialUserInfo(
+  url: string
+): Promise<{ user: PartialUserInfo }> {
   const res = await fetch(url, { credentials: 'include' })
   const data = await res.json()
 

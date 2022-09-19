@@ -163,6 +163,7 @@ export class UserService {
 			username: user.username,
 			elo: user.elo,
 			profile_picture: user.profile_picture,
+			status: user.status,
 		}
 	}
 

@@ -18,7 +18,7 @@ import {
 import NextLink from 'next/link'
 
 import useSWR from 'swr'
-import { fetchUsers } from 'src/lib/fetchers'
+import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
 import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
 
@@ -28,14 +28,24 @@ import { API_URL } from 'src/constants'
 
 function UserList() {
   const { user: currentUser } = useUser()
-  const { data: users, error } = useSWR(
+  const { data: usersData, error: usersError } = useSWR(
     `${API_URL}/api/user/search`,
     fetchUsers
   )
 
-  const isLoading = !users && !error
-  console.log(users)
-  console.log('isLoading: ', isLoading)
+  const usersIsLoading = !usersData && !usersError
+  console.log('/users usersData: ', usersData)
+
+  // From here
+  console.log('/users currentUser: ', currentUser)
+
+  const { data: friendsData, error: friendsError } = useSWR(
+    `${API_URL}/api/user/friendList`,
+    fetchPartialUserInfos
+  )
+
+  console.log('/users friendsData: ', friendsData)
+  console.log('/users isLoading: ', !friendsData && !friendsError)
 
   return (
     <Layout>
@@ -43,23 +53,32 @@ function UserList() {
         <Box py='12'>
           <Stack spacing='12'>
             <Heading as='h1' fontSize='5xl'>
+              Friends
+            </Heading>
+            <Stack>
+              {currentUser.friends.map((friend) => (
+                <Text key={friend}>friend: {friend}</Text>
+              ))}
+            </Stack>
+
+            <Heading as='h2' fontSize='2xl'>
               Users
             </Heading>
-            {error && (
+            {usersError && (
               <Stack spacing='8'>
                 <Text>Error occurred</Text>
               </Stack>
             )}
-            {isLoading && (
+            {usersIsLoading && (
               <Stack spacing='8'>
-                <Skeleton height='60px' isLoaded={!isLoading} />
-                <Skeleton height='60px' isLoaded={!isLoading} />
-                <Skeleton height='60px' isLoaded={!isLoading} />
+                <Skeleton height='60px' isLoaded={!usersIsLoading} />
+                <Skeleton height='60px' isLoaded={!usersIsLoading} />
+                <Skeleton height='60px' isLoaded={!usersIsLoading} />
               </Stack>
             )}
             <Stack spacing='2'>
-              {users &&
-                users
+              {usersData &&
+                usersData
                   .filter((user) => user.userId !== currentUser.userId)
                   .map((user: User) => (
                     <NextLink
@@ -109,9 +128,6 @@ function UserList() {
                     </NextLink>
                   ))}
             </Stack>
-            <Heading as='h2' fontSize='2xl'>
-              Friends
-            </Heading>
           </Stack>
         </Box>
       </Container>

@@ -46,11 +46,11 @@ import ChakraNextImage from 'src/components/chakra-next-image'
 import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
-import { fetchUserPartialInfo, fetchText } from 'src/lib/fetchers'
+import { fetchPartialUserInfo, fetchText } from 'src/lib/fetchers'
 
 import Layout from '@components/scrollable-layout'
 
-import { User, UserPartialInfo, GameHistory } from 'src/types/user'
+import { User, PartialUserInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
 
@@ -586,7 +586,7 @@ function Statistics({ user }: StatistiscProps) {
 }
 
 type PlayerInfoProps = {
-  player: UserPartialInfo
+  player: PartialUserInfo
 }
 
 function PlayerInfo({ player }: PlayerInfoProps) {
@@ -629,7 +629,7 @@ function MatchInfo({ user, game }: MatchInfoProps) {
 
   const { data: data, error } = useSWR(
     `${API_URL}/api/user/partialInfo?userId=${opponentId}`,
-    fetchUserPartialInfo
+    fetchPartialUserInfo
   )
 
   const isLoading = !data && !error
