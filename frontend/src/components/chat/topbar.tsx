@@ -3,6 +3,7 @@ import { Image, Button, Text, IconButton } from '@chakra-ui/react'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
+import ButtonLeave from './button-leave'
 
 const TopBar = ({ socket, currentRoom }) => {
   return (
@@ -23,9 +24,10 @@ const TopBar = ({ socket, currentRoom }) => {
             whiteSpace='nowrap'
             textOverflow='ellipsis'
           >
-            Current Channel : {currentRoom.name}
+            # {currentRoom.name}
           </Text>
           <MemberListModal socket={socket} currentRoom={currentRoom} />
+          <ButtonLeave socket={socket} currentRoom={currentRoom} />
         </>
       )}
     </Flex>
