@@ -51,7 +51,7 @@ const BottomBar = ({
           password: password,
         })
       },
-      [socket, currentRoom]
+      [socket, onClose]
     )
 
     return (
