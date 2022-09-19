@@ -22,7 +22,7 @@ export class ChatService {
 		private jwtService: JwtService,
 	) {}
 
-	setUserIdToSocket(socket: Socket) {
+	setUserToSocket(socket: Socket) {
 		const cookie = socket.handshake.headers['cookie']
 		const { jwt: token } = parse(cookie)
 		if (!token) {
@@ -34,8 +34,9 @@ export class ChatService {
 			//secret: process.env.SECRET_JWT,
 			secret: 'superSecret2022',
 		})
-		const { userid } = payload
+		const { userid, username } = payload
 		socket.data.userId = userid
+		socket.data.username = username
 	}
 
 	async createRoom(
@@ -60,7 +61,7 @@ export class ChatService {
 	): Promise<Message> {
 		const room: ChatRoom = await chatRepository.findId(roomId)
 		const messageId = uuidv4()
-		const message: Message = {
+		const message: Partial<Message> = {
 			id: messageId,
 			userId: userId,
 			...addMessageDto,
@@ -164,5 +165,25 @@ export class ChatService {
 		// 		'============error in join room: the user is already a member==========',
 		// 	)
 		// }
+	}
+
+	async joinProtectedRoom(
+		userId: uuidv4,
+		roomId: string,
+		password: string,
+	): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		console.log(room)
+		if (room.members.indexOf(userId) === -1) {
+			// 暗号化される予定なのでデコードする必要がある
+			const roomPassword = room.password
+			if (roomPassword == password) {
+				console.log('=========new member joined the channel=========')
+				room.members.push(userId)
+				return chatRepository.save(room)
+			} else {
+				return null
+			}
+		}
 	}
 }

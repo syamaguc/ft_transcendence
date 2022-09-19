@@ -6,6 +6,7 @@ import {
 	JoinColumn,
 } from 'typeorm'
 import { ChatRoom } from './chat-room.entity'
+import { DMRoom } from './dm-room.entity'
 
 @Entity()
 export class Message {
@@ -23,6 +24,13 @@ export class Message {
 
 	@ManyToOne(() => ChatRoom, (room) => room.messages, {
 		cascade: true,
+		nullable: true,
 	})
 	room: ChatRoom
+
+	@ManyToOne(() => DMRoom, (DMroom) => DMroom.messages, {
+		cascade: true,
+		nullable: true,
+	})
+	DMroom: DMRoom
 }

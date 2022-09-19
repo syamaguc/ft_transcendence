@@ -25,7 +25,7 @@ export class ChatGateway {
 	private logger: Logger = new Logger('ChatGateway')
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		this.chatService.setUserIdToSocket(socket)
+		this.chatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 
@@ -127,6 +127,41 @@ export class ChatGateway {
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 		socket.join(roomId)
+	}
+
+	// room which user is watching
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`leaveRoom: ${socket.id} watched ${roomId}`)
+		const rooms = [...socket.rooms].slice(0)
+		if (rooms.length == 2) socket.leave(rooms[1])
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('joinProtectedRoom')
+	async joinProtectedRoom(
+		@MessageBody() data,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const roomId = data['roomId']
+		const password = data['password']
+		const userId = socket.data.userId
+		const room: ChatRoom = await this.chatService.joinProtectedRoom(
+			userId,
+			roomId,
+			password,
+		)
+		if (room) {
+			this.watchOrSwitchRoom(roomId, socket)
+			this.updateRoom(room)
+			this.getMessageLog(roomId, socket)
+		} else {
+			throw new WsException('Password is incorrect.')
+		}
 	}
 
 	// join room to be a member

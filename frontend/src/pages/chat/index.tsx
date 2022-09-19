@@ -28,7 +28,6 @@ const API_URL = 'http://localhost:3000/chat'
 
 const Chat = () => {
   const { user } = useUser()
-  const toast = useToast()
   const [isJoined, setIsJoined] = useState(false)
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
@@ -44,6 +43,8 @@ const Chat = () => {
     password: '',
   })
   const [socket, setSocket] = useState()
+  const [toastMessage, setToastMessage] = useState()
+  const toast = useToast()
 
   useEffect(() => {
     const tempSocket = io(API_URL, { transports: ['websocket'] })
@@ -107,6 +108,7 @@ const Chat = () => {
             setCurrentRoom={setCurrentRoom}
             setChatLog={setChatLog}
             setInputMessage={setInputText}
+            user={user}
           />
         </Flex>
         <Flex h='90vh' w='80%' direction='column'>
