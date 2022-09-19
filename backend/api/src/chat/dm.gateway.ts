@@ -35,13 +35,13 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`addMessage: recieved ${addMessageDto.message}`)
-		const room = [...socket.rooms].slice(0)[1]
+		const roomId = [...socket.rooms].slice(0)[1]
 		const newMessage = await this.DMService.addMessageByRoomId(
 			addMessageDto,
 			socket.data.userId,
-			room,
+			roomId,
 		)
-		this.server.to(room).emit('updateNewMessage', newMessage)
+		this.server.to(roomId).emit('updateNewMessage', newMessage)
 	}
 
 	@SubscribeMessage('getMessageLog')
@@ -101,18 +101,17 @@ export class DMGateway {
 		this.logger.log(
 			`getRoomIdByUserIds: for ${socket.data.userId} and ${userId}`,
 		)
-		const room = await this.DMService.getRoomByUserIds(
+		let room = await this.DMService.getRoomByUserIds(
 			socket.data.userId,
 			userId,
 		)
 		if (!room) {
-			let newDMRoom = await this.DMService.createRoomByUserIds(
+			room = await this.DMService.createRoomByUserIds(
 				userId,
 				socket.data.userId,
 			)
-			socket.emit('getRoomIdByUserIds', newDMRoom.id)
+			const newDMRoom = await this.DMService.getRoomByRoomId(room.id)
 			this.sendAddRoomByUserId(socket, userId, newDMRoom)
-			return
 		}
 		socket.emit('getRoomIdByUserIds', room.id)
 	}
