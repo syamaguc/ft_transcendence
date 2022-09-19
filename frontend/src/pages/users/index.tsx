@@ -9,6 +9,7 @@ import {
   Divider,
   Flex,
   Heading,
+  Icon,
   Stack,
   Spacer,
   Skeleton,
@@ -18,6 +19,7 @@ import {
   TabList,
   TabPanels,
   TabPanel,
+  Tooltip,
   useBreakpointValue,
   useColorModeValue,
 } from '@chakra-ui/react'
@@ -28,6 +30,7 @@ import useSWR from 'swr'
 import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
 import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
+import { BiMessage } from 'react-icons/bi'
 
 import { PartialUserInfo, User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
@@ -68,12 +71,34 @@ function FriendItem({ friend }: FriendItemProps) {
             </Text>
           </Stack>
           <Spacer />
-          <Circle bg='gray.100' size='38px' mr='16px'>
-            <FiMessageSquare />
-          </Circle>
-          <Circle bg='gray.100' size='38px' mr='16px'>
-            <FiMoreVertical />
-          </Circle>
+          <Tooltip label='Message'>
+            <Circle
+              _hover={{ bg: 'gray.200' }}
+              bg='gray.100'
+              size='38px'
+              mr='16px'
+              onClick={() => alert('hey')}
+            >
+              <Icon
+                as={BiMessage}
+                display='block'
+                transition='color 0.2s'
+                size='38px'
+                _hover={{ color: 'gray.600' }}
+              />
+            </Circle>
+          </Tooltip>
+          <Tooltip label='More'>
+            <Circle _hover={{ bg: 'gray.200' }} bg='gray.100' size='38px'>
+              <Icon
+                as={FiMoreVertical}
+                display='block'
+                transition='color 0.2s'
+                size='38px'
+                _hover={{ color: 'gray.600' }}
+              />
+            </Circle>
+          </Tooltip>
         </Flex>
       </Stack>
     </NextLink>
