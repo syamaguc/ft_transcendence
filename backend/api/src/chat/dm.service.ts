@@ -17,14 +17,14 @@ export class DMService {
 		private readonly DMRoomRepository: Repository<DMRoom>,
 	) {}
 
-	async getUserIdByUsername(username: string) {
+	async getUserIdByUsername(username: string): Promise<string> {
 		const user = await UsersRepository.findOne({
 			where: { username: username },
 		})
 		if (!user) {
 			throw new WsException('User Not Found')
 		}
-		return user.id
+		return user.userId
 	}
 
 	async getRoomByUserIds(userId1: string, userId2: string): Promise<DMRoom> {
