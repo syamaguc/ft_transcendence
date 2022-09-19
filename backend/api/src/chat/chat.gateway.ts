@@ -130,12 +130,12 @@ export class ChatGateway {
 
 	// room which user is watching
 	@UseGuards(SocketGuard)
-	@SubscribeMessage('leaveRoom')
-	leaveRoom(
+	@SubscribeMessage('unwatchRoom')
+	unwatchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`leaveRoom: ${socket.id} watched ${roomId}`)
+		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 	}

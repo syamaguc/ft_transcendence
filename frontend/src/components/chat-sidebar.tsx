@@ -103,7 +103,7 @@ const SideBar = ({
         socket.emit('getMessageLog', chatRoom.id)
         setInputMessage('')
       } else {
-        socket.emit('leaveRoom', chatRoom.id)
+        socket.emit('unwatchRoom', chatRoom.id)
         setChatLog([])
       }
     }
