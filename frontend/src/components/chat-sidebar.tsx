@@ -17,6 +17,7 @@ import { useState, useCallback, useEffect, useRef } from 'react'
 import { io, Socket } from 'socket.io-client'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 import ChatCreationForm from './chat-creation-form'
+import { DEFAULT_ROOM } from 'src/constants'
 
 const ChannelOne = ({ roomInfo }) => {
   if (roomInfo.is_private) {
@@ -78,17 +79,6 @@ type Props = {
   user
 }
 
-const defaultRoom: ChannelObject = {
-  id: 'default-channel',
-  name: '',
-  members: [],
-  owner: '',
-  admins: [],
-  is_private: false,
-  logs: [],
-  password: '',
-}
-
 const SideBar = ({
   socket,
   currentRoom,
@@ -135,7 +125,7 @@ const SideBar = ({
     })
     socket.on('deleteRoom', () => {
       console.log('deleteRoom received ')
-      setCurrentRoom(defaultRoom)
+      setCurrentRoom(DEFAULT_ROOM)
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
       console.log('updateCurrentRoom received : ', channelId)
