@@ -78,6 +78,17 @@ type Props = {
   user
 }
 
+const defaultRoom: ChannelObject = {
+  id: 'default-channel',
+  name: '',
+  members: [],
+  owner: '',
+  admins: [],
+  is_private: false,
+  logs: [],
+  password: '',
+}
+
 const SideBar = ({
   socket,
   currentRoom,
@@ -121,6 +132,10 @@ const SideBar = ({
     socket.on('updateRoom', (channel: ChannelObject) => {
       console.log('updateRoom received : ', channel)
       setRoom(channel)
+    })
+    socket.on('deleteRoom', () => {
+      console.log('deleteRoom received ')
+      setCurrentRoom(defaultRoom)
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
       console.log('updateCurrentRoom received : ', channelId)

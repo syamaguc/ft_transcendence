@@ -220,6 +220,18 @@ export class ChatGateway {
 		this.getMessageLog(newChatRoom.id, socket)
 	}
 
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('deleteRoom')
+	async deleteRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`deleteRoom: ${roomId}`)
+		await this.chatService.deleteRoom(roomId)
+		this.server.to(roomId).emit('deleteRoom')
+		// this.unwatchRoom(roomId, socket)
+	}
+
 	async joinRoom(roomId: string, socket: Socket) {
 		this.logger.log(`joinRoom: ${socket.id} watched ${roomId}`)
 		this.watchOrSwitchRoom(roomId, socket)
