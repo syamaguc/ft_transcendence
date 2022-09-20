@@ -126,6 +126,7 @@ const SideBar = ({
     socket.on('deleteRoom', () => {
       console.log('deleteRoom received ')
       setCurrentRoom(DEFAULT_ROOM)
+      setChatLog([])
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
       console.log('updateCurrentRoom received : ', channelId)
