@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
 import { v4 as uuidv4 } from 'uuid'
+import { WsException } from '@nestjs/websockets'
+import * as bcrypt from 'bcrypt'
 import { ChatRoom } from './entities/chat-room.entity'
 import { chatRepository } from './chat.repository'
 import { Repository } from 'typeorm'
@@ -13,7 +15,6 @@ import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
-import { WsException } from '@nestjs/websockets'
 
 @Injectable()
 export class ChatService {
@@ -44,8 +45,16 @@ export class ChatService {
 		chatRoomData: CreateChatRoomDto,
 		userId: string,
 	): Promise<ChatRoom> {
+		const { name, is_private, password } = chatRoomData
+		let hashed_password = password
+		if (password != '') {
+			const salt = await bcrypt.genSalt()
+			hashed_password = await bcrypt.hash(password, salt)
+		}
 		const newChatRoom = {
-			...chatRoomData,
+			name: name,
+			is_private: is_private,
+			password: hashed_password,
 			id: uuidv4(),
 			owner: userId,
 			admins: [userId],
@@ -182,16 +191,13 @@ export class ChatService {
 		if (room.banned.indexOf(userId) != -1) {
 			throw new WsException('You are banned from the channel')
 		}
-		console.log(room)
 		if (room.members.indexOf(userId) === -1) {
-			// 暗号化される予定なのでデコードする必要がある
-			const roomPassword = room.password
-			if (roomPassword == password) {
+			if (await bcrypt.compare(password, room.password)) {
 				console.log('=========new member joined the channel=========')
 				room.members.push(userId)
 				return chatRepository.save(room)
 			} else {
-				return null
+				throw new WsException('password is incorrect')
 			}
 		}
 	}
