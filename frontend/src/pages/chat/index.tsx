@@ -25,6 +25,16 @@ import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
 
 const API_URL = 'http://localhost:3000/chat'
+const defaultRoom: ChannelObject = {
+  id: 'default-channel',
+  name: '',
+  members: [],
+  owner: '',
+  admins: [],
+  is_private: false,
+  logs: [],
+  password: '',
+}
 
 const Chat = () => {
   const { user } = useUser()
@@ -32,18 +42,8 @@ const Chat = () => {
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
-  const [currentRoom, setCurrentRoom] = useState<ChannelObject>({
-    id: 'default-channel',
-    name: 'random',
-    members: [],
-    owner: 'none',
-    admins: [],
-    is_private: false,
-    logs: [],
-    password: '',
-  })
+  const [currentRoom, setCurrentRoom] = useState<ChannelObject>(defaultRoom)
   const [socket, setSocket] = useState()
-  const [toastMessage, setToastMessage] = useState()
   const toast = useToast()
 
   useEffect(() => {

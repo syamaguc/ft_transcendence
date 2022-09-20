@@ -81,7 +81,6 @@ const ButtonLeave = ({ socket, currentRoom, isJoined }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoom])
 
-  console.log(isOwner)
   return (
     <>
       {isJoined ? (
