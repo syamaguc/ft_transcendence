@@ -131,12 +131,12 @@ export class ChatGateway {
 
 	// room which user is watching
 	@UseGuards(SocketGuard)
-	@SubscribeMessage('leaveRoom')
-	leaveRoom(
+	@SubscribeMessage('unwatchRoom')
+	unwatchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`leaveRoom: ${socket.id} watched ${roomId}`)
+		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 	}
@@ -182,6 +182,24 @@ export class ChatGateway {
 		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
+	}
+
+	// leave a room by roomId
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	async leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log('leaveRoom called')
+		const room: ChatRoom = await this.chatService.leaveRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
+		if (room.password) {
+			this.unwatchRoom(roomId, socket)
+		}
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/

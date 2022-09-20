@@ -112,7 +112,11 @@ const Chat = () => {
           />
         </Flex>
         <Flex h='90vh' w='80%' direction='column'>
-          <TopBar socket={socket} currentRoom={currentRoom} />
+          <TopBar
+            socket={socket}
+            currentRoom={currentRoom}
+            isJoined={isJoined}
+          />
           <MiddleBar currentRoom={currentRoom} chatLog={chatLog} />
           <Flex p={4}>
             <BottomBar
