@@ -9,6 +9,9 @@ import {
   Divider,
   Flex,
   Heading,
+  Input,
+  InputGroup,
+  InputRightElement,
   Icon,
   Stack,
   Spacer,
@@ -21,9 +24,15 @@ import {
   TabPanels,
   TabPanel,
   Tooltip,
+  FormLabel,
+  FormControl,
+  FormHelperText,
+  FormErrorMessage,
   useBreakpointValue,
   useColorModeValue,
   useTab,
+  useToast,
+  UseToastOptions,
   useStyleConfig,
   useMultiStyleConfig,
 } from '@chakra-ui/react'
@@ -31,7 +40,8 @@ import NextLink from 'next/link'
 import UserStatusBadge from '@components/user-status-badge'
 import { useRef, forwardRef } from 'react'
 
-import useSWR from 'swr'
+import { useFormik, FormikErrors } from 'formik'
+import useSWR, { KeyedMutator } from 'swr'
 import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
 import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
@@ -110,6 +120,138 @@ function FriendItem({ friend }: FriendItemProps) {
   )
 }
 
+type AddFriendProps = {
+  user: User
+  mutateFriends: KeyedMutator<PartialUserInfo[]>
+}
+
+function AddFriend({ user, mutateFriends }: AddFriendProps) {
+  const toast = useToast()
+
+  const validate = (values: { username: string }) => {
+    const errors: FormikErrors<{ username: string }> = {}
+    return errors
+  }
+
+  const formik = useFormik<{ username: string }>({
+    initialValues: {
+      username: '',
+    },
+    validate,
+    onSubmit: async (values, actions) => {
+      let message: string
+      let status: 'success' | 'info' | 'error' = 'error'
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
+      console.log(JSON.stringify(values))
+
+      const res = await fetch(
+        `${API_URL}/api/user/userInfo?username=${values.username}`,
+        {
+          method: 'GET',
+          credentials: 'include',
+        }
+      )
+
+      const data = await res.json()
+      console.log('userInfo data: ', data)
+      console.log('friendList: ', user.friends)
+
+      if (!res.ok) {
+        message = 'Username not found'
+        formik.errors.username = message
+      } else if (res.ok) {
+        const username = data.username
+        const userId = data.userId
+        if (username === user.username) {
+          message = 'You cannot add yourself as friends'
+          formik.errors.username = message
+        } else if (user.friends.indexOf(userId) > -1) {
+          message = 'Already friends with that user'
+          formik.errors.username = message
+        } else {
+          const res = await fetch(`${API_URL}/api/user/addFriend`, {
+            method: 'PATCH',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userId: userId }),
+          })
+          if (!res.ok) {
+            message = 'Could not add friend'
+          } else if (res.ok) {
+            message = 'Friend added'
+            status = 'success'
+            mutateFriends()
+          }
+        }
+      }
+
+      toast({
+        description: message,
+        variant: 'subtle',
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
+      actions.setSubmitting(false)
+    },
+  })
+
+  return (
+    <>
+      <form onSubmit={formik.handleSubmit}>
+        <Stack>
+          <FormControl
+            isInvalid={formik.errors.username && formik.touched.username}
+          >
+            <Stack spacing='2'>
+              <Heading as='h2' fontSize='lg'>
+                ADD FRIEND
+              </Heading>
+              <Text fontSize='sm' colorScheme='gray'>
+                {`You can add a friend with their username. It's cAsE sEnSitIvE`}
+              </Text>
+              <FormHelperText fontSize='sm'></FormHelperText>
+              <InputGroup size='lg'>
+                <Input
+                  name='username'
+                  type='text'
+                  pr='4.5rem'
+                  placeholder='Enter a username'
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                  value={formik.values.username}
+                />
+                <InputRightElement width='4.5rem'>
+                  <Button
+                    h='2rem'
+                    px='4'
+                    size='md'
+                    colorScheme='blackAlpha'
+                    bg='blackAlpha.900'
+                    _dark={{
+                      bg: 'whiteAlpha.900',
+                      _hover: { bg: 'whiteAlpha.600' },
+                    }}
+                    type='submit'
+                    isDisabled={!formik.values.username ? true : false}
+                    isLoading={formik.isSubmitting}
+                  >
+                    Add
+                  </Button>
+                </InputRightElement>
+              </InputGroup>
+            </Stack>
+            <FormErrorMessage>{formik.errors.username}</FormErrorMessage>
+          </FormControl>
+        </Stack>
+      </form>
+    </>
+  )
+}
+
 type BlockedItemProps = {
   blocked: PartialUserInfo
 }
@@ -131,13 +273,15 @@ function UserList() {
   // From here
   console.log('/users currentUser: ', currentUser)
 
-  const { data: friendsData, error: friendsError } = useSWR(
-    `${API_URL}/api/user/friendList`,
-    fetchPartialUserInfos
-  )
+  const {
+    data: friendsData,
+    mutate: mutateFriends,
+    error: friendsError,
+  } = useSWR(`${API_URL}/api/user/friendList`, fetchPartialUserInfos)
 
   const friendsIsLoading = !usersData && !usersError
   console.log('/users friendsData: ', friendsData)
+  console.log('/users friendsData.length: ', friendsData?.length)
   console.log('/users isLoading: ', !friendsData && !friendsError)
 
   const SecondaryTab = (props: TabProps) => {
@@ -212,29 +356,31 @@ function UserList() {
                         <Skeleton height='60px' isLoaded={!usersIsLoading} />
                       </Stack>
                     )}
-                    {friendsData && (
-                      <Stack spacing='0'>
-                        <Text
-                          mb='3'
-                          fontSize='sm'
-                          fontWeight='semibold'
-                          color='gray.400'
-                        >
-                          ONLINE -{' '}
-                          {
-                            friendsData.filter(
-                              (friend) => friend.status === 'Online'
-                            ).length
-                          }
-                        </Text>
-                        <Divider />
-                        {friendsData
-                          .filter((friend) => friend.status === 'Online')
-                          .map((friend: PartialUserInfo) => (
-                            <FriendItem key={friend.userId} friend={friend} />
-                          ))}
-                      </Stack>
-                    )}
+                    {friendsData &&
+                      friendsData.filter((friend) => friend.status === 'Online')
+                        .length > 0 && (
+                        <Stack spacing='0'>
+                          <Text
+                            mb='3'
+                            fontSize='sm'
+                            fontWeight='semibold'
+                            color='gray.400'
+                          >
+                            ONLINE -{' '}
+                            {
+                              friendsData.filter(
+                                (friend) => friend.status === 'Online'
+                              ).length
+                            }
+                          </Text>
+                          <Divider />
+                          {friendsData
+                            .filter((friend) => friend.status === 'Online')
+                            .map((friend: PartialUserInfo) => (
+                              <FriendItem key={friend.userId} friend={friend} />
+                            ))}
+                        </Stack>
+                      )}
                   </TabPanel>
                   <TabPanel>
                     {friendsError && (
@@ -249,7 +395,7 @@ function UserList() {
                         <Skeleton height='60px' isLoaded={!usersIsLoading} />
                       </Stack>
                     )}
-                    {friendsData && (
+                    {friendsData && friendsData.length > 0 && (
                       <Stack spacing='0'>
                         <Text
                           mb='3'
@@ -270,7 +416,10 @@ function UserList() {
                     <Text>Blocked Users</Text>
                   </TabPanel>
                   <TabPanel>
-                    <Text>Add Friend</Text>
+                    <AddFriend
+                      user={currentUser}
+                      mutateFriends={mutateFriends}
+                    />
                   </TabPanel>
                 </TabPanels>
               </Stack>

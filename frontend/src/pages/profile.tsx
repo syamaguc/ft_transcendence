@@ -752,6 +752,7 @@ function TwoFactorAuth() {
     if (!values.code) {
       errors.code = 'Required'
     }
+    return errors
   }
 
   const updateTwoFactorAuth = async (toggle: boolean) => {
