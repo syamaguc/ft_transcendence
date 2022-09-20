@@ -90,6 +90,7 @@ const SideBar = ({
   const [chatRooms, setChatRooms] = useState<ChannelObject[]>([currentRoom])
   const [room, setRoom] = useState<ChannelObject>()
   const [moveChannelId, setMoveChannelId] = useState()
+  const [deleteFlag, setDeleteFlag] = useState(false)
 
   const onClickChannel = (chatRoom: ChannelObject, user) => {
     if (currentRoom != chatRoom) {
@@ -123,9 +124,11 @@ const SideBar = ({
       console.log('updateRoom received : ', channel)
       setRoom(channel)
     })
-    socket.on('deleteRoom', () => {
-      console.log('deleteRoom received ')
+    socket.on('deleteRoom', (deletedChannel: ChannelObject) => {
+      console.log('deleteRoom received ', deletedChannel)
       setCurrentRoom(DEFAULT_ROOM)
+      setDeleteFlag(true)
+      setRoom(deletedChannel)
       setChatLog([])
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
@@ -138,6 +141,14 @@ const SideBar = ({
 
   useEffect(() => {
     if (room) {
+      if (deleteFlag) {
+        const index = chatRooms.indexOf(room)
+        if (index !== -1) {
+          chatRooms.splice(index, 1)
+        }
+        setDeleteFlag(false)
+        return
+      }
       let existFlag = false
       for (let i = 0; i < chatRooms.length; i++) {
         if (chatRooms[i].id == room.id) {

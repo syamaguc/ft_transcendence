@@ -222,14 +222,10 @@ export class ChatGateway {
 
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('deleteRoom')
-	async deleteRoom(
-		@MessageBody() roomId: string,
-		@ConnectedSocket() socket: Socket,
-	) {
+	async deleteRoom(@MessageBody() roomId: string) {
 		this.logger.log(`deleteRoom: ${roomId}`)
-		await this.chatService.deleteRoom(roomId)
-		this.server.to(roomId).emit('deleteRoom')
-		// this.unwatchRoom(roomId, socket)
+		const deletedRoom = await this.chatService.deleteRoom(roomId)
+		this.server.to(roomId).emit('deleteRoom', deletedRoom)
 	}
 
 	async joinRoom(roomId: string, socket: Socket) {
