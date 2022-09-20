@@ -9,10 +9,19 @@ import {
   Divider,
   Flex,
   Heading,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
   Input,
   InputGroup,
   InputRightElement,
   Icon,
+  IconButton,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
   Stack,
   Spacer,
   Skeleton,
@@ -38,7 +47,7 @@ import {
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import UserStatusBadge from '@components/user-status-badge'
-import { useRef, forwardRef } from 'react'
+import { useState, useRef, forwardRef } from 'react'
 
 import { useFormik, FormikErrors } from 'formik'
 import useSWR, { KeyedMutator } from 'swr'
@@ -50,12 +59,21 @@ import { BiMessage } from 'react-icons/bi'
 import { PartialUserInfo, User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+import { Key } from 'readline'
 
 type FriendItemProps = {
   friend: PartialUserInfo
+  mutateFriends: KeyedMutator<PartialUserInfo[]>
 }
 
-function FriendItem({ friend }: FriendItemProps) {
+function FriendItem({ friend, mutateFriends }: FriendItemProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
+
+  const removeFriend = async () => {
+    console.log('removing friend')
+  }
+
   return (
     <NextLink key={friend.userId} href={`/users/${friend.username}`}>
       <Stack
@@ -92,7 +110,10 @@ function FriendItem({ friend }: FriendItemProps) {
               bg='gray.100'
               size='38px'
               mr='16px'
-              onClick={() => alert('hey')}
+              onClick={(e) => {
+                alert('child')
+                e.stopPropagation()
+              }}
             >
               <Icon
                 as={BiMessage}
@@ -104,15 +125,81 @@ function FriendItem({ friend }: FriendItemProps) {
             </Circle>
           </Tooltip>
           <Tooltip label='More'>
-            <Circle _hover={{ bg: 'gray.200' }} bg='gray.100' size='38px'>
-              <Icon
-                as={FiMoreVertical}
-                display='block'
-                transition='color 0.2s'
-                size='38px'
-                _hover={{ color: 'gray.600' }}
-              />
-            </Circle>
+            <Box bg='none'>
+              <Menu>
+                <MenuButton
+                  as={Button}
+                  rounded='full'
+                  variant='link'
+                  cursor='pointer'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                >
+                  <Circle _hover={{ bg: 'gray.200' }} bg='gray.100' size='38px'>
+                    <Icon
+                      as={FiMoreVertical}
+                      display='block'
+                      transition='color 0.2s'
+                      size='38px'
+                      _hover={{ color: 'gray.600' }}
+                    />
+                  </Circle>
+                </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    fontSize='sm'
+                    onClick={removeFriend}
+                    disabled={isLoading}
+                  >
+                    Remove friend
+                  </MenuItem>
+                  <MenuItem fontSize='sm'>Block user</MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
+          </Tooltip>
+          <Tooltip
+            label='More'
+            placement='top'
+            hasArrow
+            arrowSize={6}
+            borderRadius='base'
+          >
+            <Box bg='none'>
+              <Menu>
+                <MenuButton
+                  as={Circle}
+                  rounded='full'
+                  variant='link'
+                  cursor='pointer'
+                  _hover={{ bg: 'gray.200' }}
+                  bg='gray.100'
+                  size='38px'
+                  onClick={(e) => {
+                    e.stopPropagation()
+                  }}
+                  align='center'
+                >
+                  <Icon
+                    as={FiMoreVertical}
+                    display='block'
+                    transition='color 0.2s'
+                    _hover={{ color: 'gray.600' }}
+                  />
+                </MenuButton>
+                <MenuList>
+                  <MenuItem
+                    fontSize='sm'
+                    onClick={removeFriend}
+                    disabled={isLoading}
+                  >
+                    Remove friend
+                  </MenuItem>
+                  <MenuItem fontSize='sm'>Block user</MenuItem>
+                </MenuList>
+              </Menu>
+            </Box>
           </Tooltip>
         </Flex>
       </Stack>
@@ -143,7 +230,6 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
       let status: 'success' | 'info' | 'error' = 'error'
 
       await new Promise((resolve) => setTimeout(resolve, 500))
-      console.log(JSON.stringify(values))
 
       const res = await fetch(
         `${API_URL}/api/user/userInfo?username=${values.username}`,
@@ -154,8 +240,6 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
       )
 
       const data = await res.json()
-      console.log('userInfo data: ', data)
-      console.log('friendList: ', user.friends)
 
       if (!res.ok) {
         message = 'Username not found'
@@ -183,7 +267,7 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
           } else if (res.ok) {
             message = 'Friend added'
             status = 'success'
-            mutateFriends()
+            await mutateFriends()
           }
         }
       }
@@ -285,7 +369,7 @@ function UserList() {
   console.log('/users isLoading: ', !friendsData && !friendsError)
 
   const SecondaryTab = (props: TabProps) => {
-    const selectedBgColor = useColorModeValue('gray.100', 'gray.500')
+    const selectedBgColor = useColorModeValue('gray.200', 'gray.500')
     const hoverBgColor = useColorModeValue('gray.50', 'inherit')
 
     return (
