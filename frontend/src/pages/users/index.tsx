@@ -68,10 +68,45 @@ type FriendItemProps = {
 
 function FriendItem({ friend, mutateFriends }: FriendItemProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { mutateUser } = useUser()
   const toast = useToast()
 
   const removeFriend = async () => {
-    console.log('removing friend')
+    let message: string
+    let status: 'success' | 'info' | 'error' = 'error'
+
+    setIsLoading(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/deleteFriend`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: friend.userId }),
+      })
+      if (!res.ok) {
+        message = 'Could not remove friend'
+      } else if (res.ok) {
+        message = 'Removed from friends'
+        status = 'info'
+        await mutateFriends()
+        await mutateUser()
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+    toast({
+      description: message,
+      variant: 'subtle',
+      status: status,
+      duration: 5000,
+      isClosable: true,
+    })
+    setIsLoading(false)
   }
 
   return (
@@ -104,7 +139,13 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
             </Text>
           </Stack>
           <Spacer />
-          <Tooltip label='Message'>
+          <Tooltip
+            label='Message'
+            placement='top'
+            hasArrow
+            arrowSize={6}
+            borderRadius='base'
+          >
             <Circle
               _hover={{ bg: 'gray.200' }}
               bg='gray.100'
@@ -123,41 +164,6 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
                 _hover={{ color: 'gray.600' }}
               />
             </Circle>
-          </Tooltip>
-          <Tooltip label='More'>
-            <Box bg='none'>
-              <Menu>
-                <MenuButton
-                  as={Button}
-                  rounded='full'
-                  variant='link'
-                  cursor='pointer'
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
-                >
-                  <Circle _hover={{ bg: 'gray.200' }} bg='gray.100' size='38px'>
-                    <Icon
-                      as={FiMoreVertical}
-                      display='block'
-                      transition='color 0.2s'
-                      size='38px'
-                      _hover={{ color: 'gray.600' }}
-                    />
-                  </Circle>
-                </MenuButton>
-                <MenuList>
-                  <MenuItem
-                    fontSize='sm'
-                    onClick={removeFriend}
-                    disabled={isLoading}
-                  >
-                    Remove friend
-                  </MenuItem>
-                  <MenuItem fontSize='sm'>Block user</MenuItem>
-                </MenuList>
-              </Menu>
-            </Box>
           </Tooltip>
           <Tooltip
             label='More'
@@ -191,7 +197,10 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
                 <MenuList>
                   <MenuItem
                     fontSize='sm'
-                    onClick={removeFriend}
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      await removeFriend()
+                    }}
                     disabled={isLoading}
                   >
                     Remove friend
@@ -266,8 +275,9 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
             message = 'Could not add friend'
           } else if (res.ok) {
             message = 'Friend added'
-            status = 'success'
+            status = 'info'
             await mutateFriends()
+            formik.setFieldValue('username', '')
           }
         }
       }
@@ -461,7 +471,11 @@ function UserList() {
                           {friendsData
                             .filter((friend) => friend.status === 'Online')
                             .map((friend: PartialUserInfo) => (
-                              <FriendItem key={friend.userId} friend={friend} />
+                              <FriendItem
+                                key={friend.userId}
+                                friend={friend}
+                                mutateFriends={mutateFriends}
+                              />
                             ))}
                         </Stack>
                       )}
@@ -491,7 +505,11 @@ function UserList() {
                         </Text>
                         <Divider />
                         {friendsData.map((friend: PartialUserInfo) => (
-                          <FriendItem key={friend.userId} friend={friend} />
+                          <FriendItem
+                            key={friend.userId}
+                            friend={friend}
+                            mutateFriends={mutateFriends}
+                          />
                         ))}
                       </Stack>
                     )}

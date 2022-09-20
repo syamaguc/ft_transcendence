@@ -124,7 +124,10 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
     },
     validate: validate,
     onSubmit: async (values, actions) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      let message: string
+      let status: 'success' | 'info' | 'error' = 'error'
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
       try {
         const body = new FormData()
@@ -138,35 +141,21 @@ const AvatarForm = forwardRef<HTMLElement, AvatarFormProps>((props, ref) => {
 
         if (res.ok) {
           await mutateUser()
-          toast({
-            description: 'Successfully updated your avatar.',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          })
+          message = 'Successfully updated your avatar'
+          status = 'success'
         } else if (res.status === 413) {
-          toast({
-            description: 'File too large.',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          })
+          message = 'File too large'
         } else {
-          toast({
-            description: 'Failed to update your avatar',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          })
+          message = 'Failed to update your avatar'
         }
-      } catch (err) {
-        console.log(err)
         toast({
-          description: 'Failed to update your avatar',
-          status: 'error',
+          description: message,
+          status: status,
           duration: 5000,
           isClosable: true,
         })
+      } catch (err) {
+        console.log(err)
       }
 
       actions.setSubmitting(false)
@@ -279,7 +268,10 @@ function BasicInfo() {
     initialValues,
     validate,
     onSubmit: async (values, actions) => {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      let message: string
+      let status: 'success' | 'info' | 'error' = 'error'
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
       try {
         const res = await fetch(`${API_URL}/api/user/settings`, {
@@ -298,54 +290,34 @@ function BasicInfo() {
 
         if (res.ok) {
           await mutateUser()
-          toast({
-            description: 'Successfully updated your info.',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          })
+          message = 'Successfully updated your info'
+          status = 'success'
         } else if (res.status === 400) {
           const data = await res.json()
-          toast({
-            description:
-              typeof data.message === 'object'
-                ? data.message[0]
-                : 'Internal error occurred',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          })
+          message =
+            typeof data.message === 'object'
+              ? data.message[0]
+              : 'Internal error occurred'
         } else if (res.status === 403) {
           const data = await res.json()
-          console.log(data)
-          toast({
-            description:
-              typeof data.message === 'string'
-                ? data.message
-                : 'Internal error occurred',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          })
+          message =
+            typeof data.message === 'string'
+              ? data.message
+              : 'Internal error occurred'
         } else if (res.status === 500) {
-          toast({
-            description:
-              modalField === 'username'
-                ? 'username already exists'
-                : 'email already exists',
-            status: 'error',
-            duration: 5000,
-            isClosable: true,
-          })
+          message =
+            modalField === 'username'
+              ? 'username already exists'
+              : 'email already exists'
         }
-      } catch (err) {
-        console.log(err)
         toast({
-          description: 'Internal error occurred',
-          status: 'error',
+          description: message,
+          status: status,
           duration: 5000,
           isClosable: true,
         })
+      } catch (err) {
+        console.log(err)
       }
 
       modal.onClose()
@@ -774,6 +746,9 @@ function TwoFactorAuth() {
     },
     validate,
     onSubmit: async (values, actions) => {
+      let message: string
+      let status: 'success' | 'info' | 'error' = 'error'
+
       const res = await fetch(`${API_URL}/api/auth/2fa/${values.code}`, {
         method: 'POST',
         credentials: 'include',
