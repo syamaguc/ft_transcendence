@@ -13,6 +13,7 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
 import { ChatRoom } from './entities/chat-room.entity'
+import { WsException } from '@nestjs/websockets'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
@@ -130,12 +131,12 @@ export class ChatGateway {
 
 	// room which user is watching
 	@UseGuards(SocketGuard)
-	@SubscribeMessage('leaveRoom')
-	leaveRoom(
+	@SubscribeMessage('unwatchRoom')
+	unwatchRoom(
 		@MessageBody() roomId: string,
 		@ConnectedSocket() socket: Socket,
 	) {
-		this.logger.log(`leaveRoom: ${socket.id} watched ${roomId}`)
+		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
 	}
@@ -159,9 +160,7 @@ export class ChatGateway {
 			this.updateRoom(room)
 			this.getMessageLog(roomId, socket)
 		} else {
-			this.server
-				.to(socket.id)
-				.emit('toastMessage', 'Password is incorrect.')
+			throw new WsException('Password is incorrect.')
 		}
 	}
 
@@ -173,10 +172,34 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		//banの場合
+		const tmp = await this.chatService.findRoom(roomId)
+		if (tmp.banned.indexOf(socket.data.userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
 
 		//privateの場合
+
+		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
+	}
+
+	// leave a room by roomId
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	async leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log('leaveRoom called')
+		const room: ChatRoom = await this.chatService.leaveRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
+		if (room.password) {
+			this.unwatchRoom(roomId, socket)
+		}
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
