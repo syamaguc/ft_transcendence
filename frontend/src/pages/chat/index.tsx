@@ -9,8 +9,8 @@ import {
   Stack,
   Flex,
   Text,
-  useControllableState,
   useToast,
+  useControllableState,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useCallback, useRef } from 'react'
@@ -64,8 +64,14 @@ const Chat = () => {
       console.log('recieved : ', message)
       setMsg(message)
     })
-    socket.on('toastMessage', (message: string) => {
-      setToastMessage(message)
+    socket.on('exception', ({ status, message }) => {
+      console.log(status, message)
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
     })
   }, [socket])
 
@@ -92,17 +98,6 @@ const Chat = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [msg])
 
-  useEffect(() => {
-    if (!toastMessage) return
-    toast({
-      description: toastMessage,
-      status: 'error',
-      duration: 5000,
-      isClosable: true,
-    })
-    setToastMessage('')
-  }, [toastMessage])
-
   return (
     <Layout>
       <Flex>
@@ -122,7 +117,7 @@ const Chat = () => {
             currentRoom={currentRoom}
             isJoined={isJoined}
           />
-          <MiddleBar chatLog={chatLog} />
+          <MiddleBar currentRoom={currentRoom} chatLog={chatLog} />
           <Flex p={4}>
             <BottomBar
               inputText={inputText}
