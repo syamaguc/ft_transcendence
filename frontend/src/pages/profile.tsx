@@ -746,9 +746,6 @@ function TwoFactorAuth() {
     },
     validate,
     onSubmit: async (values, actions) => {
-      let message: string
-      let status: 'success' | 'info' | 'error' = 'error'
-
       const res = await fetch(`${API_URL}/api/auth/2fa/${values.code}`, {
         method: 'POST',
         credentials: 'include',

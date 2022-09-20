@@ -54,7 +54,7 @@ import useSWR, { KeyedMutator } from 'swr'
 import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
 import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
-import { BiMessage } from 'react-icons/bi'
+import { BiMessage, BiUserX } from 'react-icons/bi'
 
 import { PartialUserInfo, User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
@@ -64,10 +64,12 @@ import { Key } from 'readline'
 type FriendItemProps = {
   friend: PartialUserInfo
   mutateFriends: KeyedMutator<PartialUserInfo[]>
+  mutateBlocked: KeyedMutator<PartialUserInfo[]>
 }
 
-function FriendItem({ friend, mutateFriends }: FriendItemProps) {
-  const [isLoading, setIsLoading] = useState(false)
+function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
+  const [removeFriendIsLoading, setRemoveFriendIsLoading] = useState(false)
+  const [blockIsLoading, setBlockIsLoading] = useState(false)
   const { mutateUser } = useUser()
   const toast = useToast()
 
@@ -75,7 +77,7 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
     let message: string
     let status: 'success' | 'info' | 'error' = 'error'
 
-    setIsLoading(true)
+    setRemoveFriendIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 500))
 
     try {
@@ -106,7 +108,46 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
       duration: 5000,
       isClosable: true,
     })
-    setIsLoading(false)
+    setRemoveFriendIsLoading(false)
+  }
+
+  const blockUser = async () => {
+    let message: string
+    let status: 'success' | 'info' | 'error' = 'error'
+
+    setBlockIsLoading(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/blockFriend`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: friend.userId }),
+      })
+      if (!res.ok) {
+        message = 'Could not block user'
+      } else if (res.ok) {
+        message = 'Blocked user'
+        status = 'info'
+        await mutateFriends()
+        await mutateBlocked()
+        await mutateUser()
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+    toast({
+      description: message,
+      variant: 'subtle',
+      status: status,
+      duration: 5000,
+      isClosable: true,
+    })
+    setBlockIsLoading(false)
   }
 
   return (
@@ -201,14 +242,134 @@ function FriendItem({ friend, mutateFriends }: FriendItemProps) {
                       e.stopPropagation()
                       await removeFriend()
                     }}
-                    disabled={isLoading}
+                    disabled={removeFriendIsLoading}
                   >
                     Remove friend
                   </MenuItem>
-                  <MenuItem fontSize='sm'>Block user</MenuItem>
+                  <MenuItem
+                    fontSize='sm'
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      await blockUser()
+                    }}
+                    disabled={blockIsLoading}
+                  >
+                    Block
+                  </MenuItem>
                 </MenuList>
               </Menu>
             </Box>
+          </Tooltip>
+        </Flex>
+      </Stack>
+    </NextLink>
+  )
+}
+
+type BlockedUserItemProp = {
+  blockedUser: PartialUserInfo
+  mutateBlocked: KeyedMutator<PartialUserInfo[]>
+}
+
+function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
+  const [isLoading, setIsLoading] = useState(false)
+  const { mutateUser } = useUser()
+  const toast = useToast()
+
+  const unblockUser = async () => {
+    let message: string
+    let status: 'success' | 'info' | 'error' = 'error'
+
+    setIsLoading(true)
+    await new Promise((resolve) => setTimeout(resolve, 500))
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/unblockFriend`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: blockedUser.userId }),
+      })
+      if (!res.ok) {
+        message = 'Could not unblock user'
+      } else if (res.ok) {
+        message = 'Unblocked user'
+        status = 'info'
+        await mutateBlocked()
+        await mutateUser()
+      }
+    } catch (err) {
+      console.log(err)
+    }
+
+    toast({
+      description: message,
+      variant: 'subtle',
+      status: status,
+      duration: 5000,
+      isClosable: true,
+    })
+    setIsLoading(false)
+  }
+
+  return (
+    <NextLink key={blockedUser.userId} href={`/users/${blockedUser.username}`}>
+      <Stack
+        key={blockedUser.userId}
+        direction='row'
+        align='center'
+        py='4'
+        px='4'
+        borderRadius='md'
+        transition='color 0.2s'
+        _hover={{ bg: 'gray.50', cursor: 'pointer' }}
+      >
+        <Avatar
+          key={blockedUser.userId}
+          size='sm'
+          src={`${API_URL}/api/user/avatar/${blockedUser.profile_picture}`}
+          mr='12px'
+        >
+          <UserStatusBadge boxSize='1.25em' status={blockedUser.status} />
+        </Avatar>
+        <Flex direction='row' align='center' w='full'>
+          <Stack direction='column' spacing='0'>
+            <Text fontWeight='800' fontSize='md'>
+              {blockedUser.username}
+            </Text>
+            <Text fontWeight='600' color='gray.400' fontSize='sm'>
+              Blocked
+            </Text>
+          </Stack>
+          <Spacer />
+          <Tooltip
+            label='Unblock'
+            placement='top'
+            hasArrow
+            arrowSize={6}
+            borderRadius='base'
+          >
+            <Circle
+              _hover={{ bg: 'gray.200' }}
+              bg='gray.100'
+              size='38px'
+              mr='16px'
+              onClick={async (e) => {
+                e.stopPropagation()
+                if (isLoading) return
+                await unblockUser()
+              }}
+            >
+              <Icon
+                as={BiUserX}
+                display='block'
+                transition='color 0.2s'
+                size='38px'
+                _hover={{ color: 'gray.600' }}
+              />
+            </Circle>
           </Tooltip>
         </Flex>
       </Stack>
@@ -346,14 +507,6 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
   )
 }
 
-type BlockedItemProps = {
-  blocked: PartialUserInfo
-}
-
-function BlockedItem({ blocked }: BlockedItemProps) {
-  return <>Blocked</>
-}
-
 function UserList() {
   const { user: currentUser } = useUser()
   const { data: usersData, error: usersError } = useSWR(
@@ -374,9 +527,14 @@ function UserList() {
   } = useSWR(`${API_URL}/api/user/friendList`, fetchPartialUserInfos)
 
   const friendsIsLoading = !usersData && !usersError
-  console.log('/users friendsData: ', friendsData)
-  console.log('/users friendsData.length: ', friendsData?.length)
-  console.log('/users isLoading: ', !friendsData && !friendsError)
+
+  const {
+    data: blockedData,
+    mutate: mutateBlocked,
+    error: blockedError,
+  } = useSWR(`${API_URL}/api/user/blockedList`, fetchPartialUserInfos)
+
+  const blockedIsLoading = !blockedData && !blockedError
 
   const SecondaryTab = (props: TabProps) => {
     const selectedBgColor = useColorModeValue('gray.200', 'gray.500')
@@ -451,8 +609,11 @@ function UserList() {
                       </Stack>
                     )}
                     {friendsData &&
-                      friendsData.filter((friend) => friend.status === 'Online')
-                        .length > 0 && (
+                      friendsData.filter(
+                        (friend) =>
+                          friend.status === 'Online' &&
+                          currentUser.blockedUsers.indexOf(friend.userId) == -1
+                      ).length > 0 && (
                         <Stack spacing='0'>
                           <Text
                             mb='3'
@@ -469,12 +630,19 @@ function UserList() {
                           </Text>
                           <Divider />
                           {friendsData
-                            .filter((friend) => friend.status === 'Online')
+                            .filter(
+                              (friend) =>
+                                friend.status === 'Online' &&
+                                currentUser.blockedUsers.indexOf(
+                                  friend.userId
+                                ) == -1
+                            )
                             .map((friend: PartialUserInfo) => (
                               <FriendItem
                                 key={friend.userId}
                                 friend={friend}
                                 mutateFriends={mutateFriends}
+                                mutateBlocked={mutateBlocked}
                               />
                             ))}
                         </Stack>
@@ -493,7 +661,53 @@ function UserList() {
                         <Skeleton height='60px' isLoaded={!usersIsLoading} />
                       </Stack>
                     )}
-                    {friendsData && friendsData.length > 0 && (
+                    {friendsData &&
+                      friendsData.filter(
+                        (friend) =>
+                          currentUser.blockedUsers.indexOf(friend.userId) == -1
+                      ).length > 0 && (
+                        <Stack spacing='0'>
+                          <Text
+                            mb='3'
+                            fontSize='sm'
+                            fontWeight='semibold'
+                            color='gray.400'
+                          >
+                            ALL FRIENDS - {friendsData.length}
+                          </Text>
+                          <Divider />
+                          {friendsData
+                            .filter(
+                              (friend) =>
+                                currentUser.blockedUsers.indexOf(
+                                  friend.userId
+                                ) == -1
+                            )
+                            .map((friend: PartialUserInfo) => (
+                              <FriendItem
+                                key={friend.userId}
+                                friend={friend}
+                                mutateFriends={mutateFriends}
+                                mutateBlocked={mutateBlocked}
+                              />
+                            ))}
+                        </Stack>
+                      )}
+                  </TabPanel>
+                  <TabPanel>
+                    {blockedError && (
+                      <Stack spacing='8'>
+                        <Text>Error occurred</Text>
+                      </Stack>
+                    )}
+                    {blockedIsLoading && (
+                      <Stack spacing='4'>
+                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
+                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
+                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
+                      </Stack>
+                    )}
+                    {blockedData && blockedData.length > 0 && (
                       <Stack spacing='0'>
                         <Text
                           mb='3'
@@ -501,21 +715,18 @@ function UserList() {
                           fontWeight='semibold'
                           color='gray.400'
                         >
-                          ALL FRIENDS - {friendsData.length}
+                          BLOCKED - {blockedData.length}
                         </Text>
                         <Divider />
-                        {friendsData.map((friend: PartialUserInfo) => (
-                          <FriendItem
-                            key={friend.userId}
-                            friend={friend}
-                            mutateFriends={mutateFriends}
+                        {blockedData.map((blockedUser: PartialUserInfo) => (
+                          <BlockedUserItem
+                            key={blockedUser.userId}
+                            blockedUser={blockedUser}
+                            mutateBlocked={mutateBlocked}
                           />
                         ))}
                       </Stack>
                     )}
-                  </TabPanel>
-                  <TabPanel>
-                    <Text>Blocked Users</Text>
                   </TabPanel>
                   <TabPanel>
                     <AddFriend
@@ -526,71 +737,6 @@ function UserList() {
                 </TabPanels>
               </Stack>
             </Tabs>
-
-            <Heading as='h2' fontSize='2xl'>
-              Users
-            </Heading>
-            {usersError && (
-              <Stack spacing='8'>
-                <Text>Error occurred</Text>
-              </Stack>
-            )}
-            {usersIsLoading && (
-              <Stack spacing='8'>
-                <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                <Skeleton height='60px' isLoaded={!usersIsLoading} />
-              </Stack>
-            )}
-            <Stack spacing='2'>
-              {usersData &&
-                usersData
-                  .filter((user) => user.userId !== currentUser.userId)
-                  .map((user: User, index: number) => (
-                    <NextLink key={index} href={`/users/${user.username}`}>
-                      <Stack
-                        key={user.userId}
-                        direction='row'
-                        align='center'
-                        py='4'
-                        px='8'
-                        borderRadius='md'
-                        transition='color 0.2s'
-                        _hover={{ bg: 'gray.50', cursor: 'pointer' }}
-                      >
-                        <Avatar
-                          key={user.userId}
-                          size='sm'
-                          src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                          mr='12px'
-                        >
-                          <AvatarBadge boxSize='1.25em' bg='green.500' />
-                        </Avatar>
-                        <Flex direction='row' align='center' w='full'>
-                          <Stack direction='column' spacing='0'>
-                            <Text fontWeight='800' fontSize='md'>
-                              {user.username}
-                            </Text>
-                            <Text
-                              fontWeight='600'
-                              color='gray.400'
-                              fontSize='sm'
-                            >
-                              {user.status}
-                            </Text>
-                          </Stack>
-                          <Spacer />
-                          <Circle bg='gray.100' size='38px' mr='16px'>
-                            <FiMessageSquare />
-                          </Circle>
-                          <Circle bg='gray.100' size='38px' mr='16px'>
-                            <FiMoreVertical />
-                          </Circle>
-                        </Flex>
-                      </Stack>
-                    </NextLink>
-                  ))}
-            </Stack>
           </Stack>
         </Box>
       </Container>
