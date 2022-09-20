@@ -49,7 +49,13 @@ const ButtonDelete = ({ socket, currentRoom }) => {
             <Button variant='ghost' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='red' onClick={onClickDelete}>
+            <Button
+              colorScheme='red'
+              onClick={() => {
+                onClickDelete()
+                onClose()
+              }}
+            >
               Delete Channel
             </Button>
           </ModalFooter>
