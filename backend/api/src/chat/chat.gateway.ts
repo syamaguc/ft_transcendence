@@ -87,6 +87,20 @@ export class ChatGateway {
 	}
 
 	@UseGuards(SocketGuard)
+	@SubscribeMessage('changePassword')
+	async changePassword(
+		@MessageBody() password: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`password: new room password[${password}]`)
+		const newRoom = await this.chatService.changePassword(password, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
 		@MessageBody() roomId: string,

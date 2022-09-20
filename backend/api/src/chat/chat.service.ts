@@ -117,6 +117,12 @@ export class ChatService {
 		return room
 	}
 
+	async changePassword(password: string, roomId: string): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		room.password = password
+		return chatRepository.save(room)
+	}
+
 	async getMessageLog(roomId: string): Promise<any> {
 		const messagesWithUserInfo = await messageRepository.getMessages(roomId)
 		return messagesWithUserInfo
