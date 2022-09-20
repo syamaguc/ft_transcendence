@@ -3,7 +3,7 @@ import { Button, Text, Input } from '@chakra-ui/react'
 import { DMObject, MessageObject } from 'src/types/chat'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
-import MiddleBar from '@components/chat/middlebar'
+import DmMiddleBar from '@components/dm/dm-middlebar'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
 
@@ -117,7 +117,7 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
   return (
     <>
       <DMTopBar currentRoom={currentRoom} user={user} />
-      <MiddleBar chatLog={chatLog} />
+      <DmMiddleBar chatLog={chatLog} />
       <Flex p={4}>
         <DMSendBox socket={socket} />
       </Flex>

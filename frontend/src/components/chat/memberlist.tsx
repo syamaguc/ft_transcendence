@@ -85,13 +85,21 @@ function MemberMenu({ socket, user, currentRoom, member }) {
               add admin
             </MenuItem>
           ) : null}
-          <MenuItem onClick={() => onClickMute(member.userId)}>
-            mute user
-          </MenuItem>
+          {currentRoom.muted.indexOf(member.userId) == -1 ? (
+            <MenuItem onClick={() => onClickMute(member.userId)}>
+              mute user
+            </MenuItem>
+          ) : (
+            <MenuItem onClick={() => onClickMute(member.userId)}>
+              unmute
+            </MenuItem>
+          )}
+          {/* // <MenuItem onClick={() => onClickMute(member.userId)}>
+          //   mute user
+          // </MenuItem> */}
           <MenuItem color='red.500' onClick={() => onClickBan(member.userId)}>
             ban user
           </MenuItem>
-          {/* <MenuItem>see profile</MenuItem> */}
         </MenuList>
       </Menu>
     </>
@@ -194,7 +202,8 @@ function MemberListModal({ socket, currentRoom }) {
     <>
       <IconButton
         size='sm'
-        // mr={0} ml='auto'
+        mr={0}
+        ml='auto'
         icon={<UsersIcon />}
         onClick={() => {
           onOpen()

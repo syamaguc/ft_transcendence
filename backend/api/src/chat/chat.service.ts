@@ -91,13 +91,11 @@ export class ChatService {
 
 			//delete from admin
 			const index2 = room.admins.indexOf(userId)
-			if (index2 != -1)
-				room.admins.splice(index2, 1)
+			if (index2 != -1) room.admins.splice(index2, 1)
 
 			//delete from muted
 			const index3 = room.muted.indexOf(userId)
-			if (index3 != -1)
-				room.muted.splice(index3, 1)
+			if (index3 != -1) room.muted.splice(index3, 1)
 
 			room.banned.push(userId)
 			return chatRepository.save(room)
@@ -108,9 +106,14 @@ export class ChatService {
 
 	async muteUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
-		if (room.muted.indexOf(userId) === -1) {
-			console.log('=========user is muted=========')
+		const index = room.muted.indexOf(userId)
+		if (index == -1) {
+			//mute
 			room.muted.push(userId)
+			return chatRepository.save(room)
+		} else {
+			//unmute
+			room.muted.splice(index, 1)
 			return chatRepository.save(room)
 		}
 		//not found
@@ -168,5 +171,43 @@ export class ChatService {
 		// 		'============error in join room: the user is already a member==========',
 		// 	)
 		// }
+	}
+
+	async joinProtectedRoom(
+		userId: uuidv4,
+		roomId: string,
+		password: string,
+	): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		console.log(room)
+		if (room.members.indexOf(userId) === -1) {
+			// 暗号化される予定なのでデコードする必要がある
+			const roomPassword = room.password
+			if (roomPassword == password) {
+				console.log('=========new member joined the channel=========')
+				room.members.push(userId)
+				return chatRepository.save(room)
+			} else {
+				return null
+			}
+		}
+	}
+
+	async leaveRoom(userId: string, roomId: string): Promise<ChatRoom> {
+		let room: ChatRoom = await chatRepository.findId(roomId)
+
+		const membersIndex = room.members.indexOf(userId)
+		if (membersIndex != -1) {
+			console.log(userId)
+			room.members.splice(membersIndex, 1)
+		}
+
+		const adminsIndex = room.admins.indexOf(userId)
+		if (adminsIndex != -1) {
+			console.log(userId)
+			room.admins.splice(adminsIndex, 1)
+		}
+		console.log(room)
+		return chatRepository.save(room)
 	}
 }

@@ -143,6 +143,41 @@ export class ChatGateway {
 		socket.join(roomId)
 	}
 
+	// room which user is watching
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('unwatchRoom')
+	unwatchRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
+		const rooms = [...socket.rooms].slice(0)
+		if (rooms.length == 2) socket.leave(rooms[1])
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('joinProtectedRoom')
+	async joinProtectedRoom(
+		@MessageBody() data,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const roomId = data['roomId']
+		const password = data['password']
+		const userId = socket.data.userId
+		const room: ChatRoom = await this.chatService.joinProtectedRoom(
+			userId,
+			roomId,
+			password,
+		)
+		if (room) {
+			this.watchOrSwitchRoom(roomId, socket)
+			this.updateRoom(room)
+			this.getMessageLog(roomId, socket)
+		} else {
+			throw new WsException('Password is incorrect.')
+		}
+	}
+
 	// join room to be a member
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinRoom')
@@ -158,10 +193,27 @@ export class ChatGateway {
 
 		//privateの場合
 
-
 		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
+	}
+
+	// leave a room by roomId
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	async leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log('leaveRoom called')
+		const room: ChatRoom = await this.chatService.leaveRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
+		if (room.password) {
+			this.unwatchRoom(roomId, socket)
+		}
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
