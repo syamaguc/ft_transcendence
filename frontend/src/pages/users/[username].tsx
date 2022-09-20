@@ -23,6 +23,11 @@ import { User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
 
+import UserBasicInfo from '@components/user-basic-info'
+import UserStatusInfo from '@components/user-status-info'
+import UserStatistics from '@components/user-statistics'
+import MatchHistory from '@components/match-history'
+
 function UserDetail() {
   const router = useRouter()
   const { username } = router.query
@@ -59,65 +64,18 @@ function UserDetail() {
               </Stack>
             )}
             {user && (
-              <Stack>
-                <Heading fontSize='2xl'>Basic information</Heading>
-                <Stack
-                  borderRadius='xl'
-                  direction='row'
-                  spacing='8'
-                  align='start'
-                  py='4'
-                  px='8'
-                  mx='8'
-                >
-                  <Avatar
-                    size='xl'
-                    src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                  >
-                    <AvatarBadge boxSize='0.9em' bg='green.500' />
-                  </Avatar>
-                  <Stack direction='column' spacing='2'>
-                    <Text fontWeight='600' fontSize='2xl' mt='2'>
-                      {user.username}
-                    </Text>
-                    <Text fontWeight='600' fontSize='2xl' mt='2'>
-                      {user.status}
-                    </Text>
-                  </Stack>
-                </Stack>
-                <Divider orientation='horizontal' />
-                <form>
-                  <Stack spacing='6'>
-                    <FormControl>
-                      <FormLabel fontSize='xs' color='gray.400'>
-                        USERNAME
-                      </FormLabel>
-                      <Stack direction='row' spacing='4' align='center'>
-                        <Input
-                          name='readonly-username'
-                          type='text'
-                          isReadOnly={true}
-                          value={user.username}
-                        />
-                      </Stack>
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel fontSize='xs' color='gray.400'>
-                        EMAIL
-                      </FormLabel>
-                      <Stack direction='row' spacing='4' align='center'>
-                        <Input
-                          name='readonly-email'
-                          type='email'
-                          isReadOnly={true}
-                          value={user.email}
-                        />
-                      </Stack>
-                    </FormControl>
-                  </Stack>
-                </form>
+              <Stack spacing='8'>
+                <UserBasicInfo user={user} />
+                <UserStatusInfo user={user} />
+                <UserStatistics user={user} />
+                <MatchHistory user={user} />
               </Stack>
             )}
+            <Stack direction='row'>
+              <Button>Add Friend</Button>
+              <Button>Block</Button>
+              <Button>Invite</Button>
+            </Stack>
           </Stack>
         </Box>
       </Container>
