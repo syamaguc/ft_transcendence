@@ -180,7 +180,6 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
               size='38px'
               mr='16px'
               onClick={(e) => {
-                alert('child')
                 e.stopPropagation()
               }}
             >
