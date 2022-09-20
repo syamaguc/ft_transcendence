@@ -15,7 +15,6 @@ import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
 import { WsException } from '@nestjs/websockets'
 
-
 @Injectable()
 export class ChatService {
 	constructor(
