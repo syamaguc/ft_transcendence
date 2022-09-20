@@ -46,8 +46,11 @@ export class ChatService {
 		userId: string,
 	): Promise<ChatRoom> {
 		const { name, is_private, password } = chatRoomData
-		const salt = await bcrypt.genSalt()
-		const hashed_password = await bcrypt.hash(password, salt)
+		let hashed_password = password
+		if (password != '') {
+			const salt = await bcrypt.genSalt()
+			hashed_password = await bcrypt.hash(password, salt)
+		}
 		const newChatRoom = {
 			name: name,
 			is_private: is_private,
