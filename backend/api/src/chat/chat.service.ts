@@ -13,6 +13,7 @@ import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
+import { WsException } from '@nestjs/websockets'
 
 @Injectable()
 export class ChatService {
@@ -83,6 +84,9 @@ export class ChatService {
 
 	async banUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+
+		if (room.owner == userId)
+			throw new WsException('owner cannot be banned')
 		if (room.banned.indexOf(userId) === -1) {
 			console.log('=========user is banned=========')
 			//delete from members
