@@ -16,6 +16,7 @@ SECRET=''
 ## Makefile
 
 - build: 起動（イメージの作成含む）
+- db: defaultユーザーの作成とrandomユーザーの作成
 - restart: コンテナを再起動
 - format_frontend: frontendコンテナ内で`npm run format`を実行
 - lint_frontend: frontendコンテナ内で`npm run lint`を実行
