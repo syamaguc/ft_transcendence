@@ -13,6 +13,8 @@ import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
+import { WsException } from '@nestjs/websockets'
+
 
 @Injectable()
 export class ChatService {
@@ -83,6 +85,8 @@ export class ChatService {
 
 	async banUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+		if (room.owner == userId)
+			throw new WsException('You cannot ban the channel owner')
 		if (room.banned.indexOf(userId) === -1) {
 			console.log('=========user is banned=========')
 			//delete from members
@@ -107,6 +111,9 @@ export class ChatService {
 	async muteUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
 		const index = room.muted.indexOf(userId)
+
+		if (room.owner == userId)
+			throw new WsException('You cannot mute the channel owner')
 		if (index == -1) {
 			//mute
 			room.muted.push(userId)
@@ -173,6 +180,9 @@ export class ChatService {
 		password: string,
 	): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+		if (room.banned.indexOf(userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
 		console.log(room)
 		if (room.members.indexOf(userId) === -1) {
 			// 暗号化される予定なのでデコードする必要がある
