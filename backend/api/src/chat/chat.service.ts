@@ -13,6 +13,7 @@ import { parse } from 'cookie'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
+import { WsException } from '@nestjs/websockets'
 
 @Injectable()
 export class ChatService {
@@ -83,8 +84,22 @@ export class ChatService {
 
 	async banUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+		if (room.owner == userId)
+			throw new WsException('You cannot ban the channel owner')
 		if (room.banned.indexOf(userId) === -1) {
 			console.log('=========user is banned=========')
+			//delete from members
+			const index = room.members.indexOf(userId)
+			room.members.splice(index, 1)
+
+			//delete from admin
+			const index2 = room.admins.indexOf(userId)
+			if (index2 != -1) room.admins.splice(index2, 1)
+
+			//delete from muted
+			const index3 = room.muted.indexOf(userId)
+			if (index3 != -1) room.muted.splice(index3, 1)
+
 			room.banned.push(userId)
 			return chatRepository.save(room)
 		}
@@ -94,9 +109,17 @@ export class ChatService {
 
 	async muteUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
-		if (room.muted.indexOf(userId) === -1) {
-			console.log('=========user is muted=========')
+		const index = room.muted.indexOf(userId)
+
+		if (room.owner == userId)
+			throw new WsException('You cannot mute the channel owner')
+		if (index == -1) {
+			//mute
 			room.muted.push(userId)
+			return chatRepository.save(room)
+		} else {
+			//unmute
+			room.muted.splice(index, 1)
 			return chatRepository.save(room)
 		}
 		//not found
@@ -156,6 +179,9 @@ export class ChatService {
 		password: string,
 	): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+		if (room.banned.indexOf(userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
 		console.log(room)
 		if (room.members.indexOf(userId) === -1) {
 			// 暗号化される予定なのでデコードする必要がある

@@ -13,6 +13,7 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
 import { ChatRoom } from './entities/chat-room.entity'
+import { WsException } from '@nestjs/websockets'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
@@ -159,9 +160,7 @@ export class ChatGateway {
 			this.updateRoom(room)
 			this.getMessageLog(roomId, socket)
 		} else {
-			this.server
-				.to(socket.id)
-				.emit('toastMessage', 'Password is incorrect.')
+			throw new WsException('Password is incorrect.')
 		}
 	}
 
@@ -173,8 +172,14 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		//banの場合
+		const tmp = await this.chatService.findRoom(roomId)
+		if (tmp.banned.indexOf(socket.data.userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
 
 		//privateの場合
+
+		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
 	}
