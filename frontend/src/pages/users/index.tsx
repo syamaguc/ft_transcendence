@@ -17,11 +17,6 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
-  IconButton,
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-  PopoverBody,
   Stack,
   Spacer,
   Skeleton,
@@ -33,17 +28,12 @@ import {
   TabPanels,
   TabPanel,
   Tooltip,
-  FormLabel,
   FormControl,
   FormHelperText,
   FormErrorMessage,
   useBreakpointValue,
   useColorModeValue,
-  useTab,
   useToast,
-  UseToastOptions,
-  useStyleConfig,
-  useMultiStyleConfig,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import UserStatusBadge from '@components/user-status-badge'
@@ -53,13 +43,12 @@ import { useFormik, FormikErrors } from 'formik'
 import useSWR, { KeyedMutator } from 'swr'
 import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
-import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
+import { FiMoreVertical } from 'react-icons/fi'
 import { BiMessage, BiUserX } from 'react-icons/bi'
 
 import { PartialUserInfo, User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
-import { Key } from 'readline'
 
 type FriendItemProps = {
   friend: PartialUserInfo
@@ -78,7 +67,6 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
     let status: 'success' | 'info' | 'error' = 'error'
 
     setRemoveFriendIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
     try {
       const res = await fetch(`${API_URL}/api/user/deleteFriend`, {
@@ -116,7 +104,6 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
     let status: 'success' | 'info' | 'error' = 'error'
 
     setBlockIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
     try {
       const res = await fetch(`${API_URL}/api/user/blockFriend`, {
@@ -188,7 +175,7 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
             borderRadius='base'
           >
             <Circle
-              _hover={{ bg: 'gray.200' }}
+              _hover={{ bg: 'gray.200', color: 'gray.600' }}
               bg='gray.100'
               size='38px'
               mr='16px'
@@ -197,13 +184,7 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
                 e.stopPropagation()
               }}
             >
-              <Icon
-                as={BiMessage}
-                display='block'
-                transition='color 0.2s'
-                size='38px'
-                _hover={{ color: 'gray.600' }}
-              />
+              <Icon as={BiMessage} display='block' transition='color 0.2s' />
             </Circle>
           </Tooltip>
           <Tooltip
@@ -220,7 +201,7 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
                   rounded='full'
                   variant='link'
                   cursor='pointer'
-                  _hover={{ bg: 'gray.200' }}
+                  _hover={{ bg: 'gray.200', color: 'gray.600' }}
                   bg='gray.100'
                   size='38px'
                   onClick={(e) => {
@@ -232,7 +213,6 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
                     as={FiMoreVertical}
                     display='block'
                     transition='color 0.2s'
-                    _hover={{ color: 'gray.600' }}
                   />
                 </MenuButton>
                 <MenuList>
@@ -281,7 +261,6 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
     let status: 'success' | 'info' | 'error' = 'error'
 
     setIsLoading(true)
-    await new Promise((resolve) => setTimeout(resolve, 500))
 
     try {
       const res = await fetch(`${API_URL}/api/user/unblockFriend`, {
@@ -352,7 +331,7 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
             borderRadius='base'
           >
             <Circle
-              _hover={{ bg: 'gray.200' }}
+              _hover={{ bg: 'gray.200', color: 'red.500' }}
               bg='gray.100'
               size='38px'
               mr='16px'
@@ -366,8 +345,8 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
                 as={BiUserX}
                 display='block'
                 transition='color 0.2s'
-                size='38px'
-                _hover={{ color: 'gray.600' }}
+                w={6}
+                h={6}
               />
             </Circle>
           </Tooltip>
@@ -612,7 +591,7 @@ function UserList() {
                       friendsData.filter(
                         (friend) =>
                           friend.status === 'Online' &&
-                          currentUser.blockedUsers.indexOf(friend.userId) == -1
+                          currentUser.blockedUsers.indexOf(friend.userId) === -1
                       ).length > 0 && (
                         <Stack spacing='0'>
                           <Text
@@ -624,7 +603,11 @@ function UserList() {
                             ONLINE -{' '}
                             {
                               friendsData.filter(
-                                (friend) => friend.status === 'Online'
+                                (friend) =>
+                                  friend.status === 'Online' &&
+                                  currentUser.blockedUsers.indexOf(
+                                    friend.userId
+                                  ) === -1
                               ).length
                             }
                           </Text>
@@ -635,7 +618,7 @@ function UserList() {
                                 friend.status === 'Online' &&
                                 currentUser.blockedUsers.indexOf(
                                   friend.userId
-                                ) == -1
+                                ) === -1
                             )
                             .map((friend: PartialUserInfo) => (
                               <FriendItem
@@ -673,7 +656,15 @@ function UserList() {
                             fontWeight='semibold'
                             color='gray.400'
                           >
-                            ALL FRIENDS - {friendsData.length}
+                            ALL FRIENDS -{' '}
+                            {
+                              friendsData.filter(
+                                (friend) =>
+                                  currentUser.blockedUsers.indexOf(
+                                    friend.userId
+                                  ) === -1
+                              ).length
+                            }
                           </Text>
                           <Divider />
                           {friendsData
@@ -681,7 +672,7 @@ function UserList() {
                               (friend) =>
                                 currentUser.blockedUsers.indexOf(
                                   friend.userId
-                                ) == -1
+                                ) === -1
                             )
                             .map((friend: PartialUserInfo) => (
                               <FriendItem
