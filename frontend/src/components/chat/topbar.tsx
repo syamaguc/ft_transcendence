@@ -4,6 +4,7 @@ import { ChannelObject, MessageObject } from 'src/types/chat'
 import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
 import ButtonLeave from './button-leave'
+import ChannelInfo from './channel-info-modal'
 
 const TopBar = ({ socket, currentRoom, isJoined }) => {
   return (
@@ -27,6 +28,7 @@ const TopBar = ({ socket, currentRoom, isJoined }) => {
             # {currentRoom.name}
           </Text>
           <MemberListModal socket={socket} currentRoom={currentRoom} />
+          <ChannelInfo socket={socket} currentRoom={currentRoom}/>
           <ButtonLeave
             socket={socket}
             currentRoom={currentRoom}

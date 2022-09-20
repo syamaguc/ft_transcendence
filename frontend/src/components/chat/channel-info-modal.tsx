@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Textarea,
   useDisclosure,
@@ -15,55 +14,83 @@ import {
   Input,
   MutableRefObject,
   FormControl,
-  } from '@chakra-ui/react'
+} from '@chakra-ui/react'
 import React, { useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 import ResizeTextarea from 'react-textarea-autosize'
 import { ChannelObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
+import { captureRejectionSymbol } from 'events'
 
 
-
-const ShowInfo = ({socket, currentRoom}) => {
-  const currentUser = useUser().user
-
-  const onClickDelete = () => {
-    socket.emit('deleteChannel')
-    console.log('room has been deleted')
-  }
-
-  console.log('current user', currentUser)
-
-  if (currentRoom.owner == currentUser.userId) {
-    return (
-      <>
-        <Button>delete channel</Button>
-      </>
-    )
-  }
-  return (
-    <>
-      <Text>created by: {currentRoom.owner}</Text>
-      <Button>leave channel</Button>
-    </>
-  )
-}
-
-const ChannelInfo = ({socket, currentRoom}) => {
+function PasswordEdit({socket, currentRoom}) {
   const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const channelPasswordRef = useRef<HTMLInputElement>()
+
+  const onClickPassword = useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      onClose()
+      if (!socket || !currentRoom) return
+      event.preventDefault()
+      const password = channelPasswordRef.current.value
+      socket.emit('changePassword', {
+        password: password,
+      })
+    },
+    [socket, onClose]
+  )
+
   return (
     <>
-      <Button onClick={onOpen}>view info</Button>
+      <Button onClick={onOpen}>edit</Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>About channel</ModalHeader>
+        <form onSubmit={onClickPassword}>
+            <ModalHeader>Change password</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Text>Enter new password</Text>
+              <Input type='text' ref={channelPasswordRef} />
+            </ModalBody>
+            <ModalFooter>
+              <Button variant='ghost' onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorScheme='blue' mr={3} type='submit'>
+                Enter
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    </>
+  )
+}
+
+function ChannelInfo({socket, currentRoom}) {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const currentUser = useUser().user
+  return (
+    <>
+      <Button onClick={onOpen}>Info</Button>
+
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader>About this channel</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            {/* <Text>created by: {currentRoom.owner}</Text> */}
-            <ShowInfo socket={socket} currentRoom={currentRoom} />
+            {currentUser.userId == currentRoom.owner && (
+              <>
+                
+              </>
+            )}
+            <PasswordEdit socket={socket} currentRoom={currentRoom}/>
           </ModalBody>
+
           <ModalFooter>
             <Button colorScheme='blue' onClick={onClose}>
               Close
