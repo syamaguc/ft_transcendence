@@ -40,10 +40,12 @@ export class AuthController {
 		@Res({ passthrough: true }) res: Response,
 		@Req() req: Request,
 	) {
+    console.log(req)
 		const username = req.user['username']
-		const userid = req.user['userid']
+		const userid = req.user['userId']
 		const auth = false
 		const payload: JwtPayload = { username, auth, userid }
+    console.log(payload)
 		const accessToken: string = await this.jwtService.sign(payload)
 		res.cookie('jwt', accessToken, { httpOnly: true })
 		res.redirect(process.env.IP_FRONTEND)
