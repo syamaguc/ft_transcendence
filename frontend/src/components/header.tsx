@@ -198,7 +198,7 @@ const HeaderContent = () => {
 }
 
 const Header = (props: HTMLChakraProps<'header'>) => {
-  const { maxW = '8xl', maxWidth = '8xl' } = props
+  const { maxW = '100vw', maxWidth = '100vw' } = props
   const ref = useRef<HTMLHeadingElement>()
   const [y, setY] = useState(0)
   const { height = 0 } = ref.current?.getBoundingClientRect() ?? {}
