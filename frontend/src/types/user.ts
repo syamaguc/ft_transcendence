@@ -38,11 +38,12 @@ export interface User {
   login_count: number
 }
 
-export interface UserPartialInfo {
+export interface PartialUserInfo {
   userId: string
   username: string
   elo: number
   profile_picture: string
+  status: UserStatus
 }
 
 export interface Session {

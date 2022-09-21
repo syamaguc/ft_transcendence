@@ -164,6 +164,7 @@ export class UserService {
 			username: user.username,
 			elo: user.elo,
 			profile_picture: user.profile_picture,
+			status: user.status,
 		}
 	}
 
@@ -242,12 +243,17 @@ export class UserService {
 		let i = 0
 		const blockedList = []
 		while (user.blockedUsers[i]) {
-			await this.getPartialUserInfo(user.blockedUsers[i]).then(function (
-				result,
-			) {
-				blockedList.push(result)
-				i++
-			})
+			await this.getPartialUserInfo(user.blockedUsers[i])
+				.then(function (result) {
+					if (result) {
+						blockedList.push(result)
+					}
+					i++
+				})
+				.catch((err) => {
+					console.log(err)
+					i++
+				})
 		}
 		return blockedList
 	}
@@ -264,12 +270,17 @@ export class UserService {
 		let i = 0
 		const friendList = []
 		while (user.friends[i]) {
-			await this.getPartialUserInfo(user.friends[i]).then(function (
-				result,
-			) {
-				friendList.push(result)
-				i++
-			})
+			await this.getPartialUserInfo(user.friends[i])
+				.then(function (result) {
+					if (result) {
+						friendList.push(result)
+					}
+					i++
+				})
+				.catch((err) => {
+					console.log(err)
+					i++
+				})
 		}
 		return friendList
 	}

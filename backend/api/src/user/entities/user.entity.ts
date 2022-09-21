@@ -70,7 +70,7 @@ export class User {
 	@Column('boolean', { default: false })
 	isAdmin: boolean
 
-	@Column('simple-array', { default: [] })
+	@Column('simple-array')
 	blockedUsers: string[]
 
 	// for gameHistory
