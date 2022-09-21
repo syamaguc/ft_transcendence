@@ -205,7 +205,7 @@ function FriendItem({ friend }: FriendItemProps) {
             </Text>
           </Stack>
           <Spacer />
-          <Tooltip
+          {/* <Tooltip
             label='Message'
             placement='top'
             hasArrow
@@ -221,7 +221,7 @@ function FriendItem({ friend }: FriendItemProps) {
             >
               <Icon as={BiMessage} display='block' transition='color 0.2s' />
             </Circle>
-          </Tooltip>
+          </Tooltip> */}
           <Tooltip
             label='More'
             placement='top'
