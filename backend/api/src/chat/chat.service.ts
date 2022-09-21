@@ -3,6 +3,8 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
 import { v4 as uuidv4 } from 'uuid'
+import { WsException } from '@nestjs/websockets'
+import * as bcrypt from 'bcrypt'
 import { ChatRoom } from './entities/chat-room.entity'
 import { chatRepository } from './chat.repository'
 import { Repository } from 'typeorm'
@@ -43,8 +45,16 @@ export class ChatService {
 		chatRoomData: CreateChatRoomDto,
 		userId: string,
 	): Promise<ChatRoom> {
+		const { name, is_private, password } = chatRoomData
+		let hashed_password = password
+		if (password != '') {
+			const salt = await bcrypt.genSalt()
+			hashed_password = await bcrypt.hash(password, salt)
+		}
 		const newChatRoom = {
-			...chatRoomData,
+			name: name,
+			is_private: is_private,
+			password: hashed_password,
 			id: uuidv4(),
 			owner: userId,
 			admins: [userId],
@@ -83,8 +93,22 @@ export class ChatService {
 
 	async banUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
+		if (room.owner == userId)
+			throw new WsException('You cannot ban the channel owner')
 		if (room.banned.indexOf(userId) === -1) {
 			console.log('=========user is banned=========')
+			//delete from members
+			const index = room.members.indexOf(userId)
+			room.members.splice(index, 1)
+
+			//delete from admin
+			const index2 = room.admins.indexOf(userId)
+			if (index2 != -1) room.admins.splice(index2, 1)
+
+			//delete from muted
+			const index3 = room.muted.indexOf(userId)
+			if (index3 != -1) room.muted.splice(index3, 1)
+
 			room.banned.push(userId)
 			return chatRepository.save(room)
 		}
@@ -94,9 +118,17 @@ export class ChatService {
 
 	async muteUser(userId: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
-		if (room.muted.indexOf(userId) === -1) {
-			console.log('=========user is muted=========')
+		const index = room.muted.indexOf(userId)
+
+		if (room.owner == userId)
+			throw new WsException('You cannot mute the channel owner')
+		if (index == -1) {
+			//mute
 			room.muted.push(userId)
+			return chatRepository.save(room)
+		} else {
+			//unmute
+			room.muted.splice(index, 1)
 			return chatRepository.save(room)
 		}
 		//not found
@@ -148,5 +180,43 @@ export class ChatService {
 		// 		'============error in join room: the user is already a member==========',
 		// 	)
 		// }
+	}
+
+	async joinProtectedRoom(
+		userId: uuidv4,
+		roomId: string,
+		password: string,
+	): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		if (room.banned.indexOf(userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
+		if (room.members.indexOf(userId) === -1) {
+			if (await bcrypt.compare(password, room.password)) {
+				console.log('=========new member joined the channel=========')
+				room.members.push(userId)
+				return chatRepository.save(room)
+			} else {
+				throw new WsException('password is incorrect')
+			}
+		}
+	}
+
+	async leaveRoom(userId: string, roomId: string): Promise<ChatRoom> {
+		let room: ChatRoom = await chatRepository.findId(roomId)
+
+		const membersIndex = room.members.indexOf(userId)
+		if (membersIndex != -1) {
+			console.log(userId)
+			room.members.splice(membersIndex, 1)
+		}
+
+		const adminsIndex = room.admins.indexOf(userId)
+		if (adminsIndex != -1) {
+			console.log(userId)
+			room.admins.splice(adminsIndex, 1)
+		}
+		console.log(room)
+		return chatRepository.save(room)
 	}
 }

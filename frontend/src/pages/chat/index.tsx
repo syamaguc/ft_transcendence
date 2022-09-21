@@ -9,6 +9,7 @@ import {
   Stack,
   Flex,
   Text,
+  useToast,
   useControllableState,
 } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
@@ -42,6 +43,8 @@ const Chat = () => {
     password: '',
   })
   const [socket, setSocket] = useState()
+  const [toastMessage, setToastMessage] = useState()
+  const toast = useToast()
 
   useEffect(() => {
     const tempSocket = io(API_URL, { transports: ['websocket'] })
@@ -60,6 +63,15 @@ const Chat = () => {
     socket.on('updateNewMessage', (message: MessageObject) => {
       console.log('recieved : ', message)
       setMsg(message)
+    })
+    socket.on('exception', ({ status, message }) => {
+      console.log(status, message)
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
     })
   }, [socket])
 
@@ -96,11 +108,16 @@ const Chat = () => {
             setCurrentRoom={setCurrentRoom}
             setChatLog={setChatLog}
             setInputMessage={setInputText}
+            user={user}
           />
         </Flex>
         <Flex h='90vh' w='80%' direction='column'>
-          <TopBar socket={socket} currentRoom={currentRoom} />
-          <MiddleBar chatLog={chatLog} />
+          <TopBar
+            socket={socket}
+            currentRoom={currentRoom}
+            isJoined={isJoined}
+          />
+          <MiddleBar currentRoom={currentRoom} chatLog={chatLog} />
           <Flex p={4}>
             <BottomBar
               inputText={inputText}
