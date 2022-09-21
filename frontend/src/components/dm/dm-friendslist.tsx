@@ -42,7 +42,11 @@ import { useFormik, FormikErrors } from 'formik'
 import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
 import { BiMessage, BiUserX } from 'react-icons/bi'
 
+import AddFriend from '@components/add-friend'
 import UserStatusBadge from '@components/user-status-badge'
+import DMBlockedUserItem from '@components/dm/dm-blocked-user-item'
+import DMFriendItem from '@components/dm/dm-friend-item'
+
 import { PartialUserInfo, User } from 'src/types/user'
 import { fetchUsers } from 'src/lib/fetchers'
 import { useUser } from 'src/lib/use-user'
@@ -86,38 +90,12 @@ function DMFriendsList({ socket }: Props) {
   const { friends, countAll, countOnline } = useFriends()
   const { blocked } = useBlocked()
 
-  const PrimaryTab = (props: TabProps) => {
-    const textColor = useColorModeValue('whiteAlpha.900', 'inherit')
-    const bgColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.400')
-    const selectedColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.900')
-
-    return (
-      <Tab
-        {...props}
-        color={textColor}
-        bg={bgColor}
-        borderRadius='md'
-        px='2'
-        py='1'
-        _selected={{ color: selectedColor, bg: 'inherit' }}
-      />
-    )
+  const isNotBlocked = (element: PartialUserInfo) => {
+    return currentUser.blockedUsers.indexOf(element.userId) === -1
   }
 
-  const SecondaryTab = (props: TabProps) => {
-    const selectedBgColor = useColorModeValue('gray.200', 'gray.500')
-    const hoverBgColor = useColorModeValue('gray.50', 'inherit')
-
-    return (
-      <Tab
-        {...props}
-        borderRadius='md'
-        px='2'
-        py='1'
-        _hover={{ bg: hoverBgColor }}
-        _selected={{ bg: selectedBgColor }}
-      />
-    )
+  const isOnline = (element: PartialUserInfo) => {
+    return element.status === 'Online' && isNotBlocked(element)
   }
 
   return (
@@ -156,7 +134,7 @@ function DMFriendsList({ socket }: Props) {
                   <Divider />
                   <Stack>
                     {friends.filter(isOnline).map((friend: PartialUserInfo) => (
-                      <FriendItem key={friend.username} friend={friend} />
+                      <DMFriendItem key={friend.username} friend={friend} />
                     ))}
                   </Stack>
                 </Stack>
@@ -178,7 +156,7 @@ function DMFriendsList({ socket }: Props) {
                     {friends
                       .filter(isNotBlocked)
                       .map((friend: PartialUserInfo) => (
-                        <FriendItem key={friend.username} friend={friend} />
+                        <DMFriendItem key={friend.username} friend={friend} />
                       ))}
                   </Stack>
                 </Stack>
@@ -198,7 +176,7 @@ function DMFriendsList({ socket }: Props) {
                   <Divider />
                   <Stack>
                     {blocked.map((blockedUser: PartialUserInfo) => (
-                      <BlockedUserItem
+                      <DMBlockedUserItem
                         key={blockedUser.username}
                         user={blockedUser}
                       />
@@ -278,6 +256,40 @@ function DMFriendsList({ socket }: Props) {
         </Box>
       </Flex>
     </>
+  )
+}
+
+const SecondaryTab = (props: TabProps) => {
+  const selectedBgColor = useColorModeValue('gray.200', 'gray.500')
+  const hoverBgColor = useColorModeValue('gray.50', 'inherit')
+
+  return (
+    <Tab
+      {...props}
+      borderRadius='md'
+      px='2'
+      py='1'
+      _hover={{ bg: hoverBgColor }}
+      _selected={{ bg: selectedBgColor }}
+    />
+  )
+}
+
+const PrimaryTab = (props: TabProps) => {
+  const textColor = useColorModeValue('whiteAlpha.900', 'inherit')
+  const bgColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.400')
+  const selectedColor = useColorModeValue('blackAlpha.900', 'whiteAlpha.900')
+
+  return (
+    <Tab
+      {...props}
+      color={textColor}
+      bg={bgColor}
+      borderRadius='md'
+      px='2'
+      py='1'
+      _selected={{ color: selectedColor, bg: 'inherit' }}
+    />
   )
 }
 
