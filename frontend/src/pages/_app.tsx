@@ -46,7 +46,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 function Auth({ children }) {
   const { status } = useUser({ redirectTo: '/login' })
 
-  if (status === 'loading') {
+  if (status === 'loading' || status === 'unauthenticated') {
     return (
       <Box w='100%' h='100vh'>
         <Box
@@ -60,10 +60,6 @@ function Auth({ children }) {
         </Box>
       </Box>
     )
-  }
-
-  if (status === 'unauthenticated') {
-    return <div>Unauthenticated</div>
   }
 
   return children

@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { User, Session } from 'src/types/user'
-import { getSessionCookie } from 'src/lib/cookies'
+import { getSessionCookie, setSessionCookie } from 'src/lib/cookies'
 
 const API_URL = 'http://api:3000'
 
@@ -43,7 +43,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
     const { jwt } = req.cookies
     if (!jwt) {
       // This is not optimal, but avoids 401 fetch error
-      res.status(200).json({ user: null, session: null })
+      res.status(200).json({ user: null, session: null, need2FA: false })
       return
     }
 
@@ -57,16 +57,29 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
 
     const data = await apiResponse.json()
 
-    let session: Session
-    const stringValue = getSessionCookie(req)
-    if (stringValue) {
-      session = JSON.parse(stringValue)
-    } else {
-      session = null
-    }
-
     if (apiResponse.ok) {
-      res.status(200).json({ user: data, session: session })
+      let session: Session
+      const stringValue = getSessionCookie(req)
+      if (stringValue) {
+        session = JSON.parse(stringValue)
+      } else {
+        session = { isFirstTime: true, didTwoFactorAuth: false }
+        setSessionCookie(res, session)
+      }
+
+      res.status(200).json({ user: data, session: session, need2FA: false })
+    } else if (apiResponse.status === 403 && data?.message === 'need 2FA') {
+      res.status(200).json({
+        user: null,
+        session: null,
+        need2FA: true,
+      })
+    } else if (apiResponse.status === 401) {
+      res.status(200).json({
+        user: null,
+        session: null,
+        need2FA: false,
+      })
     } else {
       res.status(500).json({
         status: 'error',

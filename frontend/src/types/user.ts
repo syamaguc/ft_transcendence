@@ -35,6 +35,7 @@ export interface User {
   isAdmin: boolean
   blockedUsers: string[]
   game_history: GameHistory[]
+  login_count: number
 }
 
 export interface UserPartialInfo {
@@ -46,4 +47,5 @@ export interface UserPartialInfo {
 
 export interface Session {
   isFirstTime: boolean
+  didTwoFactorAuth: boolean
 }

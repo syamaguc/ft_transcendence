@@ -55,16 +55,20 @@ export async function fetchJson<JSON = unknown>(
 
 export async function fetchUser(
   url: string
-): Promise<{ user: User; session: Session }> {
+): Promise<{ user: User; session: Session; need2FA: boolean }> {
   const res = await fetch(url, { credentials: 'include' })
   const data = await res.json()
 
   if (res.ok) {
-    return { user: data?.user || null, session: data?.session }
+    return {
+      user: data?.user || null,
+      session: data?.session || null,
+      need2FA: data?.need2FA,
+    }
   }
 
   // TODO: throw
-  return { user: null, session: null }
+  return { user: null, session: null, need2FA: false }
 }
 
 export async function fetchUsers(url: string): Promise<User[]> {

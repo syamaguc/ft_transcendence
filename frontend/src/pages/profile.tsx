@@ -47,6 +47,7 @@ import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
 import { fetchUserPartialInfo, fetchText } from 'src/lib/fetchers'
+import { setDidTwoFactorAuth } from 'src/lib/session'
 
 import Layout from '@components/scrollable-layout'
 
@@ -58,7 +59,7 @@ function StatusBadge(props: { user: User } & AvatarBadgeProps) {
   const bgColor =
     props.user.status === 'Online'
       ? 'green.500'
-      : 'In Game'
+      : props.user.status === 'In Game'
       ? 'red.500'
       : 'gray.400'
 
@@ -301,7 +302,6 @@ function BasicInfo() {
           body: JSON.stringify({
             username: values.username,
             email: values.email,
-            password: values.password,
             currentPassword: values.password,
           }),
         })
@@ -792,6 +792,7 @@ function TwoFactorAuth() {
       if (body === 'True') {
         const updateRes = await updateTwoFactorAuth(true)
         if (updateRes.ok) {
+          await setDidTwoFactorAuth(true)
           await mutateUser()
           toast({
             description: 'Successfully enabled 2FA',
