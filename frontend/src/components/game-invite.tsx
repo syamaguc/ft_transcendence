@@ -8,10 +8,7 @@ type Props = {
   router
 }
 
-const GameInvite = ({
-  user,
-  router
-}: Props) => {
+const GameInvite = ({ user, router }: Props) => {
   const [server, setServer] = useState()
   const [inviteStatus, setInviteStatus] = useState(0)
 
@@ -27,10 +24,10 @@ const GameInvite = ({
 
   return (
     <>
-      {inviteStatus == 0 && (<Button>Invite</Button>)}
-      {inviteStatus == 1 && (<Button>Cancel</Button>)}
-      {inviteStatus == 2 && (<Button>Receive Invitation</Button>)}
-      {inviteStatus == 3 && (<Button>Join Room</Button>)}
+      {inviteStatus == 0 && <Button>Invite</Button>}
+      {inviteStatus == 1 && <Button>Cancel</Button>}
+      {inviteStatus == 2 && <Button>Receive Invitation</Button>}
+      {inviteStatus == 3 && <Button>Join Room</Button>}
     </>
   )
 }
