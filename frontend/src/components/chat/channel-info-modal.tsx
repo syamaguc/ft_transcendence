@@ -44,7 +44,7 @@ const timestampToTime = (timestamp) => {
   return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
-function PasswordEdit({socket, currentRoom}) {
+function PasswordEdit({ socket, currentRoom }) {
   const toast = useToast()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const channelPasswordRef = useRef<HTMLInputElement>()
@@ -76,7 +76,7 @@ function PasswordEdit({socket, currentRoom}) {
       <Modal isOpen={isOpen} onClose={onClose} blockScrollOnMount={false}>
         <ModalOverlay />
         <ModalContent>
-        <form onSubmit={onClickPassword}>
+          <form onSubmit={onClickPassword}>
             <ModalHeader>Change password</ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -98,7 +98,7 @@ function PasswordEdit({socket, currentRoom}) {
   )
 }
 
-function ChannelInfo({socket, currentRoom}) {
+function ChannelInfo({ socket, currentRoom }) {
   const [owner, setOwner] = useState<User>()
   const { isOpen, onOpen, onClose } = useDisclosure()
   const currentUser = useUser().user
@@ -118,7 +118,7 @@ function ChannelInfo({socket, currentRoom}) {
   return (
     <>
       {/* <Button onClick={onOpen}>Info</Button> */}
-      <IconButton size='sm' onClick={onOpen} icon={<EditIcon/>}/>
+      <IconButton size='sm' onClick={onOpen} icon={<EditIcon />} />
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
@@ -131,7 +131,9 @@ function ChannelInfo({socket, currentRoom}) {
                 <Text>Created time: {timestampToTime(currentRoom.time_created)}</Text>
                 {(currentUser.userId == currentRoom.owner && currentRoom.password != '') && (
                   <>
-                    <Text fontSize='xs' color='gray.400'>Enter new password for your channel. Only the channel owner can see this option</Text>
+                    <Text fontSize='xs' color='gray.400'>
+                      Enter new password for your channel. Only the channel owner can see this option
+                    </Text>
                     <PasswordEdit socket={socket} currentRoom={currentRoom}/>
                   </>
                 )}

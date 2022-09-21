@@ -99,7 +99,6 @@ export class ChatGateway {
 		this.updateRoom(newRoom)
 	}
 
-
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(

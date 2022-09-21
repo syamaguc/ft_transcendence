@@ -28,7 +28,7 @@ const TopBar = ({ socket, currentRoom, isJoined }) => {
             # {currentRoom.name}
           </Text>
           <MemberListModal socket={socket} currentRoom={currentRoom} />
-          <ChannelInfo socket={socket} currentRoom={currentRoom}/>
+          <ChannelInfo socket={socket} currentRoom={currentRoom} />
           <ButtonLeave
             socket={socket}
             currentRoom={currentRoom}
