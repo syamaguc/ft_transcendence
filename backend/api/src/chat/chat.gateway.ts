@@ -190,9 +190,6 @@ export class ChatGateway {
 		if (tmp.banned.indexOf(socket.data.userId) != -1) {
 			throw new WsException('You are banned from the channel')
 		}
-
-		//privateの場合
-
 		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)

@@ -3,7 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
 import { v4 as uuidv4 } from 'uuid'
-import { WsException } from '@nestjs/websockets'
 import * as bcrypt from 'bcrypt'
 import { ChatRoom } from './entities/chat-room.entity'
 import { chatRepository } from './chat.repository'
@@ -138,7 +137,12 @@ export class ChatService {
 
 	async changePassword(password: string, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
-		room.password = password
+		let hashed_password = password
+		if (password != '') {
+			const salt = await bcrypt.genSalt()
+			hashed_password = await bcrypt.hash(password, salt)
+		}
+		room.password = hashed_password
 		return chatRepository.save(room)
 	}
 

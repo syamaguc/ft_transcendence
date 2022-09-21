@@ -1,4 +1,5 @@
 import {
+  Stack,
   Button,
   Textarea,
   useDisclosure,
@@ -34,9 +35,8 @@ function PasswordEdit({socket, currentRoom}) {
       if (!socket || !currentRoom) return
       event.preventDefault()
       const password = channelPasswordRef.current.value
-      socket.emit('changePassword', {
-        password: password,
-      })
+      console.log('update password:', password)
+      socket.emit('changePassword', password)
     },
     [socket, onClose]
   )
@@ -45,7 +45,7 @@ function PasswordEdit({socket, currentRoom}) {
     <>
       <Button onClick={onOpen}>edit</Button>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose} blockScrollOnMount={false}>
         <ModalOverlay />
         <ModalContent>
         <form onSubmit={onClickPassword}>
@@ -84,10 +84,11 @@ function ChannelInfo({socket, currentRoom}) {
           <ModalCloseButton />
           <ModalBody>
             {currentUser.userId == currentRoom.owner && (
-              <>
+              <Stack spacing='4'>
                 <Text>Edit password</Text>
+                <Text>current password: {currentRoom.password}</Text>
                 <PasswordEdit socket={socket} currentRoom={currentRoom}/>
-              </>
+              </Stack>
             )}
           </ModalBody>
 
