@@ -102,7 +102,14 @@ export class ChatGateway {
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`)
 		const rooms = await this.chatService.getRooms()
-		socket.emit('getRooms', rooms)
+		const emitRooms: ChatRoom[] = []
+		for (let i = 0; i < rooms.length; i++) {
+			const room = rooms[i]
+			if (!room.is_private || room.members.includes(socket.data.userId)) {
+				emitRooms.push(room)
+			}
+		}
+		socket.emit('getRooms', emitRooms)
 	}
 
 	@UseGuards(SocketGuard)
@@ -215,7 +222,11 @@ export class ChatGateway {
 		)
 		newChatRoom = await this.joinRoom(newChatRoom.id, socket)
 		this.logger.log(newChatRoom)
-		this.server.emit('updateRoom', newChatRoom)
+		if (newChatRoom.is_private) {
+			this.server.to(socket.id).emit('updateRoom', newChatRoom)
+		} else {
+			this.server.emit('updateRoom', newChatRoom)
+		}
 		this.server.to(socket.id).emit('updateCurrentRoom', newChatRoom.id)
 		this.getMessageLog(newChatRoom.id, socket)
 	}
