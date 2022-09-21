@@ -36,7 +36,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
       }
 
       const newSession: Session = { isFirstTime, didTwoFactorAuth }
-      console.log('/api/session: newSession', newSession)
       setSessionCookie(res, newSession)
 
       return res.status(200).end(res.getHeader('Set-Cookie'))
