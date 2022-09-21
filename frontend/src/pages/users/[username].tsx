@@ -9,6 +9,7 @@ import UserBasicInfo from '@components/user-basic-info'
 import UserStatusInfo from '@components/user-status-info'
 import UserStatistics from '@components/user-statistics'
 import MatchHistory from '@components/match-history'
+import GameInvite from '@components/game-invite'
 
 function UserDetail() {
   const router = useRouter()
@@ -47,7 +48,7 @@ function UserDetail() {
             <Stack direction='row'>
               <Button>Add Friend</Button>
               <Button>Block</Button>
-              <Button>Invite</Button>
+              <GameInvite user={user} router={router} />
             </Stack>
           </Stack>
         </Box>
