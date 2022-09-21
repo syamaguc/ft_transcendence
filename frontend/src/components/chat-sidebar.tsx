@@ -124,11 +124,14 @@ const SideBar = ({
       console.log('updateRoom received : ', channel)
       setRoom(channel)
     })
-    socket.on('deleteRoom', (deletedChannel: ChannelObject) => {
-      console.log('deleteRoom received ', deletedChannel)
-      setCurrentRoom(DEFAULT_ROOM)
+    socket.on('updateRoomDelete', (channel: ChannelObject) => {
+      console.log('updateRoomDelete received : ', channel)
+      setRoom(channel)
       setDeleteFlag(true)
-      setRoom(deletedChannel)
+    })
+    socket.on('deleteRoom', () => {
+      console.log('deleteRoom received ')
+      setCurrentRoom(DEFAULT_ROOM)
       setChatLog([])
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
@@ -141,17 +144,15 @@ const SideBar = ({
 
   useEffect(() => {
     if (room) {
-      if (deleteFlag) {
-        const index = chatRooms.indexOf(room)
-        if (index !== -1) {
-          chatRooms.splice(index, 1)
-        }
-        setDeleteFlag(false)
-        return
-      }
       let existFlag = false
       for (let i = 0; i < chatRooms.length; i++) {
         if (chatRooms[i].id == room.id) {
+          if (deleteFlag) {
+            chatRooms.splice(i, 1)
+            setChatRooms(chatRooms)
+            setDeleteFlag(false)
+            return
+          }
           existFlag = true
           chatRooms[i] = room
           const newChatRooms = chatRooms.slice(0)
@@ -159,8 +160,11 @@ const SideBar = ({
           break
         }
       }
-      if (!existFlag) {
+      if (!existFlag && !deleteFlag) {
         setChatRooms([...chatRooms, room])
+      }
+      if (deleteFlag) {
+        setDeleteFlag(false)
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -200,19 +204,20 @@ const SideBar = ({
       </Flex>
 
       <Flex direction='column'>
-        {chatRooms.map((chatRoom: ChannelObject) => (
-          <Flex
-            as='button'
-            p={4}
-            _hover={{ bgColor: '#00BABC' }}
-            onClick={() => {
-              onClickChannel(chatRoom, user)
-            }}
-            key={chatRoom.id}
-          >
-            <ChannelOne roomInfo={chatRoom} />
-          </Flex>
-        ))}
+        {chatRooms.length != 0 &&
+          chatRooms.map((chatRoom: ChannelObject) => (
+            <Flex
+              as='button'
+              p={4}
+              _hover={{ bgColor: '#00BABC' }}
+              onClick={() => {
+                onClickChannel(chatRoom, user)
+              }}
+              key={chatRoom.id}
+            >
+              <ChannelOne roomInfo={chatRoom} />
+            </Flex>
+          ))}
       </Flex>
     </Flex>
   )

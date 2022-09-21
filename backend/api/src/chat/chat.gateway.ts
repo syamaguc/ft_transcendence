@@ -224,8 +224,10 @@ export class ChatGateway {
 	@SubscribeMessage('deleteRoom')
 	async deleteRoom(@MessageBody() roomId: string) {
 		this.logger.log(`deleteRoom: ${roomId}`)
-		const deletedRoom = await this.chatService.deleteRoom(roomId)
-		this.server.to(roomId).emit('deleteRoom', deletedRoom)
+		const deletedRoom = await this.chatService.findRoom(roomId)
+		this.chatService.deleteRoom(roomId)
+		this.server.to(roomId).emit('deleteRoom')
+		this.server.emit('updateRoomDelete', deletedRoom)
 	}
 
 	async joinRoom(roomId: string, socket: Socket) {

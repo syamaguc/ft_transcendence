@@ -220,7 +220,7 @@ export class ChatService {
 		return chatRepository.save(room)
 	}
 
-	async deleteRoom(roomId: string): Promise<ChatRoom> {
-		return chatRepository.delete(roomId)
+	async deleteRoom(roomId: string) {
+		await chatRepository.delete(roomId)
 	}
 }
