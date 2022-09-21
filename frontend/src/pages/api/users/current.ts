@@ -74,6 +74,12 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         session: null,
         need2FA: true,
       })
+    } else if (apiResponse.status === 401) {
+      res.status(200).json({
+        user: null,
+        session: null,
+        need2FA: false,
+      })
     } else {
       res.status(500).json({
         status: 'error',
