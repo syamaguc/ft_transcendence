@@ -226,9 +226,7 @@ function MemberListModal({ socket, currentRoom }) {
             <FriendList friends={friends} />
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>
-              Close
-            </Button>
+            <Button onClick={onClose}>Close</Button>
             {/* <Button colorScheme='blue' variant='ghost'>
               Invite User
             </Button> */}
