@@ -129,7 +129,7 @@ function ChannelInfo({socket, currentRoom}) {
                 <Text>Channel name: {currentRoom.name}</Text>
                 <Text>Owner: {owner ? (owner.username): null}</Text>
                 <Text>Created time: {timestampToTime(currentRoom.time_created)}</Text>
-                {currentUser.userId == currentRoom.owner && (
+                {(currentUser.userId == currentRoom.owner && currentRoom.password != '') && (
                   <>
                     <Text fontSize='xs' color='gray.400'>Enter new password for your channel. Only the channel owner can see this option</Text>
                     <PasswordEdit socket={socket} currentRoom={currentRoom}/>
