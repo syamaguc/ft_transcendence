@@ -125,19 +125,23 @@ function ChannelInfo({ socket, currentRoom }) {
           <ModalHeader>About this channel</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-              <Stack spacing='4'>
-                <Text>Channel name: {currentRoom.name}</Text>
-                <Text>Owner: {owner ? (owner.username): null}</Text>
-                <Text>Created time: {timestampToTime(currentRoom.time_created)}</Text>
-                {(currentUser.userId == currentRoom.owner && currentRoom.password != '') && (
+            <Stack spacing='4'>
+              <Text>Channel name: {currentRoom.name}</Text>
+              <Text>Owner: {owner ? owner.username : null}</Text>
+              <Text>
+                Created time: {timestampToTime(currentRoom.time_created)}
+              </Text>
+              {currentUser.userId == currentRoom.owner &&
+                currentRoom.password != '' && (
                   <>
                     <Text fontSize='xs' color='gray.400'>
-                      Enter new password for your channel. Only the channel owner can see this option
+                      Enter new password for your channel. Only the channel
+                      owner can see this option
                     </Text>
-                    <PasswordEdit socket={socket} currentRoom={currentRoom}/>
+                    <PasswordEdit socket={socket} currentRoom={currentRoom} />
                   </>
                 )}
-              </Stack>
+            </Stack>
           </ModalBody>
 
           <ModalFooter>
