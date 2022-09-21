@@ -1,7 +1,6 @@
 import Layout from '@components/layout'
 import {
   Avatar,
-  AvatarBadge,
   Box,
   Button,
   Circle,
@@ -19,7 +18,6 @@ import {
   Icon,
   Stack,
   Spacer,
-  Skeleton,
   Text,
   Tab,
   TabProps,
@@ -31,42 +29,39 @@ import {
   FormControl,
   FormHelperText,
   FormErrorMessage,
-  useBreakpointValue,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
-import UserStatusBadge from '@components/user-status-badge'
-import { useState, useRef, forwardRef } from 'react'
+import { useState } from 'react'
 
 import { useFormik, FormikErrors } from 'formik'
-import useSWR, { KeyedMutator } from 'swr'
-import { fetchUsers, fetchPartialUserInfos } from 'src/lib/fetchers'
 
 import { FiMoreVertical } from 'react-icons/fi'
 import { BiMessage, BiUserX } from 'react-icons/bi'
 
+import UserStatusBadge from '@components/user-status-badge'
 import { PartialUserInfo, User } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
+import { useFriends } from 'src/lib/use-friends'
+import { useBlocked } from 'src/lib/use-blocked'
 import { API_URL } from 'src/constants'
 
-type FriendItemProps = {
+type RemoveFriendMenuItemProps = {
   friend: PartialUserInfo
-  mutateFriends: KeyedMutator<PartialUserInfo[]>
-  mutateBlocked: KeyedMutator<PartialUserInfo[]>
 }
 
-function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
-  const [removeFriendIsLoading, setRemoveFriendIsLoading] = useState(false)
-  const [blockIsLoading, setBlockIsLoading] = useState(false)
-  const { mutateUser } = useUser()
+function RemoveFriendMenuItem({ friend }: RemoveFriendMenuItemProps) {
+  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
+  const { mutateUser } = useUser()
+  const { mutateFriends } = useFriends()
 
   const removeFriend = async () => {
     let message: string
     let status: 'success' | 'info' | 'error' = 'error'
 
-    setRemoveFriendIsLoading(true)
+    setIsLoading(true)
 
     try {
       const res = await fetch(`${API_URL}/api/user/deleteFriend`, {
@@ -96,14 +91,39 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
       duration: 5000,
       isClosable: true,
     })
-    setRemoveFriendIsLoading(false)
+    setIsLoading(false)
   }
+
+  return (
+    <MenuItem
+      fontSize='sm'
+      onClick={async (e) => {
+        e.stopPropagation()
+        await removeFriend()
+      }}
+      disabled={isLoading}
+    >
+      Remove friend
+    </MenuItem>
+  )
+}
+
+type BlockMenuItemProps = {
+  friend: PartialUserInfo
+}
+
+function BlockMenuItem({ friend }: BlockMenuItemProps) {
+  const [isLoading, setIsLoading] = useState(false)
+  const { mutateUser } = useUser()
+  const { mutateFriends } = useFriends()
+  const { mutateBlocked } = useBlocked()
+  const toast = useToast()
 
   const blockUser = async () => {
     let message: string
     let status: 'success' | 'info' | 'error' = 'error'
 
-    setBlockIsLoading(true)
+    setIsLoading(true)
 
     try {
       const res = await fetch(`${API_URL}/api/user/blockFriend`, {
@@ -134,13 +154,31 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
       duration: 5000,
       isClosable: true,
     })
-    setBlockIsLoading(false)
+    setIsLoading(false)
   }
 
   return (
-    <NextLink key={friend.userId} href={`/users/${friend.username}`}>
+    <MenuItem
+      fontSize='sm'
+      onClick={async (e) => {
+        e.stopPropagation()
+        await blockUser()
+      }}
+      disabled={isLoading}
+    >
+      Block
+    </MenuItem>
+  )
+}
+
+type FriendItemProps = {
+  friend: PartialUserInfo
+}
+
+function FriendItem({ friend }: FriendItemProps) {
+  return (
+    <NextLink href={`/users/${friend.username}`}>
       <Stack
-        key={friend.userId}
         direction='row'
         align='center'
         py='4'
@@ -179,9 +217,7 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
               bg='gray.100'
               size='38px'
               mr='16px'
-              onClick={(e) => {
-                e.stopPropagation()
-              }}
+              onClick={(e) => e.stopPropagation()}
             >
               <Icon as={BiMessage} display='block' transition='color 0.2s' />
             </Circle>
@@ -203,9 +239,7 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
                   _hover={{ bg: 'gray.200', color: 'gray.600' }}
                   bg='gray.100'
                   size='38px'
-                  onClick={(e) => {
-                    e.stopPropagation()
-                  }}
+                  onClick={(e) => e.stopPropagation()}
                   align='center'
                 >
                   <Icon
@@ -215,26 +249,8 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
                   />
                 </MenuButton>
                 <MenuList>
-                  <MenuItem
-                    fontSize='sm'
-                    onClick={async (e) => {
-                      e.stopPropagation()
-                      await removeFriend()
-                    }}
-                    disabled={removeFriendIsLoading}
-                  >
-                    Remove friend
-                  </MenuItem>
-                  <MenuItem
-                    fontSize='sm'
-                    onClick={async (e) => {
-                      e.stopPropagation()
-                      await blockUser()
-                    }}
-                    disabled={blockIsLoading}
-                  >
-                    Block
-                  </MenuItem>
+                  <RemoveFriendMenuItem friend={friend} />
+                  <BlockMenuItem friend={friend} />
                 </MenuList>
               </Menu>
             </Box>
@@ -246,13 +262,13 @@ function FriendItem({ friend, mutateFriends, mutateBlocked }: FriendItemProps) {
 }
 
 type BlockedUserItemProp = {
-  blockedUser: PartialUserInfo
-  mutateBlocked: KeyedMutator<PartialUserInfo[]>
+  user: PartialUserInfo
 }
 
-function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
+function BlockedUserItem({ user }: BlockedUserItemProp) {
   const [isLoading, setIsLoading] = useState(false)
   const { mutateUser } = useUser()
+  const { mutateBlocked } = useBlocked()
   const toast = useToast()
 
   const unblockUser = async () => {
@@ -268,7 +284,7 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId: blockedUser.userId }),
+        body: JSON.stringify({ userId: user.userId }),
       })
       if (!res.ok) {
         message = 'Could not unblock user'
@@ -293,9 +309,8 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
   }
 
   return (
-    <NextLink key={blockedUser.userId} href={`/users/${blockedUser.username}`}>
+    <NextLink href={`/users/${user.username}`}>
       <Stack
-        key={blockedUser.userId}
         direction='row'
         align='center'
         py='4'
@@ -305,17 +320,16 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
         _hover={{ bg: 'gray.50', cursor: 'pointer' }}
       >
         <Avatar
-          key={blockedUser.userId}
           size='sm'
-          src={`${API_URL}/api/user/avatar/${blockedUser.profile_picture}`}
+          src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
           mr='12px'
         >
-          <UserStatusBadge boxSize='1.25em' status={blockedUser.status} />
+          <UserStatusBadge boxSize='1.25em' status={user.status} />
         </Avatar>
         <Flex direction='row' align='center' w='full'>
           <Stack direction='column' spacing='0'>
             <Text fontWeight='800' fontSize='md'>
-              {blockedUser.username}
+              {user.username}
             </Text>
             <Text fontWeight='600' color='gray.400' fontSize='sm'>
               Blocked
@@ -357,10 +371,10 @@ function BlockedUserItem({ blockedUser, mutateBlocked }: BlockedUserItemProp) {
 
 type AddFriendProps = {
   user: User
-  mutateFriends: KeyedMutator<PartialUserInfo[]>
 }
 
-function AddFriend({ user, mutateFriends }: AddFriendProps) {
+function AddFriend({ user }: AddFriendProps) {
+  const { mutateFriends } = useFriends()
   const toast = useToast()
 
   const validate = (values: { username: string }) => {
@@ -487,32 +501,17 @@ function AddFriend({ user, mutateFriends }: AddFriendProps) {
 
 function UserList() {
   const { user: currentUser } = useUser()
-  const { data: usersData, error: usersError } = useSWR(
-    `${API_URL}/api/user/search`,
-    fetchUsers
-  )
 
-  const usersIsLoading = !usersData && !usersError
-  console.log('/users usersData: ', usersData)
+  const { friends, countAll, countOnline } = useFriends()
+  const { blocked } = useBlocked()
 
-  // From here
-  console.log('/users currentUser: ', currentUser)
+  const isNotBlocked = (element: PartialUserInfo) => {
+    return currentUser.blockedUsers.indexOf(element.userId) === -1
+  }
 
-  const {
-    data: friendsData,
-    mutate: mutateFriends,
-    error: friendsError,
-  } = useSWR(`${API_URL}/api/user/friendList`, fetchPartialUserInfos)
-
-  const friendsIsLoading = !usersData && !usersError
-
-  const {
-    data: blockedData,
-    mutate: mutateBlocked,
-    error: blockedError,
-  } = useSWR(`${API_URL}/api/user/blockedList`, fetchPartialUserInfos)
-
-  const blockedIsLoading = !blockedData && !blockedError
+  const isOnline = (element: PartialUserInfo) => {
+    return element.status === 'Online' && isNotBlocked(element)
+  }
 
   const SecondaryTab = (props: TabProps) => {
     const selectedBgColor = useColorModeValue('gray.200', 'gray.500')
@@ -550,185 +549,100 @@ function UserList() {
 
   return (
     <Layout>
-      <Container maxW='2xl'>
-        <Box py='12'>
-          <Stack spacing='12'>
-            <Tabs variant='soft-rounded' colorScheme='gray'>
-              <Stack>
-                <Flex align='center'>
-                  <Stack direction='row' align='center' spacing='4'>
-                    <Heading as='h1' fontSize='xl'>
-                      Friends
-                    </Heading>
-                    <Box h='24px'>
-                      <Divider orientation='vertical' />
-                    </Box>
-                    <TabList>
-                      <SecondaryTab mr='2'>Online</SecondaryTab>
-                      <SecondaryTab mr='2'>All</SecondaryTab>
-                      <SecondaryTab mr='2'>Blocked</SecondaryTab>
-                    </TabList>
-                  </Stack>
-                  <Spacer />
-                  <PrimaryTab>Add Friend</PrimaryTab>
-                </Flex>
-                <TabPanels>
-                  <TabPanel>
-                    {friendsError && (
-                      <Stack spacing='8'>
-                        <Text>Error occurred</Text>
-                      </Stack>
-                    )}
-                    {friendsIsLoading && (
-                      <Stack spacing='4'>
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                      </Stack>
-                    )}
-                    {friendsData &&
-                      friendsData.filter(
-                        (friend) =>
-                          friend.status === 'Online' &&
-                          currentUser.blockedUsers.indexOf(friend.userId) === -1
-                      ).length > 0 && (
-                        <Stack spacing='0'>
-                          <Text
-                            mb='3'
-                            fontSize='sm'
-                            fontWeight='semibold'
-                            color='gray.400'
-                          >
-                            ONLINE -{' '}
-                            {
-                              friendsData.filter(
-                                (friend) =>
-                                  friend.status === 'Online' &&
-                                  currentUser.blockedUsers.indexOf(
-                                    friend.userId
-                                  ) === -1
-                              ).length
-                            }
-                          </Text>
-                          <Divider />
-                          {friendsData
-                            .filter(
-                              (friend) =>
-                                friend.status === 'Online' &&
-                                currentUser.blockedUsers.indexOf(
-                                  friend.userId
-                                ) === -1
-                            )
-                            .map((friend: PartialUserInfo) => (
-                              <FriendItem
-                                key={friend.userId}
-                                friend={friend}
-                                mutateFriends={mutateFriends}
-                                mutateBlocked={mutateBlocked}
-                              />
-                            ))}
-                        </Stack>
-                      )}
-                  </TabPanel>
-                  <TabPanel>
-                    {friendsError && (
-                      <Stack spacing='8'>
-                        <Text>Error occurred</Text>
-                      </Stack>
-                    )}
-                    {friendsIsLoading && (
-                      <Stack spacing='4'>
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                      </Stack>
-                    )}
-                    {friendsData &&
-                      friendsData.filter(
-                        (friend) =>
-                          currentUser.blockedUsers.indexOf(friend.userId) == -1
-                      ).length > 0 && (
-                        <Stack spacing='0'>
-                          <Text
-                            mb='3'
-                            fontSize='sm'
-                            fontWeight='semibold'
-                            color='gray.400'
-                          >
-                            ALL FRIENDS -{' '}
-                            {
-                              friendsData.filter(
-                                (friend) =>
-                                  currentUser.blockedUsers.indexOf(
-                                    friend.userId
-                                  ) === -1
-                              ).length
-                            }
-                          </Text>
-                          <Divider />
-                          {friendsData
-                            .filter(
-                              (friend) =>
-                                currentUser.blockedUsers.indexOf(
-                                  friend.userId
-                                ) === -1
-                            )
-                            .map((friend: PartialUserInfo) => (
-                              <FriendItem
-                                key={friend.userId}
-                                friend={friend}
-                                mutateFriends={mutateFriends}
-                                mutateBlocked={mutateBlocked}
-                              />
-                            ))}
-                        </Stack>
-                      )}
-                  </TabPanel>
-                  <TabPanel>
-                    {blockedError && (
-                      <Stack spacing='8'>
-                        <Text>Error occurred</Text>
-                      </Stack>
-                    )}
-                    {blockedIsLoading && (
-                      <Stack spacing='4'>
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                        <Skeleton height='60px' isLoaded={!usersIsLoading} />
-                      </Stack>
-                    )}
-                    {blockedData && blockedData.length > 0 && (
-                      <Stack spacing='0'>
-                        <Text
-                          mb='3'
-                          fontSize='sm'
-                          fontWeight='semibold'
-                          color='gray.400'
-                        >
-                          BLOCKED - {blockedData.length}
-                        </Text>
-                        <Divider />
-                        {blockedData.map((blockedUser: PartialUserInfo) => (
-                          <BlockedUserItem
-                            key={blockedUser.userId}
-                            blockedUser={blockedUser}
-                            mutateBlocked={mutateBlocked}
-                          />
-                        ))}
-                      </Stack>
-                    )}
-                  </TabPanel>
-                  <TabPanel>
-                    <AddFriend
-                      user={currentUser}
-                      mutateFriends={mutateFriends}
-                    />
-                  </TabPanel>
-                </TabPanels>
+      <Container maxW='2xl' py='12'>
+        <Tabs variant='soft-rounded' colorScheme='gray'>
+          <Stack>
+            <Flex align='center'>
+              <Stack direction='row' align='center' spacing='4'>
+                <Heading as='h1' fontSize='xl'>
+                  Friends
+                </Heading>
+                <Box h='24px'>
+                  <Divider orientation='vertical' />
+                </Box>
+                <TabList>
+                  <SecondaryTab mr='2'>Online</SecondaryTab>
+                  <SecondaryTab mr='2'>All</SecondaryTab>
+                  <SecondaryTab mr='2'>Blocked</SecondaryTab>
+                </TabList>
               </Stack>
-            </Tabs>
+              <Spacer />
+              <PrimaryTab>Add Friend</PrimaryTab>
+            </Flex>
+            <TabPanels>
+              <TabPanel>
+                {friends && countOnline > 0 && (
+                  <Stack spacing='0'>
+                    <Text
+                      mb='3'
+                      fontSize='sm'
+                      fontWeight='semibold'
+                      color='gray.400'
+                    >
+                      ONLINE - {countOnline}
+                    </Text>
+                    <Divider />
+                    <Stack>
+                      {friends
+                        .filter(isOnline)
+                        .map((friend: PartialUserInfo) => (
+                          <FriendItem key={friend.username} friend={friend} />
+                        ))}
+                    </Stack>
+                  </Stack>
+                )}
+              </TabPanel>
+              <TabPanel>
+                {friends && countAll > 0 && (
+                  <Stack spacing='0'>
+                    <Text
+                      mb='3'
+                      fontSize='sm'
+                      fontWeight='semibold'
+                      color='gray.400'
+                    >
+                      ALL FRIENDS - {countAll}
+                    </Text>
+                    <Divider />
+                    <Stack>
+                      {friends
+                        .filter(isNotBlocked)
+                        .map((friend: PartialUserInfo) => (
+                          <FriendItem key={friend.username} friend={friend} />
+                        ))}
+                    </Stack>
+                  </Stack>
+                )}
+              </TabPanel>
+              <TabPanel>
+                {blocked && blocked.length > 0 && (
+                  <Stack spacing='0'>
+                    <Text
+                      mb='3'
+                      fontSize='sm'
+                      fontWeight='semibold'
+                      color='gray.400'
+                    >
+                      BLOCKED - {blocked.length}
+                    </Text>
+                    <Divider />
+                    <Stack>
+                      {blocked.map((blockedUser: PartialUserInfo) => (
+                        <BlockedUserItem
+                          key={blockedUser.username}
+                          user={blockedUser}
+                        />
+                      ))}
+                    </Stack>
+                  </Stack>
+                )}
+              </TabPanel>
+              <TabPanel>
+                <AddFriend user={currentUser} />
+              </TabPanel>
+            </TabPanels>
           </Stack>
-        </Box>
+        </Tabs>
       </Container>
     </Layout>
   )

@@ -63,7 +63,6 @@ export async function fetchUser(
     return { user: data?.user || null, session: data?.session }
   }
 
-  // TODO: throw
   return { user: null, session: null }
 }
 
@@ -75,7 +74,6 @@ export async function fetchUsers(url: string): Promise<User[]> {
     return data
   }
 
-  // TODO: throw
   return []
 }
 
@@ -87,7 +85,6 @@ export async function fetchUserInfo(url: string): Promise<{ user: User }> {
     return { user: data || null }
   }
 
-  // TODO: throw
   return { user: null }
 }
 
@@ -101,7 +98,6 @@ export async function fetchPartialUserInfos(
     return data
   }
 
-  // TODO: throw
   return []
 }
 
@@ -115,7 +111,6 @@ export async function fetchPartialUserInfo(
     return { user: data || null }
   }
 
-  // TODO: throw
   return { user: null }
 }
 
@@ -127,6 +122,5 @@ export async function fetchText(url: string): Promise<{ text: string }> {
     return { text: text }
   }
 
-  // TODO: throw
   return { text: null }
 }
