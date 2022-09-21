@@ -62,6 +62,7 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 		const salt = await bcrypt.genSalt()
 		user.password = await bcrypt.hash(user.password, salt)
 		user.friends = []
+		user.blockedUsers = []
 		user.profile_picture = await this.generateProfilePicture()
 
 		const numberUsers = await this.createQueryBuilder('user')
@@ -86,6 +87,7 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 		const salt = await bcrypt.genSalt()
 		user.password = await bcrypt.hash(user.password, salt)
 		user.friends = []
+		user.blockedUsers = []
 		user.login42 = userData.login42
 		user.profile_picture = await this.generateProfilePicture()
 		const numberUsers = await this.createQueryBuilder('user')
