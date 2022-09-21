@@ -29,6 +29,9 @@ image_clean:
 volume_clean:
 	docker volume prune -f
 
+db:
+	bash db.sh
+
 clean:
 	docker system prune -f
 
