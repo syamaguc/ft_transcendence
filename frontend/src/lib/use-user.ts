@@ -26,15 +26,15 @@ export function useUser({ redirectTo = '', redirectIfFound = false } = {}) {
 
   const isLoading = !error && !data
   const session = data?.session
+  const need2FA = data?.need2FA
 
   return {
     user: error ? null : user,
     mutateUser: mutate,
     isLoading: isLoading,
-    isError: error,
-    isAuthenticated: hasUser,
-    isUnauthenticated: !hasUser,
     status: isLoading ? 'loading' : user ? 'authenticated' : 'unauthenticated',
-    isFirstTime: session ? session.isFirstTime : false,
+    isFirstTime: session?.isFirstTime && user?.login_count === 1,
+    needTwoFactorAuth: need2FA,
+    didTwoFactorAuth: session?.didTwoFactorAuth,
   }
 }

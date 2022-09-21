@@ -6,24 +6,37 @@ import { setSessionCookie, getSessionCookie } from 'src/lib/cookies'
 async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
   try {
     if (req.method === 'POST') {
-      const isFirstTime = req.body.isFirstTime
-      if (typeof isFirstTime === 'undefined') {
+      let isFirstTime = req.body.isFirstTime
+      let didTwoFactorAuth = req.body.didTwoFactorAuth
+
+      if (
+        typeof isFirstTime === 'undefined' &&
+        typeof didTwoFactorAuth === 'undefined'
+      ) {
         return res.status(400).end()
       }
 
-      let didTwoFactorAuth: boolean
+      let session: Session
       const stringValue = getSessionCookie(req)
       if (stringValue) {
-        const session = JSON.parse(stringValue)
-        if (typeof session.didTwoFactorAuth === 'boolean') {
-          didTwoFactorAuth = session.didTwoFactorAuth
-        } else {
-          didTwoFactorAuth = false
-        }
+        session = JSON.parse(stringValue)
       }
 
-      const session: Session = { isFirstTime, didTwoFactorAuth }
-      setSessionCookie(res, session)
+      if (typeof isFirstTime === 'undefined') {
+        isFirstTime =
+          typeof session?.isFirstTime === 'boolean'
+            ? session.isFirstTime
+            : false
+      }
+      if (typeof didTwoFactorAuth === 'undefined') {
+        didTwoFactorAuth =
+          typeof session?.didTwoFactorAuth === 'boolean'
+            ? session.didTwoFactorAuth
+            : false
+      }
+
+      const newSession: Session = { isFirstTime, didTwoFactorAuth }
+      setSessionCookie(res, newSession)
 
       return res.status(200).end(res.getHeader('Set-Cookie'))
     }
@@ -37,11 +50,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse<any>) {
         session = null
       }
 
-      if (session) {
-        return res.status(200).json(session)
-      } else {
-        return res.status(400).end()
-      }
+      return res.status(200).json({ session: session })
     }
     res.status(400).end()
   } catch (err) {

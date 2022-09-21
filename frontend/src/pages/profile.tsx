@@ -26,6 +26,7 @@ import useSWR from 'swr'
 import { fetchText } from 'src/lib/fetchers'
 import { API_URL } from 'src/constants'
 import { useUser } from 'src/lib/use-user'
+import { setDidTwoFactorAuth } from 'src/lib/session'
 
 import Layout from '@components/scrollable-layout'
 import ChakraNextImage from '@components/chakra-next-image'
@@ -112,6 +113,7 @@ function TwoFactorAuth() {
       if (body === 'True') {
         const updateRes = await updateTwoFactorAuth(true)
         if (updateRes.ok) {
+          await setDidTwoFactorAuth(true)
           await mutateUser()
           toast({
             description: 'Successfully enabled 2FA',

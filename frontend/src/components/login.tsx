@@ -52,17 +52,6 @@ export function LoginForm() {
 
     if (!values.password) {
       errors.password = 'Required'
-    } else if (values.password.length < 8) {
-      errors.password = 'Must be 8 characters minimum'
-    } else if (values.password.length > 30) {
-      errors.password = 'Must be 30 characters or less'
-    } else if (
-      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*_\(\)\-\[\]\~\.\`\;\:])/.test(
-        values.password
-      )
-    ) {
-      errors.password =
-        'Must contain uppercase, lowercase, number and symbol chracter'
     }
 
     return errors

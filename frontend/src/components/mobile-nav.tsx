@@ -162,7 +162,6 @@ export const MobileNavContent = (props: MobileNavContentProps) => {
                   pt='4'
                 >
                   <LogoutButton colorScheme='gray' w='50%' />
-                  more nav content...
                 </Flex>
               </ScrollView>
             </Flex>
