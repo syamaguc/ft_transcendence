@@ -46,7 +46,7 @@ const MessageFilter = ({ currentRoom, message }) => {
             {timestampToTime(message.timestamp)}
           </Text>
         </Flex>
-        <Text>{message.message}</Text>
+        <Text whiteSpace='pre-wrap'>{message.message}</Text>
       </Flex>
     </Flex>
   )

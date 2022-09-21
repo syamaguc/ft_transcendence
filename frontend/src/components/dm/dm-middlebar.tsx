@@ -49,9 +49,7 @@ const DmMiddleBar = ({ chatLog }) => {
                     {timestampToTime(message.timestamp)}
                   </Text>
                 </Flex>
-                {/* <Box bg="blue.100" w="fit-content" minWidth="100px" borderRadius="10px" p={3} m={1}> */}
-                <Text>{message.message}</Text>
-                {/* </Box> */}
+                <Text whiteSpace='pre-wrap'>{message.message}</Text>
               </Flex>
             </Flex>
           ))
