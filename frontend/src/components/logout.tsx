@@ -4,52 +4,50 @@ import { API_URL } from 'src/constants'
 import { useUser } from 'src/lib/use-user'
 import { setIsFirstTime } from 'src/lib/session'
 
+async function logout() {
+  const res = await fetch(`${API_URL}/api/user/logout`, {
+    method: 'DELETE',
+    credentials: 'include',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  return res
+}
+
 export function LogoutButton(props: ButtonProps) {
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
   const { mutateUser } = useUser()
 
   const handleLogout = async () => {
+    let message: string
+    let status: 'info' | 'error' = 'error'
+
     setIsLoading(true)
 
     try {
-      const res = await fetch(`${API_URL}/api/user/logout`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      const res = await logout()
       if (res.ok) {
         await setIsFirstTime(false)
         await mutateUser()
-        toast({
-          description: 'Successfully logged out.',
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-        })
+        message = 'Successfully logged out'
+        status = 'info'
       } else {
-        toast({
-          description: 'Internal error occurred',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        })
+        message = 'Failed to log out'
       }
     } catch (err) {
       console.log(err)
-      toast({
-        description: 'Failed to logout',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
     }
 
+    toast({
+      description: message,
+      status: status,
+      duration: 5000,
+      isClosable: true,
+    })
     setIsLoading(false)
   }
 
@@ -66,46 +64,31 @@ export function LogoutMenuItem() {
   const { mutateUser } = useUser()
 
   const handleLogout = async () => {
+    let message: string
+    let status: 'info' | 'error' = 'error'
+
     setIsLoading(true)
 
     try {
-      const res = await fetch(`${API_URL}/api/user/logout`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
+      const res = await logout()
       if (res.ok) {
         await setIsFirstTime(false)
         await mutateUser()
-        toast({
-          description: 'Successfully logged out.',
-          status: 'info',
-          duration: 5000,
-          isClosable: true,
-        })
+        message = 'Successfully logged out'
+        status = 'info'
       } else {
-        toast({
-          description: 'Internal error occurred',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        })
+        message = 'Failed to log out'
       }
     } catch (err) {
       console.log(err)
-      toast({
-        description: 'Failed to logout',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
     }
 
+    toast({
+      description: message,
+      status: status,
+      duration: 5000,
+      isClosable: true,
+    })
     setIsLoading(false)
   }
 
