@@ -1,4 +1,4 @@
-import { User, UserPartialInfo, Session } from 'src/types/user'
+import { User, PartialUserInfo, Session } from 'src/types/user'
 
 export class FetchError extends Error {
   response: Response
@@ -63,7 +63,6 @@ export async function fetchUser(
     return { user: data?.user || null, session: data?.session }
   }
 
-  // TODO: throw
   return { user: null, session: null }
 }
 
@@ -75,7 +74,6 @@ export async function fetchUsers(url: string): Promise<User[]> {
     return data
   }
 
-  // TODO: throw
   return []
 }
 
@@ -87,13 +85,25 @@ export async function fetchUserInfo(url: string): Promise<{ user: User }> {
     return { user: data || null }
   }
 
-  // TODO: throw
   return { user: null }
 }
 
-export async function fetchUserPartialInfo(
+export async function fetchPartialUserInfos(
   url: string
-): Promise<{ user: UserPartialInfo }> {
+): Promise<PartialUserInfo[]> {
+  const res = await fetch(url, { credentials: 'include' })
+  const data = await res.json()
+
+  if (res.ok) {
+    return data
+  }
+
+  return []
+}
+
+export async function fetchPartialUserInfo(
+  url: string
+): Promise<{ user: PartialUserInfo }> {
   const res = await fetch(url, { credentials: 'include' })
   const data = await res.json()
 
@@ -101,7 +111,6 @@ export async function fetchUserPartialInfo(
     return { user: data || null }
   }
 
-  // TODO: throw
   return { user: null }
 }
 
@@ -113,6 +122,5 @@ export async function fetchText(url: string): Promise<{ text: string }> {
     return { text: text }
   }
 
-  // TODO: throw
   return { text: null }
 }

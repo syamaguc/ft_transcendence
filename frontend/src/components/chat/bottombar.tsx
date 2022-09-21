@@ -1,5 +1,21 @@
-import { Button, Textarea } from '@chakra-ui/react'
-import { useCallback } from 'react'
+import {
+  Button,
+  Textarea,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  Text,
+  MemberList,
+  ModalFooter,
+  Input,
+  MutableRefObject,
+  FormControl,
+} from '@chakra-ui/react'
+import React, { useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
 import ResizeTextarea from 'react-textarea-autosize'
 import { ChannelObject } from 'src/types/chat'
@@ -19,6 +35,49 @@ const BottomBar = ({
   currentRoom,
   isJoined,
 }: Props) => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
+  const AskPassword = ({ isOpen, onClose, socket }) => {
+    const channelPasswordRef = useRef<HTMLInputElement>()
+
+    const onClickPassword = useCallback(
+      (event: React.FormEvent<HTMLFormElement>) => {
+        onClose()
+        if (!socket || !currentRoom) return
+        event.preventDefault()
+        const password = channelPasswordRef.current.value
+        socket.emit('joinProtectedRoom', {
+          roomId: currentRoom.id,
+          password: password,
+        })
+      },
+      [socket, onClose]
+    )
+
+    return (
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <form onSubmit={onClickPassword}>
+            <ModalHeader>Please enter a password</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              <Input type='text' ref={channelPasswordRef} />
+            </ModalBody>
+            <ModalFooter>
+              <Button variant='ghost' onClick={onClose}>
+                Cancel
+              </Button>
+              <Button colorScheme='blue' mr={3} type='submit'>
+                Enter
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+    )
+  }
+
   const onClickSubmit = useCallback(() => {
     if (!socket) return
     const message = {
@@ -61,7 +120,10 @@ const BottomBar = ({
   } else {
     return (
       <>
-        <Button onClick={onClickJoin}>join</Button>
+        <Button onClick={currentRoom.password ? onOpen : onClickJoin}>
+          join
+        </Button>
+        <AskPassword isOpen={isOpen} onClose={onClose} socket={socket} />
       </>
     )
   }

@@ -39,13 +39,18 @@ const API_URL = 'http://localhost:3000'
 export const mainNavLinks = [
   {
     icon: null,
-    label: 'Users',
+    label: 'Friends',
     href: '/users',
   },
   {
     icon: null,
     label: 'Chat',
     href: '/chat',
+  },
+  {
+    icon: null,
+    label: 'DM',
+    href: '/dm',
   },
   {
     icon: null,
@@ -172,7 +177,9 @@ const HeaderContent = () => {
                     <NextLink href='/profile' passHref>
                       <MenuItem as='a'>Profile</MenuItem>
                     </NextLink>
-                    <MenuItem>Friends</MenuItem>
+                    <NextLink href='/users' passHref>
+                      <MenuItem as='a'>Friends</MenuItem>
+                    </NextLink>
                     <MenuDivider />
                     <LogoutMenuItem />
                   </MenuList>

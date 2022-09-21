@@ -34,7 +34,7 @@ export class ChatRoom {
 	@Column('text', { default: '' })
 	password: string
 
-	@Column()
+	@Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
 	time_created: Date
 
 	// @Column()

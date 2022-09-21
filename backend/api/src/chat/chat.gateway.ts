@@ -13,6 +13,7 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
 import { ChatRoom } from './entities/chat-room.entity'
+import { WsException } from '@nestjs/websockets'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
@@ -24,7 +25,7 @@ export class ChatGateway {
 	private logger: Logger = new Logger('ChatGateway')
 
 	async handleConnection(@ConnectedSocket() socket: Socket) {
-		this.chatService.setUserIdToSocket(socket)
+		this.chatService.setUserToSocket(socket)
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 
@@ -128,6 +129,41 @@ export class ChatGateway {
 		socket.join(roomId)
 	}
 
+	// room which user is watching
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('unwatchRoom')
+	unwatchRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
+		const rooms = [...socket.rooms].slice(0)
+		if (rooms.length == 2) socket.leave(rooms[1])
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('joinProtectedRoom')
+	async joinProtectedRoom(
+		@MessageBody() data,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const roomId = data['roomId']
+		const password = data['password']
+		const userId = socket.data.userId
+		const room: ChatRoom = await this.chatService.joinProtectedRoom(
+			userId,
+			roomId,
+			password,
+		)
+		if (room) {
+			this.watchOrSwitchRoom(roomId, socket)
+			this.updateRoom(room)
+			this.getMessageLog(roomId, socket)
+		} else {
+			throw new WsException('Password is incorrect.')
+		}
+	}
+
 	// join room to be a member
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinRoom')
@@ -136,10 +172,34 @@ export class ChatGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		//banの場合
+		const tmp = await this.chatService.findRoom(roomId)
+		if (tmp.banned.indexOf(socket.data.userId) != -1) {
+			throw new WsException('You are banned from the channel')
+		}
 
 		//privateの場合
+
+		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
+	}
+
+	// leave a room by roomId
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('leaveRoom')
+	async leaveRoom(
+		@MessageBody() roomId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		this.logger.log('leaveRoom called')
+		const room: ChatRoom = await this.chatService.leaveRoom(
+			socket.data.userId,
+			roomId,
+		)
+		this.updateRoom(room)
+		if (room.password) {
+			this.unwatchRoom(roomId, socket)
+		}
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
