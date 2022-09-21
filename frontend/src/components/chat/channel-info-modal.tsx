@@ -85,10 +85,10 @@ function ChannelInfo({socket, currentRoom}) {
           <ModalBody>
             {currentUser.userId == currentRoom.owner && (
               <>
-                
+                <Text>Edit password</Text>
+                <PasswordEdit socket={socket} currentRoom={currentRoom}/>
               </>
             )}
-            <PasswordEdit socket={socket} currentRoom={currentRoom}/>
           </ModalBody>
 
           <ModalFooter>
