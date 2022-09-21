@@ -319,6 +319,18 @@ export class GameRoom {
 		}
 	}
 
+	removeDisconnectNotPlayer() {
+		const removeArray = []
+		for (let i = 0; i < this.socketDatas.length; i++) {
+			if (!this.socketDatas[i].client.connected && this.socketDatas[i].role == 2) {
+				removeArray.push(i)
+			}
+		}
+		for (let i = removeArray.length - 1; i >= 0; i--) {
+			this.socketDatas.splice(removeArray[i], 1)
+		}
+	}
+
 	start(point: number, speed: number) {
 		this.settingEnd()
 		this.gameObjectInit(

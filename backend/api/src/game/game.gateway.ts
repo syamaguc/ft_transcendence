@@ -10,12 +10,13 @@ import {
 	NotFoundException,
 	InternalServerErrorException,
 } from '@nestjs/common'
-import { SocketGuard } from '../user/guards/socketAuth.guard'
 import { UseGuards } from '@nestjs/common'
+import { WsException } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
 import { User } from '../user/entities/user.entity'
 import { UsersRepository } from '../user/user.repository'
+import { SocketGuard } from '../user/guards/socketAuth.guard'
 import { GameRoom } from './game.lib'
 import {
 	socketData,
@@ -32,6 +33,7 @@ export class GameGateway {
 	private gameRooms: GameRoom[] = []
 	private gameRoomInfos: GameRoomInfo[] = []
 	private matchUsers: socketData[] = []
+	private inviteUsers: socketData[] = []
 	private logger: Logger = new Logger('Gateway Log')
 
 	searchRoom(roomId: string) {
@@ -45,6 +47,7 @@ export class GameGateway {
 
 	searchRoomFromUserId(userId: string) {
 		for (let i = 0; i < this.gameRooms.length; i++) {
+			this.gameRooms[i].removeDisconnectNotPlayer()
 			if (this.gameRooms[i].inUser(userId)) {
 				return this.gameRooms[i].id
 			}
@@ -248,6 +251,7 @@ export class GameGateway {
 	}
 
 	checkInMatchUsers(userId: string): number {
+		this.disconnectMatchUserRemove()
 		for (let i = 0; i < this.matchUsers.length; i++) {
 			if (userId == this.matchUsers[i].userId) {
 				return i
@@ -318,7 +322,6 @@ export class GameGateway {
 			const userName = user['username']
 			this.logger.log(userId)
 			this.logger.log(userName)
-			this.disconnectMatchUserRemove()
 			if (!this.checkAndUpdateInMatchUsers(userId, client)) {
 				const clientData: socketData = {
 					client: client,
@@ -360,5 +363,59 @@ export class GameGateway {
 			}
 		}
 		this.logger.log(this.matchUsers.length)
+	}
+
+	inInviteUsers(userId: string) {
+		for (let i = 0; i < this.inviteUsers.length; i++) {
+			if (this.inviteUsers[i].userId == userId) {
+				return i
+			}
+		}
+		return -1
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('gameInviteReady')
+	handleGameInviteReady(
+		@MessageBody() data: any,
+		@ConnectedSocket() client: Socket,
+	) {
+		
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('gameInvite')
+	handleGameInvite(
+		@MessageBody() data: any,
+		@ConnectedSocket() client: Socket,
+	) {
+		const userId = client.data.userId
+		const userName = client.data.userName
+		const inviteUserId = data['inviteUserId']
+
+		if (this.searchRoomFromUserId(userId)) {
+			throw new WsException('Cannot be invited because you are participating or watching the game')
+		}
+		if (this.checkInMatchUsers(userId) != -1) {
+			throw new WsException('Cannot invite due to matching in progress')
+		}
+
+		const roomId = this.searchRoomFromUserId(inviteUserId)
+		if (roomId) {
+			this.server.to(client.id).emit('gameWatch', {roomId: roomId})
+		} else {
+			const inviteUserIndex = this.inInviteUsers(userId)
+			if (inviteUserIndex != -1) {
+				this.inviteUsers[inviteUserId].client = client
+			} else {
+				const clientData: socketData = {
+					client: client,
+					role: -1,
+					userId: userId,
+					userName: userName,
+				}
+				this.inviteUsers.push(clientData)
+			}
+		}
 	}
 }

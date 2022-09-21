@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Button } from '@chakra-ui/react'
+import { Button, useToast } from '@chakra-ui/react'
 import io from 'socket.io-client'
 import { API_URL } from 'src/constants'
 
@@ -9,6 +9,7 @@ type Props = {
 }
 
 const GameInvite = ({ user, router }: Props) => {
+  const toast = useToast()
   const [server, setServer] = useState()
   const [inviteStatus, setInviteStatus] = useState(0)
 
@@ -21,6 +22,19 @@ const GameInvite = ({ user, router }: Props) => {
       tempServer.disconnect()
     }
   }, [router])
+
+  useEffect(() => {
+    if (!server) return
+    server.on('exception', ({ status, message }) => {
+      console.log(status, message)
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
+    })
+  }, [server])
 
   return (
     <>
