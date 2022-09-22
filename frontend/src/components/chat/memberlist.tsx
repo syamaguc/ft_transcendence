@@ -186,6 +186,7 @@ function MemberListModal({ socket, currentRoom }) {
         {
           if (currentRoom.members.includes(data[i].userId)) {
             data.splice(i, 1)
+            i--
           }
         }
         console.log('data :', data)
