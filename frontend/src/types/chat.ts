@@ -13,6 +13,8 @@ export interface ChannelObject {
   members: string[]
   owner: string
   admins: string[]
+  muted: string[]
+  banned: string[]
   is_private: boolean
   logs: MessageObject[]
   password: string
