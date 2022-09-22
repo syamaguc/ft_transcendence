@@ -30,10 +30,14 @@ const Chat = () => {
       }
       socket.on('exception', ({ status, message }) => {
         console.log(status, message)
+        if (message === 'Room Not Found') {
+          router.push('/dm')
+          return
+        }
         toast({
           description: message,
           status: status,
-          duration: 5000,
+          duration: 2500,
           isClosable: true,
         })
       })
