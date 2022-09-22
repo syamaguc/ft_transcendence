@@ -13,6 +13,7 @@ import { ChatService } from './chat.service'
 import { UseGuards } from '@nestjs/common'
 import { SocketGuard } from 'src/user/guards/socketAuth.guard'
 import { DMObject, DMRawData } from './interfaces/dm.interface'
+import { DMRoom } from './entities/dm-room.entity'
 
 @WebSocketGateway({ namespace: '/dm', cors: { origin: '*' } })
 export class DMGateway {
@@ -64,7 +65,7 @@ export class DMGateway {
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
 		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
-		let DMObjectsForFront: DMObject[]
+		let DMObjectsForFront: DMObject[] = []
 		rooms.map((room) => {
 			DMObjectsForFront.push(this.createDMObjectForFront(room, socket))
 		})
