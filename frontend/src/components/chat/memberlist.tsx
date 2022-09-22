@@ -130,10 +130,7 @@ function MemberList({ socket, currentRoom, members }) {
   )
 }
 
-
-
 function FriendList({ socket, friends, members }) {
-
   const onClickInvite = (userId: string) => {
     socket.emit('inviteMember', userId)
     console.log('invite :', userId)
@@ -142,12 +139,19 @@ function FriendList({ socket, friends, members }) {
 
   return (
     <>
-      <Text fontSize='xs' color='gray.400'>Invite your friends to the channel</Text>
-      {friends.map((friend) =>
-      (
+      <Text fontSize='xs' color='gray.400'>
+        Invite your friends to the channel
+      </Text>
+      {friends.map((friend) => (
         <Stack direction='row' align='center' key={friend.userId}>
           <Text>{friend.username}</Text>
-          <Button onClick={() => {onClickInvite(friend.userId)}}>invite</Button>
+          <Button
+            onClick={() => {
+              onClickInvite(friend.userId)
+            }}
+          >
+            invite
+          </Button>
         </Stack>
       ))}
     </>
@@ -182,8 +186,7 @@ function MemberListModal({ socket, currentRoom }) {
       .then((r) => r.json())
       .then((data) => {
         //exclude members from friends list
-        for (let i = 0; i < data.length; i++)
-        {
+        for (let i = 0; i < data.length; i++) {
           if (currentRoom.members.includes(data[i].userId)) {
             data.splice(i, 1)
             i--
@@ -220,7 +223,7 @@ function MemberListModal({ socket, currentRoom }) {
               members={members}
             />
             {currentRoom.members.includes(currentUser.userId) && (
-                <FriendList socket={socket} friends={friends} members={members}/>
+              <FriendList socket={socket} friends={friends} members={members} />
             )}
           </ModalBody>
           <ModalFooter>
