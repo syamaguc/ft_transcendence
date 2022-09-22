@@ -1,21 +1,9 @@
 import {
-  Avatar,
-  AvatarBadge,
   Box,
-  Button,
-  Circle,
   Container,
   Divider,
   Flex,
   Heading,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Icon,
   Stack,
   Spacer,
   Text,
@@ -25,34 +13,20 @@ import {
   TabList,
   TabPanels,
   TabPanel,
-  Tooltip,
-  FormControl,
-  FormHelperText,
-  FormErrorMessage,
   useColorModeValue,
-  useToast,
 } from '@chakra-ui/react'
 
-import NextLink from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
-import useSWR from 'swr'
-
-import { useFormik, FormikErrors } from 'formik'
-import { FiMessageSquare, FiMoreVertical } from 'react-icons/fi'
-import { BiMessage, BiUserX } from 'react-icons/bi'
 
 import AddFriend from '@components/add-friend'
-import UserStatusBadge from '@components/user-status-badge'
 import DMBlockedUserItem from '@components/dm/dm-blocked-user-item'
 import DMFriendItem from '@components/dm/dm-friend-item'
 
 import { PartialUserInfo, User } from 'src/types/user'
-import { fetchUsers } from 'src/lib/fetchers'
 import { useUser } from 'src/lib/use-user'
 import { useFriends } from 'src/lib/use-friends'
 import { useBlocked } from 'src/lib/use-blocked'
-import { API_URL } from 'src/constants'
 
 import { Socket } from 'socket.io-client'
 
