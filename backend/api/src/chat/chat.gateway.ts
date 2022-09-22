@@ -71,7 +71,7 @@ export class ChatGateway {
 		const newRoom = await this.chatService.banUser(userId, room)
 
 		// refresh the user's room list (don't show private rooms)
-		const tmp: Socket = this.chatService.findSocketUserId(userId, socket);
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket)
 		if (tmp) {
 			const rooms = await this.chatService.getRooms(tmp)
 			tmp.emit('getRooms', rooms)
@@ -185,7 +185,7 @@ export class ChatGateway {
 		// 		}
 		// 	})
 		// }
-		const tmp: Socket = this.chatService.findSocketUserId(userId, socket);
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket)
 		// refresh the user's room list
 		if (tmp) {
 			const rooms = await this.chatService.getRooms(tmp)

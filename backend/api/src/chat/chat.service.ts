@@ -265,6 +265,6 @@ export class ChatService {
 				}
 			})
 		}
-		return tmp;
+		return tmp
 	}
 }
