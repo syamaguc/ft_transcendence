@@ -30,7 +30,10 @@ volume_clean:
 	docker volume prune -f
 
 db:
-	bash db.sh
+	bash scripts/db.sh
+
+friends:
+	bash scripts/friends.sh
 
 clean:
 	docker system prune -f
