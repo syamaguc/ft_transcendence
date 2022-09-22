@@ -2,7 +2,6 @@ import Layout from '@components/layout'
 import {
   Avatar,
   Box,
-  Button,
   Circle,
   Container,
   Divider,
@@ -11,10 +10,6 @@ import {
   Menu,
   MenuButton,
   MenuList,
-  MenuItem,
-  Input,
-  InputGroup,
-  InputRightElement,
   Icon,
   Stack,
   Spacer,
@@ -26,150 +21,26 @@ import {
   TabPanels,
   TabPanel,
   Tooltip,
-  FormControl,
-  FormHelperText,
-  FormErrorMessage,
   useColorModeValue,
   useToast,
 } from '@chakra-ui/react'
 import NextLink from 'next/link'
 import { useState } from 'react'
 
-import { useFormik, FormikErrors } from 'formik'
-
 import { FiMoreVertical } from 'react-icons/fi'
-import { BiMessage, BiUserX } from 'react-icons/bi'
+import { BiUserX } from 'react-icons/bi'
 
+import AddFriend from '@components/add-friend'
 import UserStatusBadge from '@components/user-status-badge'
-import { PartialUserInfo, User } from 'src/types/user'
+import {
+  RemoveFriendMenuItem,
+  BlockMenuItem,
+} from '@components/more-menu-items'
+import { PartialUserInfo } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { useFriends } from 'src/lib/use-friends'
 import { useBlocked } from 'src/lib/use-blocked'
 import { API_URL } from 'src/constants'
-
-type RemoveFriendMenuItemProps = {
-  friend: PartialUserInfo
-}
-
-function RemoveFriendMenuItem({ friend }: RemoveFriendMenuItemProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast()
-  const { mutateUser } = useUser()
-  const { mutateFriends } = useFriends()
-
-  const removeFriend = async () => {
-    let message: string
-    let status: 'success' | 'info' | 'error' = 'error'
-
-    setIsLoading(true)
-
-    try {
-      const res = await fetch(`${API_URL}/api/user/deleteFriend`, {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: friend.userId }),
-      })
-      if (!res.ok) {
-        message = 'Could not remove friend'
-      } else if (res.ok) {
-        message = 'Removed from friends'
-        status = 'info'
-        await mutateFriends()
-        await mutateUser()
-      }
-    } catch (err) {
-      console.log(err)
-    }
-
-    toast({
-      description: message,
-      variant: 'subtle',
-      status: status,
-      duration: 5000,
-      isClosable: true,
-    })
-    setIsLoading(false)
-  }
-
-  return (
-    <MenuItem
-      fontSize='sm'
-      onClick={async (e) => {
-        e.stopPropagation()
-        await removeFriend()
-      }}
-      disabled={isLoading}
-    >
-      Remove friend
-    </MenuItem>
-  )
-}
-
-type BlockMenuItemProps = {
-  friend: PartialUserInfo
-}
-
-function BlockMenuItem({ friend }: BlockMenuItemProps) {
-  const [isLoading, setIsLoading] = useState(false)
-  const { mutateUser } = useUser()
-  const { mutateFriends } = useFriends()
-  const { mutateBlocked } = useBlocked()
-  const toast = useToast()
-
-  const blockUser = async () => {
-    let message: string
-    let status: 'success' | 'info' | 'error' = 'error'
-
-    setIsLoading(true)
-
-    try {
-      const res = await fetch(`${API_URL}/api/user/blockFriend`, {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: friend.userId }),
-      })
-      if (!res.ok) {
-        message = 'Could not block user'
-      } else if (res.ok) {
-        message = 'Blocked user'
-        status = 'info'
-        await mutateFriends()
-        await mutateBlocked()
-        await mutateUser()
-      }
-    } catch (err) {
-      console.log(err)
-    }
-
-    toast({
-      description: message,
-      variant: 'subtle',
-      status: status,
-      duration: 5000,
-      isClosable: true,
-    })
-    setIsLoading(false)
-  }
-
-  return (
-    <MenuItem
-      fontSize='sm'
-      onClick={async (e) => {
-        e.stopPropagation()
-        await blockUser()
-      }}
-      disabled={isLoading}
-    >
-      Block
-    </MenuItem>
-  )
-}
 
 type FriendItemProps = {
   friend: PartialUserInfo
@@ -205,23 +76,6 @@ function FriendItem({ friend }: FriendItemProps) {
             </Text>
           </Stack>
           <Spacer />
-          {/* <Tooltip
-            label='Message'
-            placement='top'
-            hasArrow
-            arrowSize={6}
-            borderRadius='base'
-          >
-            <Circle
-              _hover={{ bg: 'gray.200', color: 'gray.600' }}
-              bg='gray.100'
-              size='38px'
-              mr='16px'
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Icon as={BiMessage} display='block' transition='color 0.2s' />
-            </Circle>
-          </Tooltip> */}
           <Tooltip
             label='More'
             placement='top'
@@ -366,136 +220,6 @@ function BlockedUserItem({ user }: BlockedUserItemProp) {
         </Flex>
       </Stack>
     </NextLink>
-  )
-}
-
-type AddFriendProps = {
-  user: User
-}
-
-function AddFriend({ user }: AddFriendProps) {
-  const { mutateFriends } = useFriends()
-  const toast = useToast()
-
-  const validate = (values: { username: string }) => {
-    const errors: FormikErrors<{ username: string }> = {}
-    return errors
-  }
-
-  const formik = useFormik<{ username: string }>({
-    initialValues: {
-      username: '',
-    },
-    validate,
-    onSubmit: async (values, actions) => {
-      let message: string
-      let status: 'success' | 'info' | 'error' = 'error'
-
-      await new Promise((resolve) => setTimeout(resolve, 500))
-
-      const res = await fetch(
-        `${API_URL}/api/user/userInfo?username=${values.username}`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      )
-
-      const data = await res.json()
-
-      if (!res.ok) {
-        message = 'Username not found'
-        formik.errors.username = message
-      } else if (res.ok) {
-        const username = data.username
-        const userId = data.userId
-        if (username === user.username) {
-          message = 'You cannot add yourself as friends'
-          formik.errors.username = message
-        } else if (user.friends.indexOf(userId) > -1) {
-          message = 'Already friends with that user'
-          formik.errors.username = message
-        } else {
-          const res = await fetch(`${API_URL}/api/user/addFriend`, {
-            method: 'PATCH',
-            credentials: 'include',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId: userId }),
-          })
-          if (!res.ok) {
-            message = 'Could not add friend'
-          } else if (res.ok) {
-            message = 'Friend added'
-            status = 'info'
-            await mutateFriends()
-            formik.setFieldValue('username', '')
-          }
-        }
-      }
-
-      toast({
-        description: message,
-        variant: 'subtle',
-        status: status,
-        duration: 5000,
-        isClosable: true,
-      })
-      actions.setSubmitting(false)
-    },
-  })
-
-  return (
-    <>
-      <form onSubmit={formik.handleSubmit}>
-        <Stack>
-          <FormControl
-            isInvalid={formik.errors.username && formik.touched.username}
-          >
-            <Stack spacing='2'>
-              <Heading as='h2' fontSize='lg'>
-                ADD FRIEND
-              </Heading>
-              <Text fontSize='sm' colorScheme='gray'>
-                {`You can add a friend with their username. It's cAsE sEnSitIvE`}
-              </Text>
-              <FormHelperText fontSize='sm'></FormHelperText>
-              <InputGroup size='lg'>
-                <Input
-                  name='username'
-                  type='text'
-                  pr='4.5rem'
-                  placeholder='Enter a username'
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                  value={formik.values.username}
-                />
-                <InputRightElement width='4.5rem'>
-                  <Button
-                    h='2rem'
-                    px='4'
-                    size='md'
-                    colorScheme='blackAlpha'
-                    bg='blackAlpha.900'
-                    _dark={{
-                      bg: 'whiteAlpha.900',
-                      _hover: { bg: 'whiteAlpha.600' },
-                    }}
-                    type='submit'
-                    isDisabled={!formik.values.username ? true : false}
-                    isLoading={formik.isSubmitting}
-                  >
-                    Add
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </Stack>
-            <FormErrorMessage>{formik.errors.username}</FormErrorMessage>
-          </FormControl>
-        </Stack>
-      </form>
-    </>
   )
 }
 
