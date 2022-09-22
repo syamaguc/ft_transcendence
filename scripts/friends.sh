@@ -1,7 +1,8 @@
 #!/bin/bash
 
 # Token of user to add friends to
-MY_TOKEN=
+# e.g. `export MY_TOKEN=token` before running this script
+echo $MY_TOKEN
 
 sign_up () {
     local NAME=$1
@@ -48,7 +49,7 @@ sign_out () {
 
 main () {
     if [[ ! $MY_TOKEN ]] ; then
-        echo "set MY_TOKEN"
+        echo "set MY_TOKEN by running 'export MY_TOKEN=token'"
         exit
     fi
 
