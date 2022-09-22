@@ -1,8 +1,9 @@
 import { Flex } from '@chakra-ui/layout'
-import { Button, Text, Input } from '@chakra-ui/react'
+import { Button, Text, Textarea } from '@chakra-ui/react'
 import { DMObject, MessageObject } from 'src/types/chat'
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Socket } from 'socket.io-client'
+import ResizeTextarea from 'react-textarea-autosize'
 import DmMiddleBar from '@components/dm/dm-middlebar'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
@@ -54,12 +55,17 @@ const DMSendBox = ({ socket }) => {
 
   return (
     <>
-      <Input
-        type='text'
+      <Textarea
         value={inputText}
         onChange={(event) => {
           setInputText(event.target.value)
         }}
+        minH='unset'
+        overflow='hidden'
+        w='100%'
+        minRows={1}
+        maxRows={10}
+        as={ResizeTextarea}
       />
       <Button ml={3} px={6} onClick={onClickSubmit} type='submit'>
         Send
