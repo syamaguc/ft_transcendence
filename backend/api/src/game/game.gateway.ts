@@ -28,6 +28,7 @@ import {
 	GameObject,
 } from './game.interface'
 import { UserStatus } from 'src/user/interfaces/user-status.enum'
+import { GameService } from './game.service'
 
 @WebSocketGateway({ cors: { origin: '*' } })
 export class GameGateway {
@@ -38,6 +39,11 @@ export class GameGateway {
 	private inviteUsers: InviteDict = {}
 	private logger: Logger = new Logger('Gateway Log')
 	private socketDatas: UserDict = {}
+
+	async handleConnection(@ConnectedSocket() socket: Socket) {
+		new GameService().setUserToSocket(socket)
+		this.logger.log(`Client connected: ${socket.id}`)
+	}
 
 	removeInvitedUser(userId: string) {
 		// 修正予定
@@ -102,8 +108,6 @@ export class GameGateway {
 
 	prepareNewStatus(socket: Socket, newStatus: GameStatus) {
 		const userId = socket.data.userId
-		console.log(userId)
-		console.log(socket.data.username)
 		if (!(userId in this.socketDatas)) {
 			const socketData = {
 				client: socket,
@@ -354,8 +358,9 @@ export class GameGateway {
 	makeGameRoomInfos() {
 		const gameRoomInfos = []
 		for (let key in this.gameRooms) {
-			gameRoomInfos.push(this.gameRooms[key].makeGameRoomInfo)
+			gameRoomInfos.push(this.gameRooms[key].makeGameRoomInfo())
 		}
+		return gameRoomInfos
 	}
 
 	@UseGuards(SocketGuard)

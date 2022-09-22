@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
+import { useToast } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import io from 'socket.io-client'
 import style from '../../styles/game.module.css'
@@ -36,6 +37,7 @@ function Game() {
   const [playerRole, setPlayerRole] = useState(-1)
   const [userId, setUserId] = useState()
   const { user } = useUser()
+  const toast = useToast()
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
     console.log(event.code)
@@ -84,7 +86,7 @@ function Game() {
   useEffect(() => {
     if (!server || !router.isReady || !userId) return
     const roomId = router.query.id
-    server.emit('connectServer', { roomId: roomId, userId: userId })
+    server.emit('connectGame', { roomId: roomId })
 
     server.on('noRoom', () => {
       setGameStatus(-2)
@@ -116,6 +118,24 @@ function Game() {
 
       server.on('goNewGame', (data: string) => {
         router.push('/game/' + data)
+      })
+    })
+
+    server.on('exception', ({ status, message }) => {
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
+    })
+
+    server.on('disconnect', () => {
+      toast({
+        description: 'Disconnected, please reload.',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
       })
     })
   }, [server, router, userId])

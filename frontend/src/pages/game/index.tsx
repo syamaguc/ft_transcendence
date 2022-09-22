@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
+import { useToast } from '@chakra-ui/react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
 import { Center, Flex } from '@chakra-ui/react'
@@ -20,6 +21,7 @@ export default function GameMatching() {
   const [gameRoomsLog, setGameRoomsLog] = useState(false)
   const [myGameRoomId, setMyGameRoomId] = useState()
   const [deleteRoomId, setDeleteRoomId] = useState()
+  const toast = useToast()
 
   useEffect(() => {
     if (user) setUserId(user['userId'])
@@ -89,6 +91,15 @@ export default function GameMatching() {
         setMyGameRoomId(data['gameRoomId'])
         changeButton(2)
       }
+    })
+
+    server.on('exception', ({ status, message }) => {
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
     })
 
     server.emit('readyGameIndex')
