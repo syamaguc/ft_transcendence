@@ -1,5 +1,8 @@
+import { forwardRef, ReactNode, Ref, useEffect, useRef, useState } from 'react'
+import { useScroll } from 'framer-motion'
 import {
   Box,
+  BoxProps,
   Container,
   Divider,
   Flex,
@@ -14,10 +17,10 @@ import {
   TabPanels,
   TabPanel,
   useColorModeValue,
+  useUpdateEffect,
 } from '@chakra-ui/react'
 
 import { useRouter } from 'next/router'
-import { useState, useEffect } from 'react'
 
 import AddFriend from '@components/add-friend'
 import DMBlockedUserItem from '@components/dm/dm-blocked-user-item'
@@ -59,9 +62,9 @@ function DMFriendsList({ socket }: Props) {
   }, [])
 
   return (
-    <Container maxW='2xl' py='12'>
+    <Container maxW='2xl' py='12' h='full'>
       <Tabs variant='soft-rounded' colorScheme='gray'>
-        <Stack>
+        <Stack h='full'>
           <Flex align='center'>
             <Stack direction='row' align='center' spacing='4'>
               <Heading as='h1' fontSize='xl'>
@@ -92,19 +95,23 @@ function DMFriendsList({ socket }: Props) {
                     ONLINE - {countOnline}
                   </Text>
                   <Divider />
-                  <Stack>
-                    {friends.filter(isOnline).map((friend: PartialUserInfo) => (
-                      <DMFriendItem
-                        key={friend.username}
-                        friend={friend}
-                        socket={socket}
-                      />
-                    ))}
-                  </Stack>
+                  <ScrollView maxH='calc(70vh)'>
+                    <Stack>
+                      {friends
+                        .filter(isOnline)
+                        .map((friend: PartialUserInfo) => (
+                          <DMFriendItem
+                            key={friend.username}
+                            friend={friend}
+                            socket={socket}
+                          />
+                        ))}
+                    </Stack>
+                  </ScrollView>
                 </Stack>
               )}
             </TabPanel>
-            <TabPanel>
+            <TabPanel h='full'>
               {friends && countAll > 0 && (
                 <Stack spacing='0'>
                   <Text
@@ -116,17 +123,19 @@ function DMFriendsList({ socket }: Props) {
                     ALL FRIENDS - {countAll}
                   </Text>
                   <Divider />
-                  <Stack>
-                    {friends
-                      .filter(isNotBlocked)
-                      .map((friend: PartialUserInfo) => (
-                        <DMFriendItem
-                          key={friend.username}
-                          friend={friend}
-                          socket={socket}
-                        />
-                      ))}
-                  </Stack>
+                  <ScrollView maxH='calc(70vh)'>
+                    <Stack>
+                      {friends
+                        .filter(isNotBlocked)
+                        .map((friend: PartialUserInfo) => (
+                          <DMFriendItem
+                            key={friend.username}
+                            friend={friend}
+                            socket={socket}
+                          />
+                        ))}
+                    </Stack>
+                  </ScrollView>
                 </Stack>
               )}
             </TabPanel>
@@ -142,14 +151,16 @@ function DMFriendsList({ socket }: Props) {
                     BLOCKED - {blocked.length}
                   </Text>
                   <Divider />
-                  <Stack>
-                    {blocked.map((blockedUser: PartialUserInfo) => (
-                      <DMBlockedUserItem
-                        key={blockedUser.username}
-                        user={blockedUser}
-                      />
-                    ))}
-                  </Stack>
+                  <ScrollView maxH='calc(70vh)'>
+                    <Stack>
+                      {blocked.map((blockedUser: PartialUserInfo) => (
+                        <DMBlockedUserItem
+                          key={blockedUser.username}
+                          user={blockedUser}
+                        />
+                      ))}
+                    </Stack>
+                  </ScrollView>
                 </Stack>
               )}
             </TabPanel>
@@ -160,6 +171,22 @@ function DMFriendsList({ socket }: Props) {
         </Stack>
       </Tabs>
     </Container>
+  )
+}
+
+const ScrollView = (props: BoxProps) => {
+  const ref = useRef<any>()
+
+  return (
+    <Box
+      ref={ref}
+      flex='1'
+      id='routes'
+      overflow='auto'
+      // px='6'
+      // pb='6'
+      {...props}
+    />
   )
 }
 
