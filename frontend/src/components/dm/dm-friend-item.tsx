@@ -13,21 +13,19 @@ import {
   Text,
   Tooltip,
   useColorModeValue,
-  useToast,
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
 import { Socket } from 'socket.io-client'
 
 import { FiMoreVertical } from 'react-icons/fi'
-import { BiMessage, BiUserX } from 'react-icons/bi'
+import { BiMessage } from 'react-icons/bi'
 
 import UserStatusBadge from '@components/user-status-badge'
 import {
   RemoveFriendMenuItem,
   BlockMenuItem,
 } from '@components/more-menu-items'
-import { useBlocked } from 'src/lib/use-blocked'
+import { PartialUserInfo } from 'src/types/user'
 import { API_URL } from 'src/constants'
 
 type FriendItemProps = {
