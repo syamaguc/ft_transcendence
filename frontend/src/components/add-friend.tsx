@@ -75,7 +75,11 @@ function AddFriend({ user }: AddFriendProps) {
             body: JSON.stringify({ userId: userId }),
           })
           if (!res.ok) {
-            message = 'Could not add friend'
+            if (res.status === 403) {
+              message = "You've reached maximum number of friends"
+            } else {
+              message = 'Could not add friend'
+            }
           } else if (res.ok) {
             message = 'Friend added'
             status = 'info'
