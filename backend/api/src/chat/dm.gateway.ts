@@ -63,7 +63,11 @@ export class DMGateway {
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
 		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
-		socket.emit('getRooms', rooms)
+		let DMObjectsForFront
+		rooms.map((room) => {
+			DMObjectsForFront.push(this.createDMObjectForFront(room, socket))
+		})
+		socket.emit('getRooms', DMObjectsForFront)
 	}
 
 	// room which user is watching
@@ -78,7 +82,8 @@ export class DMGateway {
 		if (rooms.length == 2) socket.leave(rooms[1])
 		socket.join(roomId)
 		const room = await this.DMService.getRoomByRoomId(roomId)
-		socket.emit('watchRoom', room)
+		const DMObjectForFront = this.createDMObjectForFront(room, socket)
+		socket.emit('watchRoom', DMObjectForFront)
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
@@ -97,7 +102,8 @@ export class DMGateway {
 		)
 		if (existingRoom) {
 			const DMRoom = await this.DMService.getRoomByRoomId(existingRoom.id)
-			socket.emit('updateRoom', DMRoom)
+			const DMObjectForFront = this.createDMObjectForFront(DMRoom, socket)
+			socket.emit('updateRoom', DMObjectForFront)
 			return
 		}
 		const createdRoom = await this.DMService.createRoomByUserIds(
@@ -105,8 +111,9 @@ export class DMGateway {
 			selfUserId,
 		)
 		const newDMRoom = await this.DMService.getRoomByRoomId(createdRoom.id)
-		socket.emit('updateRoom', newDMRoom)
-		this.sendAddRoomByUserId(socket, userId, newDMRoom)
+		const DMObjectForFront = this.createDMObjectForFront(newDMRoom, socket)
+		socket.emit('updateRoom', DMObjectForFront)
+		this.sendAddRoomByUserId(socket, userId, DMObjectForFront)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -143,6 +150,21 @@ export class DMGateway {
 				}
 			})
 		}
+	}
+
+	createDMObjectForFront(room: any, socket: Socket): any {
+		let name = room.user1
+		let userId = room.user1Id
+		if (userId === socket.data.userId) {
+			name = room.user2
+			userId = room.user2Id
+		}
+		const DMObjectForFront = {
+			id: room.id,
+			name,
+			userId,
+		}
+		return DMObjectForFront
 	}
 }
 

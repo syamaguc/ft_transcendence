@@ -22,7 +22,7 @@ export interface ChannelObject {
 
 export interface DMObject {
   id: string
-  user1: string
-  user2: string
+  name: string
+  userId: string
   logs: MessageObject[]
 }

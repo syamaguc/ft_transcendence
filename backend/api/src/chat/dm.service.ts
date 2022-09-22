@@ -76,7 +76,9 @@ export class DMService {
 			.select([
 				'dm.id AS id',
 				'userA.username AS user1',
+				'userA.userId AS user1Id',
 				'userB.username AS user2',
+				'userB.userId AS user2Id',
 			])
 			.where('dm.id = :roomId', { roomId })
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
@@ -90,7 +92,9 @@ export class DMService {
 			.select([
 				'dm.id AS id',
 				'userA.username AS user1',
+				'userA.userId AS user1Id',
 				'userB.username AS user2',
+				'userB.userId AS user2Id',
 			])
 			.orderBy('dm.time_created', 'DESC')
 			.where('dm.memberA = :userId', { userId })

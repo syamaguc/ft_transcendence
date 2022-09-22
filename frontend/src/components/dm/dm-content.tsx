@@ -10,22 +10,9 @@ import { User } from 'src/types/user'
 
 type DMTopBarProps = {
   currentRoom: DMObject
-  user: User
 }
 
-const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
-  const [roomName, setRoomName] = useState<string>('')
-
-  useEffect(() => {
-    if (currentRoom) {
-      setRoomName(
-        currentRoom.user1 == user.username
-          ? currentRoom.user2
-          : currentRoom.user1
-      )
-    }
-  }, [currentRoom, user])
-
+const DMTopBar = ({ currentRoom }: DMTopBarProps) => {
   return (
     <Flex
       h='55px'
@@ -34,7 +21,7 @@ const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
       p={4}
       align='center'
     >
-      <Text>@ {roomName}</Text>
+      <Text>@ {currentRoom && currentRoom.name}</Text>
     </Flex>
   )
 }
@@ -84,7 +71,6 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
   const [currentRoom, setCurrentRoom] = useState<DMObject>()
-  const { user } = useUser()
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -122,7 +108,7 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
 
   return (
     <>
-      <DMTopBar currentRoom={currentRoom} user={user} />
+      <DMTopBar currentRoom={currentRoom} />
       <DmMiddleBar chatLog={chatLog} />
       <Flex p={4}>
         <DMSendBox socket={socket} />
