@@ -3,9 +3,11 @@ import { Server, Socket } from 'socket.io'
 import {
 	Position,
 	GameObject,
-	socketData,
+	SocketData,
 	KeyStatus,
 	gameInfo,
+	GameStatus,
+	UserDict,
 } from './game.interface'
 import { GameService } from './game.service'
 
@@ -25,30 +27,20 @@ class BallDirection {
 	moveY: number
 }
 
+export interface GameRoomDict {
+	[id: string]: GameRoom
+}
+
 export class GameRoom {
 	id: string
 	server: Server
 	gameObject: GameObject
 	interval
 	ballDirection: BallDirection
-	socketDatas: socketData[]
+	socketDatas: UserDict
 	logger: Logger
-
-	getPlayer1AndPlayer2() {
-		let player1
-		let player2
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (this.socketDatas[i].role == 0) {
-				player1 = this.socketDatas[i]
-			} else if (this.socketDatas[i].role == 1) {
-				player2 = this.socketDatas[i]
-			}
-			if (player1 && player2) {
-				break
-			}
-		}
-		return [player1, player2]
-	}
+	player1Id: string
+	player2Id: string
 
 	gameObjectInit(
 		point: number,
@@ -81,8 +73,8 @@ export class GameRoom {
 	constructor(
 		id: string,
 		server: Server,
-		player1: socketData,
-		player2: socketData,
+		player1: SocketData,
+		player2: SocketData,
 	) {
 		this.id = id
 		this.server = server
@@ -92,18 +84,21 @@ export class GameRoom {
 			moveX: 0,
 			moveY: 0,
 		}
-		this.socketDatas = [player1, player2]
+		this.socketDatas = {}
+		this.socketDatas[player1.userId] = player1
+		this.socketDatas[player2.userId] = player2
+		this.player1Id = player1.userId
+		this.player2Id = player2.userId
 		this.logger = new Logger('GameRoom Log')
 	}
 
 	gameSave() {
-		const [player1, player2] = this.getPlayer1AndPlayer2()
 		const info: gameInfo = {
 			gameId: this.id,
 			player1Score: this.gameObject.player1.point,
 			player2Score: this.gameObject.player2.point,
-			player1: player1.userId,
-			player2: player2.userId,
+			player1: this.player1Id,
+			player2: this.player2Id,
 		}
 		new GameService().saveGameHistory(info)
 	}
@@ -274,61 +269,43 @@ export class GameRoom {
 		}, 30)
 	}
 
-	connect(client: Socket, userId: string) {
-		client.join(this.id)
-		// roleの判定は変更予定
-		let role = 2
-		let joinedFlag = false
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (this.socketDatas[i].userId == userId) {
-				role = this.socketDatas[i].role
-				this.socketDatas[i].client = client
-				joinedFlag = true
-				break
-			}
-		}
-		if (!joinedFlag) {
-			this.socketDatas.push({
-				client: client,
-				role: 2,
-				userId: userId,
-				userName: '',
-			})
-		}
-		this.logger.log(client.id)
-		this.logger.log('client num:', this.socketDatas.length)
-		return role
+	addWatcher(socketData: SocketData) {
+		socketData.client.join(this.id)
+		socketData.gameId = this.id
+		socketData.role = 2
+		socketData.status = GameStatus.Watch
+		this.socketDatas[socketData.userId] = socketData
 	}
 
 	disconnectAll() {
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (this.socketDatas[i].client.connected) {
-				this.socketDatas[i].client.leave(this.id)
+		for (let key in this.socketDatas) {
+			if (this.socketDatas[key].client.connected) {
+				this.socketDatas[key].client.leave(this.id)
 			}
 		}
 	}
 
-	disconnectUser(userId: string) {
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (this.socketDatas[i].userId == userId) {
-				if (this.socketDatas[i].client.connected) {
-					this.socketDatas[i].client.leave(this.id)
-				}
-				break
-			}
+	removeNotPlayer(userId: string) {
+		if (!(userId in this.socketDatas)) return
+		const socketData = this.socketDatas[userId]
+		if (socketData.client.connected) {
+			socketData.client.leave(this.id)
 		}
+		socketData.gameId = ''
+		delete this.socketDatas[userId]
 	}
 
 	removeDisconnectNotPlayer() {
 		const removeArray = []
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (!this.socketDatas[i].client.connected && this.socketDatas[i].role == 2) {
-				removeArray.push(i)
+		for (let userId in this.socketDatas) {
+			if (!this.socketDatas[userId].client.connected) {
+				removeArray.push(userId)
 			}
 		}
-		for (let i = removeArray.length - 1; i >= 0; i--) {
-			this.socketDatas.splice(removeArray[i], 1)
+		for (let i = 0; i < removeArray.length; i++) {
+			delete this.socketDatas[removeArray[i]]
 		}
+		return removeArray
 	}
 
 	start(point: number, speed: number) {
@@ -342,11 +319,12 @@ export class GameRoom {
 		this.play()
 	}
 
-	retry(userId: string) {
-		const [player1, player2] = this.getPlayer1AndPlayer2()
-		if (player1.userId == userId) {
+	retry(userId: string): [GameObject, SocketData, SocketData] {
+		const player1: SocketData = this.socketDatas[this.player1Id]
+		const player2: SocketData = this.socketDatas[this.player2Id]
+		if (this.player1Id == userId) {
 			this.gameObject.retryFlag.player1 = true
-		} else if (player2.userId == userId) {
+		} else if (this.player2Id == userId) {
 			this.gameObject.retryFlag.player2 = true
 		}
 		this.updateObject()
@@ -354,10 +332,9 @@ export class GameRoom {
 	}
 
 	retryCancel(userId: string) {
-		const [player1, player2] = this.getPlayer1AndPlayer2()
-		if (player1.userId == userId) {
+		if (this.player1Id == userId) {
 			this.gameObject.retryFlag.player1 = false
-		} else if (player2.userId == userId) {
+		} else if (this.player2Id == userId) {
 			this.gameObject.retryFlag.player2 = false
 		}
 		this.updateObject()
@@ -369,6 +346,27 @@ export class GameRoom {
 
 	updateObject() {
 		this.server.to(this.id).emit('updateGameObject', this.gameObject)
+	}
+
+	makeGameRoomInfo() {
+		return {
+			id: this.id,
+			player1: {
+				id: this.player1Id,
+				name: this.socketDatas[this.player1Id].userName
+			},
+			player2: {
+				id: this.player2Id,
+				name: this.socketDatas[this.player2Id].userName
+			},
+		}
+	}
+
+	emitGameRoomInfo() {
+		const gameRoomInfo = this.makeGameRoomInfo()
+		this.server
+			.to('readyIndex')
+			.emit('addGameRoom', { gameRoom: gameRoomInfo })
 	}
 
 	settingChange(name: string, checked: boolean, value: number) {
@@ -395,28 +393,11 @@ export class GameRoom {
 	}
 
 	barSelect(keyStatus: KeyStatus, client: Socket) {
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			if (client.id == this.socketDatas[i].client.id) {
-				if (this.socketDatas[i].role == 0) {
-					this.barMove(keyStatus, this.gameObject.bar1)
-					break
-				} else if (this.socketDatas[i].role == 1) {
-					this.barMove(keyStatus, this.gameObject.bar2)
-					break
-				}
-			}
+		if (!(client.data.userId in this.socketDatas)) return
+		if (this.socketDatas[client.data.userId].role == 0) {
+			this.barMove(keyStatus, this.gameObject.bar1)
+		} else if (this.socketDatas[client.data.userId].role == 1) {
+			this.barMove(keyStatus, this.gameObject.bar2)
 		}
-	}
-
-	inUser(userId: string) {
-		for (let i = 0; i < this.socketDatas.length; i++) {
-			const socketData = this.socketDatas[i]
-			if (
-				(socketData.role == 0 || socketData.role == 1) &&
-				socketData.userId == userId
-			)
-				return true
-		}
-		return false
 	}
 }

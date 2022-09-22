@@ -40,11 +40,13 @@ export interface GameObject {
 	retryFlag: RetryFlag
 }
 
-export interface socketData {
+export interface SocketData {
 	role: number
 	client: Socket
 	userId: string
 	userName: string
+	status: GameStatus
+	gameId: string
 }
 
 export interface KeyStatus {
@@ -57,8 +59,20 @@ export interface GamePlayer {
 	name: string
 }
 
-export interface GameRoomInfo {
-	id: string
-	player1: GamePlayer
-	player2: GamePlayer
+export enum GameStatus {
+	MatchReady,
+	Matching,
+	InviteReady,
+	Invite,
+	Invited,
+	Game,
+	Watch,
+}
+
+export interface UserDict {
+	[id: string]: SocketData
+}
+
+export interface InviteDict {
+	[id: string]: SocketData[]
 }

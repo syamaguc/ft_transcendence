@@ -39,7 +39,7 @@ export default function GameMatching() {
   const matching = useCallback(() => {
     if (!server || !userId) return
     changeButton(1)
-    server.emit('registerMatch', { userId: userId })
+    server.emit('registerMatch')
   }, [server, userId])
 
   const cancel = useCallback(() => {
@@ -84,14 +84,14 @@ export default function GameMatching() {
       const status = data['status']
       if (status == 1) {
         changeButton(1)
-        server.emit('registerMatch', { userId: userId })
+        server.emit('registerMatch')
       } else if (status == 2) {
         setMyGameRoomId(data['gameRoomId'])
         changeButton(2)
       }
     })
 
-    server.emit('readyGameIndex', { userId: userId })
+    server.emit('readyGameIndex')
   }, [gameRoomsLog, server, router, userId])
 
   useEffect(() => {
