@@ -9,6 +9,7 @@ import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
 import { WsException } from '@nestjs/websockets'
+import { DMRawData } from './interfaces/dm.interface'
 
 @Injectable()
 export class DMService {
@@ -71,7 +72,7 @@ export class DMService {
 		return messagesWithUserInfo
 	}
 
-	async getRoomByRoomId(roomId: string): Promise<any[]> {
+	async getRoomByRoomId(roomId: string): Promise<DMRawData> {
 		const room = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
@@ -87,7 +88,7 @@ export class DMService {
 		return room
 	}
 
-	async getRoomsByUserId(userId: string): Promise<any[]> {
+	async getRoomsByUserId(userId: string): Promise<DMRawData[]> {
 		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
