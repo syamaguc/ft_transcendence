@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, validate as isValidUUID } from 'uuid'
 import { DMRoom } from './entities/dm-room.entity'
 import { Repository } from 'typeorm'
 import { messageRepository } from './message.repository'
@@ -66,6 +66,11 @@ export class DMService {
 	}
 
 	async getMessageLogByRoomId(roomId: string): Promise<any> {
+		if (!isValidUUID(roomId)) throw new WsException('Room Not Found')
+		const room: DMRoom = await this.DMRoomRepository.findOne({
+			where: { id: roomId },
+		})
+		if (!room) throw new WsException('Room Not Found')
 		const messagesWithUserInfo = await messageRepository.getDMMessages(
 			roomId,
 		)
@@ -73,6 +78,7 @@ export class DMService {
 	}
 
 	async getRoomByRoomId(roomId: string): Promise<DMRawData> {
+		if (!isValidUUID(roomId)) throw new WsException('Room Not Found')
 		const room = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
