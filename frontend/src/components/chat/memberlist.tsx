@@ -181,10 +181,10 @@ function MemberListModal({ socket, currentRoom }) {
     })
       .then((r) => r.json())
       .then((data) => {
-        //exclude members from friends list
+        //exclude members, and banned users from invitation list
         for (let i = 0; i < data.length; i++)
         {
-          if (currentRoom.members.includes(data[i].userId)) {
+          if (currentRoom.members.includes(data[i].userId) || currentRoom.banned.includes(data[i].userId)) {
             data.splice(i, 1)
             i--
           }

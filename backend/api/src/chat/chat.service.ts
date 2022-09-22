@@ -156,10 +156,19 @@ export class ChatService {
 		return room
 	}
 
-	async getRooms(): Promise<ChatRoom[]> {
+	async getRooms(socket: Socket): Promise<ChatRoom[]> {
 		const rooms = await chatRepository.getRooms()
-		return rooms
+		const emitRooms: ChatRoom[] = []
+		for (let i = 0; i < rooms.length; i++) {
+			const room = rooms[i]
+			if (!room.is_private || room.members.includes(socket.data.userId)) {
+				emitRooms.push(room)
+			}
+		}
+		return emitRooms
 	}
+
+	async
 
 	async getMembers(roomId: string): Promise<User[]> {
 		const members = await chatRepository.getMembers(roomId)
@@ -244,5 +253,18 @@ export class ChatService {
 
 	async deleteRoom(roomId: string) {
 		await chatRepository.delete(roomId)
+	}
+
+	findSocketUserId(userId: string, socket: Socket): Socket {
+		let tmp: Socket
+
+		if (socket.nsp.sockets) {
+			socket.nsp.sockets.forEach((value: Socket) => {
+				if (value.data.userId == userId) {
+					tmp = value
+				}
+			})
+		}
+		return tmp;
 	}
 }

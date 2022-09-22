@@ -69,7 +69,13 @@ export class ChatGateway {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
 		const newRoom = await this.chatService.banUser(userId, room)
-		//update the channel info
+
+		// refresh the user's room list (don't show private rooms)
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket);
+		if (tmp) {
+			const rooms = await this.chatService.getRooms(tmp)
+			tmp.emit('getRooms', rooms)
+		}
 		this.updateRoom(newRoom)
 	}
 
@@ -114,15 +120,15 @@ export class ChatGateway {
 	@SubscribeMessage('getRooms')
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`)
-		const rooms = await this.chatService.getRooms()
-		const emitRooms: ChatRoom[] = []
-		for (let i = 0; i < rooms.length; i++) {
-			const room = rooms[i]
-			if (!room.is_private || room.members.includes(socket.data.userId)) {
-				emitRooms.push(room)
-			}
-		}
-		socket.emit('getRooms', emitRooms)
+		const rooms = await this.chatService.getRooms(socket)
+		// const emitRooms: ChatRoom[] = []
+		// for (let i = 0; i < rooms.length; i++) {
+		// 	const room = rooms[i]
+		// 	if (!room.is_private || room.members.includes(socket.data.userId)) {
+		// 		emitRooms.push(room)
+		// 	}
+		// }
+		socket.emit('getRooms', rooms)
 	}
 
 	@UseGuards(SocketGuard)
@@ -170,14 +176,20 @@ export class ChatGateway {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`inviteMember: recieved [${userId}] to room[${room}]`)
 		const newRoom = await this.chatService.inviteMember(userId, room)
-
-		//find the user's socket
-		if (socket.nsp.sockets) {
-			socket.nsp.sockets.forEach((value: Socket) => {
-				if (value.data.userId == userId) {
-					this.joinRoom(room, value)
-				}
-			})
+		// find the user's socket
+		// let tmp: Socket
+		// if (socket.nsp.sockets) {
+		// 	socket.nsp.sockets.forEach((value: Socket) => {
+		// 		if (value.data.userId == userId) {
+		// 			tmp = value
+		// 		}
+		// 	})
+		// }
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket);
+		// refresh the user's room list
+		if (tmp) {
+			const rooms = await this.chatService.getRooms(tmp)
+			tmp.emit('getRooms', rooms)
 		}
 		//update the member list
 		this.getMembers(room, socket)
