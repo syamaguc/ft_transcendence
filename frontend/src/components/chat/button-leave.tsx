@@ -49,7 +49,13 @@ const ButtonDelete = ({ socket, currentRoom }) => {
             <Button variant='ghost' mr={3} onClick={onClose}>
               Cancel
             </Button>
-            <Button colorScheme='red' onClick={onClickDelete}>
+            <Button
+              colorScheme='red'
+              onClick={() => {
+                onClickDelete()
+                onClose()
+              }}
+            >
               Delete Channel
             </Button>
           </ModalFooter>
@@ -81,7 +87,6 @@ const ButtonLeave = ({ socket, currentRoom, isJoined }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoom])
 
-  console.log(isOwner)
   return (
     <>
       {isJoined ? (

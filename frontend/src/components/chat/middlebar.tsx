@@ -35,10 +35,10 @@ const MessageFilter = ({ currentRoom, message }) => {
   if (block != -1) return null
   //else
   return (
-    <Flex key={message.id} m={4} direction='horizontal' align='flex-start'>
+    <Flex key={message.id} m={4} align='flex-start'>
       <ProfileModal message={message} />
       <Flex direction='column' maxW='90%'>
-        <Flex direction='horizontal' align='flex-end'>
+        <Flex align='flex-end'>
           <Text as='b' marginEnd={2}>
             {message.username}
           </Text>
@@ -63,7 +63,11 @@ const MiddleBar = ({ currentRoom, chatLog }) => {
     >
       {chatLog.length
         ? chatLog.map((message: MessageObject) => (
-            <MessageFilter currentRoom={currentRoom} message={message} />
+            <MessageFilter
+              key={message.id}
+              currentRoom={currentRoom}
+              message={message}
+            />
           ))
         : null}
       <AlwaysScrollToBottom />

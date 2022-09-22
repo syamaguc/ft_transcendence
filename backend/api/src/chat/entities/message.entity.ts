@@ -23,13 +23,13 @@ export class Message {
 	timestamp: Date
 
 	@ManyToOne(() => ChatRoom, (room) => room.messages, {
-		cascade: true,
+		onDelete: 'CASCADE',
 		nullable: true,
 	})
 	room: ChatRoom
 
 	@ManyToOne(() => DMRoom, (DMroom) => DMroom.messages, {
-		cascade: true,
+		onDelete: 'CASCADE',
 		nullable: true,
 	})
 	DMroom: DMRoom

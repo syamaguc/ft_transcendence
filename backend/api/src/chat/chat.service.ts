@@ -230,4 +230,8 @@ export class ChatService {
 		console.log(room)
 		return chatRepository.save(room)
 	}
+
+	async deleteRoom(roomId: string) {
+		await chatRepository.delete(roomId)
+	}
 }
