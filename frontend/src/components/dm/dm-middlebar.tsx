@@ -1,6 +1,6 @@
 import { Text, Box, Flex } from '@chakra-ui/layout'
 import { Avatar } from '@chakra-ui/avatar'
-import { MessageObject } from 'src/types/chat'
+import { DMObject, MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from '../chat/profile-modal'
 import AlwaysScrollToBottom from '../chat/always-scroll-bottom'
@@ -27,21 +27,31 @@ type Props = {
 }
 
 const MessageBlock = ({ message }: Props) => {
+  const { user: currentUser } = useUser()
+
+  const isNotBlocked = (userId: string) => {
+    return currentUser.blockedUsers.indexOf(userId) === -1
+  }
+
   return (
-    <Flex m={4} align='flex-start'>
-      <ProfileModal message={message} />
-      <Flex direction='column' maxW='90%'>
-        <Flex align='flex-end'>
-          <Text as='b' marginEnd={2}>
-            {message.username}
-          </Text>
-          <Text fontSize='xs' pb='1px'>
-            {timestampToTime(message.timestamp)}
-          </Text>
+    <>
+      {isNotBlocked(message.userId) ? (
+        <Flex m={4} align='flex-start'>
+          <ProfileModal message={message} />
+          <Flex direction='column' maxW='90%'>
+            <Flex align='flex-end'>
+              <Text as='b' marginEnd={2}>
+                {message.username}
+              </Text>
+              <Text fontSize='xs' pb='1px'>
+                {timestampToTime(message.timestamp)}
+              </Text>
+            </Flex>
+            <Text whiteSpace='pre-wrap'>{message.message}</Text>
+          </Flex>
         </Flex>
-        <Text whiteSpace='pre-wrap'>{message.message}</Text>
-      </Flex>
-    </Flex>
+      ) : null}
+    </>
   )
 }
 
