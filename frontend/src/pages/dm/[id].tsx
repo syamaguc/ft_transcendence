@@ -1,5 +1,5 @@
 import Layout from '@components/layout'
-import { Flex } from '@chakra-ui/react'
+import { Flex, useToast } from '@chakra-ui/react'
 import { io } from 'socket.io-client'
 import { useState, useEffect, useRef } from 'react'
 import DMSideBar from '@components/dm/dm-sidebar'
@@ -17,6 +17,7 @@ const Chat = () => {
   const didLogRef = useRef(false)
   const router = useRouter()
   const [roomId, setRoomId] = useState<string>()
+  const toast = useToast()
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -27,6 +28,15 @@ const Chat = () => {
       } else {
         setRoomId(tmpRoomId[0])
       }
+      socket.on('exception', ({ status, message }) => {
+        console.log(status, message)
+        toast({
+          description: message,
+          status: status,
+          duration: 5000,
+          isClosable: true,
+        })
+      })
       socket.emit('watchRoom', tmpRoomId)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
