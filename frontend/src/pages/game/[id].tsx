@@ -84,7 +84,7 @@ function Game() {
   }, [router])
 
   useEffect(() => {
-    if (!server || !router.isReady || !userId) return
+    if (!server || !router.isReady || !userId || !toast) return
     const roomId = router.query.id
     server.emit('connectGame', { roomId: roomId })
 
@@ -129,7 +129,7 @@ function Game() {
         isClosable: true,
       })
     })
-  }, [server, router, userId])
+  }, [server, router, userId, toast])
 
   return (
     <Layout>

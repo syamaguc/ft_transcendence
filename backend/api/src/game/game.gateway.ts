@@ -5,11 +5,7 @@ import {
 	MessageBody,
 	ConnectedSocket,
 } from '@nestjs/websockets'
-import {
-	Logger,
-	NotFoundException,
-	InternalServerErrorException,
-} from '@nestjs/common'
+import { Logger, InternalServerErrorException } from '@nestjs/common'
 import { UseGuards } from '@nestjs/common'
 import { WsException } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
@@ -45,11 +41,7 @@ export class GameGateway {
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 
-	removeInvitedUser(
-		userId: string,
-		socketData: SocketData,
-		emitFlag: boolean = true,
-	) {
+	removeInvitedUser(userId: string, socketData: SocketData, emitFlag = true) {
 		if (
 			userId in this.inviteUsers &&
 			this.inviteUsers[userId].length == 0
@@ -87,8 +79,8 @@ export class GameGateway {
 		}
 	}
 
-	removeInviteUser(socketData: SocketData, emitFlag: boolean = true) {
-		for (let key in this.inviteUsers) {
+	removeInviteUser(socketData: SocketData, emitFlag = true) {
+		for (const key in this.inviteUsers) {
 			const socketDatas = this.inviteUsers[key]
 			for (let i = 0; i < socketDatas.length; i++) {
 				if (socketData.userId == socketDatas[i].userId) {
@@ -165,7 +157,7 @@ export class GameGateway {
 
 	removeDisconnectInviteUser() {
 		const removeKeyArray = []
-		for (let key in this.inviteUsers) {
+		for (const key in this.inviteUsers) {
 			const socketDatas = this.inviteUsers[key]
 			const removeArray = []
 			for (let i = 0; i < socketDatas.length; i++) {
@@ -194,7 +186,7 @@ export class GameGateway {
 	}
 
 	removeDisconnectWatchUser() {
-		for (let gameId in this.gameRooms) {
+		for (const gameId in this.gameRooms) {
 			const gameRoom = this.gameRooms[gameId]
 			const removeArray = gameRoom.removeDisconnectNotPlayer()
 			for (let i = 0; i < removeArray.length; i++) {
@@ -298,11 +290,11 @@ export class GameGateway {
 		return id
 	}
 
-	deleteGameRoom(roomId: string, userRemoveFlag: boolean = true) {
+	deleteGameRoom(roomId: string, userRemoveFlag = true) {
 		this.gameRooms[roomId].disconnectAll()
 		if (userRemoveFlag) {
 			const removeUsers = []
-			for (let userId in this.gameRooms[roomId].socketDatas) {
+			for (const userId in this.gameRooms[roomId].socketDatas) {
 				if (!(userId in this.socketDatas)) return
 				const socketData = this.socketDatas[userId]
 				if (socketData.gameId == roomId) {
@@ -357,7 +349,7 @@ export class GameGateway {
 			player2,
 			gameObject.gameSetting,
 		)
-		for (let key in socketDatas) {
+		for (const key in socketDatas) {
 			socketDatas[key].gameId = newRoomId
 			this.server
 				.to(socketDatas[key].client.id)
@@ -394,7 +386,7 @@ export class GameGateway {
 
 	makeGameRoomInfos() {
 		const gameRoomInfos = []
-		for (let key in this.gameRooms) {
+		for (const key in this.gameRooms) {
 			gameRoomInfos.push(this.gameRooms[key].makeGameRoomInfo())
 		}
 		return gameRoomInfos
@@ -572,6 +564,7 @@ export class GameGateway {
 		)
 		if (status == 0) {
 			status = 1
+			roomId = ''
 		}
 		if (status == 1) {
 			this.addInviteUser(socketData, profileUserId)

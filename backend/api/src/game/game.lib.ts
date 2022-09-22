@@ -278,7 +278,7 @@ export class GameRoom {
 	}
 
 	disconnectAll() {
-		for (let key in this.socketDatas) {
+		for (const key in this.socketDatas) {
 			if (this.socketDatas[key].client.connected) {
 				this.socketDatas[key].client.leave(this.id)
 			}
@@ -297,7 +297,7 @@ export class GameRoom {
 
 	removeDisconnectNotPlayer() {
 		const removeArray = []
-		for (let userId in this.socketDatas) {
+		for (const userId in this.socketDatas) {
 			if (!this.socketDatas[userId].client.connected) {
 				removeArray.push(userId)
 			}

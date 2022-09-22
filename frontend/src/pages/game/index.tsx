@@ -72,7 +72,7 @@ export default function GameMatching() {
   }, [])
 
   useEffect(() => {
-    if (!server || !router.isReady || gameRoomsLog || !userId) return
+    if (!server || !router.isReady || gameRoomsLog || !userId || !toast) return
     server.on('goGameRoom', (data: string) => {
       router.push('/game/' + data)
     })
@@ -103,7 +103,7 @@ export default function GameMatching() {
     })
 
     server.emit('readyGameIndex')
-  }, [gameRoomsLog, server, router, userId])
+  }, [gameRoomsLog, server, router, userId, toast])
 
   useEffect(() => {
     if (!gameRoomsLog) return

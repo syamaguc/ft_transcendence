@@ -25,7 +25,7 @@ const GameInvite = ({ user, router }: Props) => {
   }, [router])
 
   useEffect(() => {
-    if (!server || !user) return
+    if (!server || !user || !toast || !router) return
     server.on('goGameRoom', (data: string) => {
       router.push('/game/' + data)
     })
@@ -45,7 +45,7 @@ const GameInvite = ({ user, router }: Props) => {
       })
     })
     server.emit('gameInviteReady', { userId: user.userId })
-  }, [server, user])
+  }, [server, user, toast, router])
 
   return (
     <>
