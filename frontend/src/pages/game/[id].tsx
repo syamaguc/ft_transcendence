@@ -129,15 +129,6 @@ function Game() {
         isClosable: true,
       })
     })
-
-    server.on('disconnect', () => {
-      toast({
-        description: 'Disconnected, please reload.',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      })
-    })
   }, [server, router, userId])
 
   return (
