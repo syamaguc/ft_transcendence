@@ -284,7 +284,6 @@ export default function UserBasicInfo({ user }: UserBasicInfoProps) {
           body: JSON.stringify({
             username: values.username,
             email: values.email,
-            password: values.password,
             currentPassword: values.password,
           }),
         })
