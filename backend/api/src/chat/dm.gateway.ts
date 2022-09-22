@@ -64,10 +64,13 @@ export class DMGateway {
 	@UseGuards(SocketGuard)
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
-		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
+		const clientUserId = socket.data.userId
+		const rooms = await this.DMService.getRoomsByUserId(clientUserId)
 		let DMObjectsForFront: DMObject[] = []
 		rooms.map((room) => {
-			DMObjectsForFront.push(this.createDMObjectForFront(room, socket))
+			DMObjectsForFront.push(
+				this.createDMObjectForFront(room, clientUserId),
+			)
 		})
 		socket.emit('getRooms', DMObjectsForFront)
 	}
@@ -86,7 +89,7 @@ export class DMGateway {
 		const room = await this.DMService.getRoomByRoomId(roomId)
 		const DMObjectForFront: DMObject = this.createDMObjectForFront(
 			room,
-			socket,
+			socket.data.userId,
 		)
 		socket.emit('watchRoom', DMObjectForFront)
 	}
@@ -99,13 +102,13 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`createRoom called for ${username}`)
-		const selfUserId = socket.data.userId
+		const clientUserId = socket.data.userId
 		const userId: string = await this.DMService.getUserIdByUsername(
 			username,
 		)
 		const existingRoom: DMRoom = await this.DMService.getRoomByUserIds(
 			userId,
-			selfUserId,
+			clientUserId,
 		)
 		if (existingRoom) {
 			const DMRoom: DMRawData = await this.DMService.getRoomByRoomId(
@@ -113,24 +116,28 @@ export class DMGateway {
 			)
 			const DMObjectForFront: DMObject = this.createDMObjectForFront(
 				DMRoom,
-				socket,
+				clientUserId,
 			)
 			socket.emit('updateRoom', DMObjectForFront)
 			return
 		}
 		const createdRoom: DMRoom = await this.DMService.createRoomByUserIds(
 			userId,
-			selfUserId,
+			clientUserId,
 		)
 		const newDMRoom: DMRawData = await this.DMService.getRoomByRoomId(
 			createdRoom.id,
 		)
-		const DMObjectForFront: DMObject = this.createDMObjectForFront(
+		const DMObjectForClient: DMObject = this.createDMObjectForFront(
 			newDMRoom,
-			socket,
+			clientUserId,
 		)
-		socket.emit('updateRoom', DMObjectForFront)
-		this.sendAddRoomByUserId(socket, userId, DMObjectForFront)
+		socket.emit('updateRoom', DMObjectForClient)
+		const DMObjectForOther: DMObject = this.createDMObjectForFront(
+			newDMRoom,
+			userId,
+		)
+		this.sendAddRoomByUserId(socket, userId, DMObjectForOther)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -142,21 +149,19 @@ export class DMGateway {
 		this.logger.log(
 			`getRoomIdByUserIds: for ${socket.data.userId} and ${userId}`,
 		)
-		let room = await this.DMService.getRoomByUserIds(
-			socket.data.userId,
-			userId,
-		)
+		const clientUserId = socket.data.userId
+		let room = await this.DMService.getRoomByUserIds(clientUserId, userId)
 		if (!room) {
 			room = await this.DMService.createRoomByUserIds(
 				userId,
-				socket.data.userId,
+				clientUserId,
 			)
 			const newDMRoom: DMRawData = await this.DMService.getRoomByRoomId(
 				room.id,
 			)
 			const DMObjectForFront: DMObject = this.createDMObjectForFront(
 				newDMRoom,
-				socket,
+				userId,
 			)
 			this.sendAddRoomByUserId(socket, userId, DMObjectForFront)
 		}
@@ -175,10 +180,10 @@ export class DMGateway {
 		}
 	}
 
-	createDMObjectForFront(room: DMRawData, socket: Socket): DMObject {
+	createDMObjectForFront(room: DMRawData, userIdToSend: string): DMObject {
 		let name = room.user1
 		let userId = room.user1id
-		if (userId === socket.data.userId) {
+		if (userId === userIdToSend) {
 			name = room.user2
 			userId = room.user2id
 		}
@@ -187,6 +192,7 @@ export class DMGateway {
 			name,
 			userId,
 		}
+		console.log(userId, room, DMObjectForFront)
 		return DMObjectForFront
 	}
 }
