@@ -45,8 +45,15 @@ export class GameGateway {
 		this.logger.log(`Client connected: ${socket.id}`)
 	}
 
-	removeInvitedUser(userId: string, socketData: SocketData, emitFlag: boolean = true) {
-		if (userId in this.inviteUsers && this.inviteUsers[userId].length == 0) {
+	removeInvitedUser(
+		userId: string,
+		socketData: SocketData,
+		emitFlag: boolean = true,
+	) {
+		if (
+			userId in this.inviteUsers &&
+			this.inviteUsers[userId].length == 0
+		) {
 			delete this.inviteUsers[userId]
 		}
 		if (!(userId in this.socketDatas)) return
@@ -57,10 +64,12 @@ export class GameGateway {
 					invitedSocketData.status = GameStatus.InviteReady
 					invitedSocketData.gameId = ''
 					if (emitFlag) {
-						this.server.to(invitedSocketData.client.id).emit('setGameInviteButton', {
-							status: 0,
-							roomId: '',
-						})
+						this.server
+							.to(invitedSocketData.client.id)
+							.emit('setGameInviteButton', {
+								status: 0,
+								roomId: '',
+							})
 					}
 				}
 			} else {
@@ -127,7 +136,7 @@ export class GameGateway {
 				userId: userId,
 				userName: socket.data.username,
 				status: newStatus,
-				gameId: ''
+				gameId: '',
 			}
 			this.socketDatas[userId] = socketData
 			return socketData
@@ -142,7 +151,10 @@ export class GameGateway {
 		const removeArray = []
 		for (let i = 0; i < this.matchUsers.length; i++) {
 			if (!this.matchUsers[i].client.connected) {
-				removeArray.push({index: i, userId: this.matchUsers[i].userId})
+				removeArray.push({
+					index: i,
+					userId: this.matchUsers[i].userId,
+				})
 			}
 		}
 		for (let i = removeArray.length - 1; i >= 0; i--) {
@@ -158,8 +170,14 @@ export class GameGateway {
 			const removeArray = []
 			for (let i = 0; i < socketDatas.length; i++) {
 				if (!socketDatas[i].client.connected) {
-					removeKeyArray.push({userId: key, socketData: socketDatas[i]})
-					removeArray.push({index: i, userId: socketDatas[i].userId})
+					removeKeyArray.push({
+						userId: key,
+						socketData: socketDatas[i],
+					})
+					removeArray.push({
+						index: i,
+						userId: socketDatas[i].userId,
+					})
 				}
 			}
 			for (let i = removeArray.length - 1; i >= 0; i--) {
@@ -168,7 +186,10 @@ export class GameGateway {
 			}
 		}
 		for (let i = 0; i < removeKeyArray.length; i++) {
-			this.removeInvitedUser(removeKeyArray[i].userId, removeKeyArray[i].socketData)
+			this.removeInvitedUser(
+				removeKeyArray[i].userId,
+				removeKeyArray[i].socketData,
+			)
 		}
 	}
 
@@ -220,7 +241,10 @@ export class GameGateway {
 	@SubscribeMessage('connectGame')
 	handleConnect(@MessageBody() data, @ConnectedSocket() client: Socket) {
 		const roomId = data['roomId']
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.Watch)
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.Watch,
+		)
 		const userId = client.data.userId
 
 		if (!(roomId in this.gameRooms)) {
@@ -318,8 +342,11 @@ export class GameGateway {
 		const roomId = data['id']
 		const userId = data['userId']
 		if (!(roomId in this.gameRooms)) return
-		const [gameObject, player1, player2]: [GameObject, SocketData, SocketData] =
-			this.gameRooms[roomId].retry(userId)
+		const [gameObject, player1, player2]: [
+			GameObject,
+			SocketData,
+			SocketData,
+		] = this.gameRooms[roomId].retry(userId)
 		if (!gameObject.retryFlag.player1 || !gameObject.retryFlag.player2) {
 			return
 		}
@@ -375,13 +402,15 @@ export class GameGateway {
 
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('readyGameIndex')
-	handleReadyGameIndex(
-		@ConnectedSocket() client: Socket,
-	) {
+	handleReadyGameIndex(@ConnectedSocket() client: Socket) {
 		let status = 0
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.MatchReady)
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.MatchReady,
+		)
 
-		const gameId = socketData.status == GameStatus.Game ? socketData.gameId : null
+		const gameId =
+			socketData.status == GameStatus.Game ? socketData.gameId : null
 		if (gameId) {
 			status = 2
 		}
@@ -396,13 +425,16 @@ export class GameGateway {
 
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('registerMatch')
-	handleRegisterMatch(
-		@ConnectedSocket() client: Socket,
-	) {
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.Matching)
+	handleRegisterMatch(@ConnectedSocket() client: Socket) {
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.Matching,
+		)
 
 		if (socketData.status == GameStatus.Game) {
-			throw new WsException('Cannot be matched because you are in the game')
+			throw new WsException(
+				'Cannot be matched because you are in the game',
+			)
 		}
 
 		this.removeDisconnectMatchUser()
@@ -411,10 +443,7 @@ export class GameGateway {
 			this.matchUsers[0].status = GameStatus.Game
 			socketData.role = 1
 			socketData.status = GameStatus.Game
-			const roomId = this.makeGameRoom(
-				this.matchUsers[0],
-				socketData,
-			)
+			const roomId = this.makeGameRoom(this.matchUsers[0], socketData)
 			this.matchUsers[0].gameId = roomId
 			socketData.gameId = roomId
 			this.updateGameStatusRoom(roomId, true)
@@ -431,22 +460,31 @@ export class GameGateway {
 
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('cancelMatch')
-	handleCancelMatch(
-		@ConnectedSocket() client: Socket,
-	) {
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.MatchReady)
-		if (!(socketData.status in [GameStatus.MatchReady, GameStatus.Matching])) {
+	handleCancelMatch(@ConnectedSocket() client: Socket) {
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.MatchReady,
+		)
+		if (
+			!(socketData.status in [GameStatus.MatchReady, GameStatus.Matching])
+		) {
 			throw new WsException('Please reload.')
 		}
 		socketData.status = GameStatus.MatchReady
 	}
 
-	getGameInviteReadyStatus(socketData: SocketData, profileUserId: string): [number, string] {
+	getGameInviteReadyStatus(
+		socketData: SocketData,
+		profileUserId: string,
+	): [number, string] {
 		if (socketData.status == GameStatus.Game) {
 			return [4, socketData.gameId]
 		}
 		this.removeDisconnectInviteUser()
-		const profileSocketData = (profileUserId in this.socketDatas) ? this.socketDatas[profileUserId] : null
+		const profileSocketData =
+			profileUserId in this.socketDatas
+				? this.socketDatas[profileUserId]
+				: null
 		if (!profileSocketData) {
 			return [0, '']
 		}
@@ -471,9 +509,13 @@ export class GameGateway {
 		@MessageBody() data: any,
 		@ConnectedSocket() client: Socket,
 	) {
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.InviteReady)
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.InviteReady,
+		)
 		const profileUserId = data['userId']
-		const [status, roomId]: [number, string] = this.getGameInviteReadyStatus(socketData, profileUserId)
+		const [status, roomId]: [number, string] =
+			this.getGameInviteReadyStatus(socketData, profileUserId)
 		if (socketData.status != GameStatus.Game) {
 			if (status == 0) {
 				socketData.status = GameStatus.InviteReady
@@ -485,7 +527,7 @@ export class GameGateway {
 		}
 		this.server.to(client.id).emit('setGameInviteButton', {
 			status: status,
-			roomId: roomId
+			roomId: roomId,
 		})
 	}
 
@@ -500,10 +542,11 @@ export class GameGateway {
 			if (profileSocketData.client.connected) {
 				if (profileSocketData.gameId == socketData.userId) {
 					profileSocketData.status = GameStatus.Invited
-					this.server.to(profileSocketData.client.id)
+					this.server
+						.to(profileSocketData.client.id)
 						.emit('setGameInviteButton', {
 							status: 2,
-							roomId: ''
+							roomId: '',
 						})
 				}
 			} else {
@@ -518,9 +561,15 @@ export class GameGateway {
 		@MessageBody() data: any,
 		@ConnectedSocket() client: Socket,
 	) {
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.Invite)
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.Invite,
+		)
 		const profileUserId = data['userId']
-		let [status, roomId]: [number, string] = this.getGameInviteReadyStatus(socketData, profileUserId)
+		let [status, roomId]: [number, string] = this.getGameInviteReadyStatus(
+			socketData,
+			profileUserId,
+		)
 		if (status == 0) {
 			status = 1
 		}
@@ -539,7 +588,7 @@ export class GameGateway {
 
 		this.server.to(client.id).emit('setGameInviteButton', {
 			status: status,
-			roomId: roomId
+			roomId: roomId,
 		})
 	}
 
@@ -549,13 +598,17 @@ export class GameGateway {
 		@MessageBody() data: any,
 		@ConnectedSocket() client: Socket,
 	) {
-		const socketData: SocketData = this.prepareNewStatus(client, GameStatus.Invited)
+		const socketData: SocketData = this.prepareNewStatus(
+			client,
+			GameStatus.Invited,
+		)
 		const profileUserId = data['userId']
-		const [status, roomId]: [number, string] = this.getGameInviteReadyStatus(socketData, profileUserId)
+		const [status, roomId]: [number, string] =
+			this.getGameInviteReadyStatus(socketData, profileUserId)
 		if (status != 2) {
 			this.server.to(client.id).emit('setGameInviteButton', {
 				status: status,
-				roomId: roomId
+				roomId: roomId,
 			})
 			return
 		}
@@ -565,16 +618,13 @@ export class GameGateway {
 		profileSocketData.status = GameStatus.Game
 		socketData.role = 1
 		socketData.status = GameStatus.Game
-		const gameRoomId = this.makeGameRoom(
-			profileSocketData,
-			socketData,
-		)
+		const gameRoomId = this.makeGameRoom(profileSocketData, socketData)
 		profileSocketData.gameId = gameRoomId
 		socketData.gameId = gameRoomId
 		this.updateGameStatusRoom(gameRoomId, true)
-		this.server.to(profileSocketData.client.id).emit('goGameRoom', gameRoomId)
 		this.server
-				.to(socketData.client.id)
-				.emit('goGameRoom', gameRoomId)
+			.to(profileSocketData.client.id)
+			.emit('goGameRoom', gameRoomId)
+		this.server.to(socketData.client.id).emit('goGameRoom', gameRoomId)
 	}
 }

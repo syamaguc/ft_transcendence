@@ -30,7 +30,7 @@ const GameInvite = ({ user, router }: Props) => {
       router.push('/game/' + data)
     })
 
-    server.on('setGameInviteButton', (data) =>{
+    server.on('setGameInviteButton', (data) => {
       setInviteStatus(data['status'])
       setRoomId(data['roomId'])
     })
@@ -44,37 +44,48 @@ const GameInvite = ({ user, router }: Props) => {
         isClosable: true,
       })
     })
-    server.emit('gameInviteReady', {userId: user.userId})
+    server.emit('gameInviteReady', { userId: user.userId })
   }, [server, user])
 
   return (
     <>
-      {inviteStatus == 0 &&
-        <Button onClick={() => server && server.emit(
-          'gameInvite', {userId: user.userId}
-        )}>
+      {inviteStatus == 0 && (
+        <Button
+          onClick={() =>
+            server && server.emit('gameInvite', { userId: user.userId })
+          }
+        >
           Invite
-        </Button>}
-      {inviteStatus == 1 &&
-        <Button onClick={() => server && server.emit(
-          'gameInviteReady', {userId: user.userId}
-        )}>
+        </Button>
+      )}
+      {inviteStatus == 1 && (
+        <Button
+          onClick={() =>
+            server && server.emit('gameInviteReady', { userId: user.userId })
+          }
+        >
           Cancel
-        </Button>}
-      {inviteStatus == 2 &&
-        <Button onClick={() => server && server.emit(
-          'gameReceiveInvite', {userId: user.userId}
-        )}>
+        </Button>
+      )}
+      {inviteStatus == 2 && (
+        <Button
+          onClick={() =>
+            server && server.emit('gameReceiveInvite', { userId: user.userId })
+          }
+        >
           Receive Invitation
-        </Button>}
-      {inviteStatus == 3 &&
+        </Button>
+      )}
+      {inviteStatus == 3 && (
         <Button onClick={() => router.push('/game/' + roomId)}>
           Join Room
-        </Button>}
-      {inviteStatus == 4 &&
+        </Button>
+      )}
+      {inviteStatus == 4 && (
         <Button onClick={() => router.push('/game/' + roomId)}>
           Back My Game
-        </Button>}
+        </Button>
+      )}
     </>
   )
 }

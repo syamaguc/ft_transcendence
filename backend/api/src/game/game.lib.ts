@@ -353,11 +353,11 @@ export class GameRoom {
 			id: this.id,
 			player1: {
 				id: this.player1Id,
-				name: this.socketDatas[this.player1Id].userName
+				name: this.socketDatas[this.player1Id].userName,
 			},
 			player2: {
 				id: this.player2Id,
-				name: this.socketDatas[this.player2Id].userName
+				name: this.socketDatas[this.player2Id].userName,
 			},
 		}
 	}
