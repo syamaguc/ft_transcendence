@@ -22,6 +22,29 @@ const timestampToTime = (timestamp) => {
   return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
+type Props = {
+  message: MessageObject
+}
+
+const MessageBlock = ({ message }: Props) => {
+  return (
+    <Flex m={4} align='flex-start'>
+      <ProfileModal message={message} />
+      <Flex direction='column' maxW='90%'>
+        <Flex align='flex-end'>
+          <Text as='b' marginEnd={2}>
+            {message.username}
+          </Text>
+          <Text fontSize='xs' pb='1px'>
+            {timestampToTime(message.timestamp)}
+          </Text>
+        </Flex>
+        <Text whiteSpace='pre-wrap'>{message.message}</Text>
+      </Flex>
+    </Flex>
+  )
+}
+
 const DmMiddleBar = ({ chatLog }) => {
   return (
     <Flex
@@ -33,25 +56,7 @@ const DmMiddleBar = ({ chatLog }) => {
     >
       {chatLog.length
         ? chatLog.map((message: MessageObject) => (
-            <Flex
-              key={message.id}
-              m={4}
-              direction='horizontal'
-              align='flex-start'
-            >
-              <ProfileModal message={message} />
-              <Flex direction='column' maxW='90%'>
-                <Flex direction='horizontal' align='flex-end'>
-                  <Text as='b' marginEnd={2}>
-                    {message.username}
-                  </Text>
-                  <Text fontSize='xs' pb='1px'>
-                    {timestampToTime(message.timestamp)}
-                  </Text>
-                </Flex>
-                <Text whiteSpace='pre-wrap'>{message.message}</Text>
-              </Flex>
-            </Flex>
+            <MessageBlock key={message.id} message={message} />
           ))
         : null}
       <AlwaysScrollToBottom />
