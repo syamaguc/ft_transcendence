@@ -217,7 +217,6 @@ function MemberListModal({ socket, currentRoom }) {
           <ModalHeader>Members</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>Members</Text>
             <MemberList
               socket={socket}
               currentRoom={currentRoom}
@@ -227,12 +226,10 @@ function MemberListModal({ socket, currentRoom }) {
             <FriendList friends={friends} />
           </ModalBody>
           <ModalFooter>
-            <Button mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button colorScheme='blue' variant='ghost'>
+            <Button onClick={onClose}>Close</Button>
+            {/* <Button colorScheme='blue' variant='ghost'>
               Invite User
-            </Button>
+            </Button> */}
           </ModalFooter>
         </ModalContent>
       </Modal>

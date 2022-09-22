@@ -1,34 +1,29 @@
 import {
   Button,
-  Heading,
   FormControl,
   FormLabel,
   FormErrorMessage,
   Input,
   Text,
   Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  useDisclosure,
   useToast,
 } from '@chakra-ui/react'
+import { useState } from 'react'
+import ChakraNextImage from 'src/components/chakra-next-image'
+import { AuthCard } from '@components/auth'
 
-import ChakraNextImage from '@components/chakra-next-image'
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
+
 import { fetchText } from 'src/lib/fetchers'
+import { setDidTwoFactorAuth } from 'src/lib/session'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
 
-export default function TwoFactorAuth() {
-  const { user, mutateUser } = useUser()
-  const modal = useDisclosure()
+export function TwoFactorAuthForm() {
+  const { mutateUser } = useUser()
   const toast = useToast()
+  const [isLoading, setIsLoading] = useState(false)
 
   const { data } = useSWR(`${API_URL}/api/auth/2fa`, fetchText)
 
@@ -47,20 +42,6 @@ export default function TwoFactorAuth() {
     if (!values.code) {
       errors.code = 'Required'
     }
-    return errors
-  }
-
-  const updateTwoFactorAuth = async (toggle: boolean) => {
-    const res = await fetch(`${API_URL}/api/user/updateTwoFactorAuth`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify({ toggle: toggle }),
-    })
-
-    return res
   }
 
   const formik = useFormik<{ code: string }>({
@@ -76,19 +57,16 @@ export default function TwoFactorAuth() {
 
       const body = await res.text()
       if (body === 'True') {
-        const updateRes = await updateTwoFactorAuth(true)
-        if (updateRes.ok) {
-          await mutateUser()
-          toast({
-            description: 'Successfully enabled 2FA',
-            status: 'success',
-            duration: 5000,
-            isClosable: true,
-          })
-          actions.setSubmitting(false)
-          modal.onClose()
-          return
-        }
+        await setDidTwoFactorAuth(true)
+        await mutateUser()
+        toast({
+          description: 'Successfully enabled 2FA',
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+        })
+        actions.setSubmitting(false)
+        return
       }
       toast({
         description: 'Failed to provide identification',
@@ -97,70 +75,55 @@ export default function TwoFactorAuth() {
         isClosable: true,
       })
       actions.setSubmitting(false)
-      modal.onClose()
     },
   })
 
-  const turnOffTwoFactorAuth = async () => {
-    const res = await updateTwoFactorAuth(false)
-    if (res.ok) {
-      toast({
-        description: 'Turned off 2FA',
-        status: 'info',
-        duration: 5000,
-        isClosable: true,
+  const handleBack = async () => {
+    setIsLoading(true)
+
+    try {
+      const res = await fetch(`${API_URL}/api/user/logout`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
-    } else {
+
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
+      if (res.ok) {
+        await mutateUser()
+      } else {
+        toast({
+          description: 'Internal error occurred',
+          status: 'error',
+          duration: 3000,
+          isClosable: true,
+        })
+      }
+    } catch (err) {
+      console.log(err)
       toast({
-        description: 'Failed to turn off 2FA',
+        description: 'Failed to logout',
         status: 'error',
-        duration: 5000,
+        duration: 3000,
         isClosable: true,
       })
     }
-    await mutateUser()
-  }
 
-  const onCloseComplete = () => {
-    formik.setFieldValue('code', '')
+    setIsLoading(false)
   }
 
   return (
-    <Stack>
-      <Heading fontSize='2xl'>Two-factor authentication</Heading>
-      <Text color='gray.600' fontSize={{ base: 'sm', md: 'md' }}>
-        {`Two factor authentication is an enhanced security measure. Once enabled, you'll be required to give additional identification through Google Authenticator`}
-      </Text>
-      {!user.twoFactorAuth && (
-        <Stack direction='row' align='center'>
-          <Text>Off</Text>
-          <Button size='sm' onClick={modal.onOpen}>
-            Turn on
-          </Button>
-        </Stack>
-      )}
-      {user.twoFactorAuth && (
-        <Stack direction='row' align='center'>
-          <Text>On</Text>
-          <Button size='sm' onClick={turnOffTwoFactorAuth}>
-            Turn off
-          </Button>
-        </Stack>
-      )}
-      <Modal
-        isOpen={modal.isOpen}
-        onClose={modal.onClose}
-        onCloseComplete={onCloseComplete}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <form id='form-2fa' onSubmit={formik.handleSubmit}>
-            <ModalHeader>Setup Two factor authentication</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody pb={6}>
-              <Text>
-                Open the Google Authenticator app and scan this QR code.
-              </Text>
+    <>
+      <AuthCard title='Two-factor Auth'>
+        <form id='form-2fa' onSubmit={formik.handleSubmit}>
+          <Stack spacing='6'>
+            <Text>
+              Open the Google Authenticator app and scan this QR code.
+            </Text>
+            <Stack spacing='5' align='center'>
               {qrCodeUrl && (
                 <ChakraNextImage src={qrCodeUrl} width='300px' height='300px' />
               )}
@@ -186,22 +149,23 @@ export default function TwoFactorAuth() {
                   {formik.errors.code ? `${formik.errors.code}` : null}
                 </FormErrorMessage>
               </FormControl>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                colorScheme='blue'
-                type='submit'
-                form='form-2fa'
-                isLoading={formik.isSubmitting}
-                mr={3}
-              >
-                Send
-              </Button>
-              <Button onClick={modal.onClose}>Cancel</Button>
-            </ModalFooter>
-          </form>
-        </ModalContent>
-      </Modal>
-    </Stack>
+            </Stack>
+            <Button
+              colorScheme='blackAlpha'
+              bg='blackAlpha.900'
+              _dark={{ bg: 'whiteAlpha.900', _hover: { bg: 'whiteAlpha.600' } }}
+              type='submit'
+              form='form-2fa'
+              isLoading={formik.isSubmitting}
+            >
+              Send
+            </Button>
+          </Stack>
+        </form>
+      </AuthCard>
+      <Button onClick={handleBack} isLoading={isLoading}>
+        Back
+      </Button>
+    </>
   )
 }

@@ -87,6 +87,19 @@ export class ChatGateway {
 	}
 
 	@UseGuards(SocketGuard)
+	@SubscribeMessage('changePassword')
+	async changePassword(
+		@MessageBody() password: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`password: new room password[${password}]`)
+		const newRoom = await this.chatService.changePassword(password, room)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('getMessageLog')
 	async getMessageLog(
 		@MessageBody() roomId: string,
@@ -176,9 +189,6 @@ export class ChatGateway {
 		if (tmp.banned.indexOf(socket.data.userId) != -1) {
 			throw new WsException('You are banned from the channel')
 		}
-
-		//privateの場合
-
 		//publicの場合
 		const room = await this.joinRoom(roomId, socket)
 		this.updateRoom(room)
@@ -218,6 +228,16 @@ export class ChatGateway {
 		this.server.emit('updateRoom', newChatRoom)
 		this.server.to(socket.id).emit('updateCurrentRoom', newChatRoom.id)
 		this.getMessageLog(newChatRoom.id, socket)
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('deleteRoom')
+	async deleteRoom(@MessageBody() roomId: string) {
+		this.logger.log(`deleteRoom: ${roomId}`)
+		const deletedRoom = await this.chatService.findRoom(roomId)
+		this.chatService.deleteRoom(roomId)
+		this.server.to(roomId).emit('deleteRoom')
+		this.server.emit('updateRoomDelete', deletedRoom)
 	}
 
 	async joinRoom(roomId: string, socket: Socket) {

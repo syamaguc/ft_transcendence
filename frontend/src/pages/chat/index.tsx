@@ -23,8 +23,9 @@ import { FetchError } from 'src/lib/fetchers'
 import SimpleSidebar from '@components/chat/simple-sidebar'
 import { useUser } from 'src/lib/use-user'
 import { User } from 'src/types/user'
+import { API_URL as API_PREFIX, DEFAULT_ROOM } from 'src/constants'
 
-const API_URL = 'http://localhost:3000/chat'
+const API_URL = API_PREFIX + '/chat'
 
 const Chat = () => {
   const { user } = useUser()
@@ -32,18 +33,8 @@ const Chat = () => {
   const [inputText, setInputText] = useState('')
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
-  const [currentRoom, setCurrentRoom] = useState<ChannelObject>({
-    id: 'default-channel',
-    name: 'random',
-    members: [],
-    owner: 'none',
-    admins: [],
-    is_private: false,
-    logs: [],
-    password: '',
-  })
+  const [currentRoom, setCurrentRoom] = useState<ChannelObject>(DEFAULT_ROOM)
   const [socket, setSocket] = useState()
-  const [toastMessage, setToastMessage] = useState()
   const toast = useToast()
 
   useEffect(() => {
