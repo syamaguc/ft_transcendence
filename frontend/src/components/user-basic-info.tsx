@@ -236,8 +236,8 @@ export default function UserBasicInfo({ user }: UserBasicInfoProps) {
   const initialValues: BasicInfoFormValues = {
     username: user.username,
     email: user.email,
-    password: '',
-    currentPassword: '',
+    password: user.login42 ? user.login42 : '',
+    currentPassword: user.login42 ? user.login42 : '',
   }
 
   const validate = (values: BasicInfoFormValues) => {
@@ -486,31 +486,33 @@ export default function UserBasicInfo({ user }: UserBasicInfoProps) {
                         </FormControl>
                       </>
                     )}
-                    <FormControl
-                      isInvalid={
-                        formik.errors.password && formik.touched.password
-                      }
-                    >
-                      <FormLabel
-                        htmlFor='password'
-                        fontSize='xs'
-                        color='gray.400'
+                    {!user.login42 && (
+                      <FormControl
+                        isInvalid={
+                          formik.errors.password && formik.touched.password
+                        }
                       >
-                        PASSWORD
-                      </FormLabel>
-                      <InputGroup>
-                        <Input
-                          name='password'
-                          type='password'
-                          onChange={formik.handleChange}
-                          onBlur={formik.handleBlur}
-                          value={formik.values.password}
-                        />
-                      </InputGroup>
-                      <FormErrorMessage>
-                        {formik.errors.password}
-                      </FormErrorMessage>
-                    </FormControl>
+                        <FormLabel
+                          htmlFor='password'
+                          fontSize='xs'
+                          color='gray.400'
+                        >
+                          PASSWORD
+                        </FormLabel>
+                        <InputGroup>
+                          <Input
+                            name='password'
+                            type='password'
+                            onChange={formik.handleChange}
+                            onBlur={formik.handleBlur}
+                            value={formik.values.password}
+                          />
+                        </InputGroup>
+                        <FormErrorMessage>
+                          {formik.errors.password}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
                   </Stack>
                 </ModalBody>
                 <ModalFooter>
