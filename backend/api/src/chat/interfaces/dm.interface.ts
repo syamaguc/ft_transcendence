@@ -7,7 +7,7 @@ export interface DMObject {
 export interface DMRawData {
 	id: string
 	user1: string
-	user1Id: string
+	user1id: string
 	user2: string
-	user2Id: string
+	user2id: string
 }

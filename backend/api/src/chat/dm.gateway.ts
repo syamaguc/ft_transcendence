@@ -177,10 +177,10 @@ export class DMGateway {
 
 	createDMObjectForFront(room: DMRawData, socket: Socket): DMObject {
 		let name = room.user1
-		let userId = room.user1Id
+		let userId = room.user1id
 		if (userId === socket.data.userId) {
 			name = room.user2
-			userId = room.user2Id
+			userId = room.user2id
 		}
 		const DMObjectForFront: DMObject = {
 			id: room.id,
