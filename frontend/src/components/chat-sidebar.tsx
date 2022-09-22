@@ -134,6 +134,12 @@ const SideBar = ({
       setCurrentRoom(DEFAULT_ROOM)
       setChatLog([])
     })
+    socket.on('leavePrivateRoom', () => {
+      console.log('leavePrivateRoom received')
+      socket.emit('getRooms')
+      setCurrentRoom(DEFAULT_ROOM)
+      setChatLog([])
+    })
     socket.on('updateCurrentRoom', (channelId: string) => {
       console.log('updateCurrentRoom received : ', channelId)
       setMoveChannelId(channelId)

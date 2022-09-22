@@ -162,6 +162,30 @@ export class ChatGateway {
 	}
 
 	@UseGuards(SocketGuard)
+	@SubscribeMessage('inviteMember')
+	async inviteMember(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`inviteMember: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.inviteMember(userId, room)
+
+		//find the user's socket
+		if (socket.nsp.sockets) {
+			socket.nsp.sockets.forEach((value: Socket) => {
+				if (value.data.userId == userId) {
+					this.joinRoom(room, value)
+				}
+			})
+		}
+		//update the member list
+		this.getMembers(room, socket)
+		//update the channel info
+		this.updateRoom(newRoom)
+	}
+
+	@UseGuards(SocketGuard)
 	@SubscribeMessage('joinProtectedRoom')
 	async joinProtectedRoom(
 		@MessageBody() data,
@@ -214,8 +238,13 @@ export class ChatGateway {
 			roomId,
 		)
 		this.updateRoom(room)
+		//leave protected room
 		if (room.password) {
 			this.unwatchRoom(roomId, socket)
+		}
+		//leave private room
+		if (room.is_private){
+			socket.emit('leavePrivateRoom')
 		}
 	}
 

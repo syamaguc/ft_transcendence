@@ -178,6 +178,17 @@ export class ChatService {
 			.getMany()
 	}
 
+	async inviteMember(userId: uuidv4, roomId: string): Promise<ChatRoom> {
+		const room = await chatRepository.findId(roomId)
+		if (!room.members.includes(userId)) {
+			console.log('=========new member joined the channel=========')
+			room.members.push(userId)
+			return chatRepository.save(room)
+		} else {
+			throw new WsException('failed inviting new member')
+		}
+	}
+
 	async joinRoom(userId: uuidv4, roomId: string): Promise<ChatRoom> {
 		const room = await chatRepository.findId(roomId)
 		console.log(room)

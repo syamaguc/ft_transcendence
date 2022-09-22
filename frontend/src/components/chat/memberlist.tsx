@@ -1,5 +1,6 @@
 import {
   Menu,
+  Stack,
   MenuButton,
   MenuList,
   MenuItem,
@@ -94,9 +95,6 @@ function MemberMenu({ socket, user, currentRoom, member }) {
               unmute
             </MenuItem>
           )}
-          {/* // <MenuItem onClick={() => onClickMute(member.userId)}>
-          //   mute user
-          // </MenuItem> */}
           <MenuItem color='red.500' onClick={() => onClickBan(member.userId)}>
             ban user
           </MenuItem>
@@ -109,21 +107,6 @@ function MemberMenu({ socket, user, currentRoom, member }) {
 function MemberList({ socket, currentRoom, members }) {
   const user = useUser()
 
-  // const onClickMute = (userId: string) => {
-  //   socket.emit('muteMember', userId)
-  //   console.log(userId, ' has been muted from the channel')
-  // }
-
-  // const onClickBan = (userId: string) => {
-  //   socket.emit('banMember', userId)
-  //   console.log(userId, ' has been banned from the channel')
-  // }
-
-  // const onClickAdmin = (userId: string) => {
-  //   socket.emit('addAdmin', userId)
-  //   console.log(userId, ' has been added to admin in channel')
-  // }
-
   if (!members || !members.length) return <Text>This room is empty</Text>
   return (
     <>
@@ -135,14 +118,6 @@ function MemberList({ socket, currentRoom, members }) {
           />
           <Text>{member.username}</Text>
           <MemberStatus user={user} currentRoom={currentRoom} member={member} />
-          {/* {currentRoom.admins.indexOf(member.userId) != -1 ? (
-            <Text ml={1}>admin</Text>
-          ) : null} */}
-          {/* <Box opacity='0' _hover={{ transition: '0.3s', opacity: '1' }} p={2}>
-            <Button onClick={() => onClickMute(member.userId)}>MUTE</Button>
-            <Button onClick={() => onClickBan(member.userId)}>BAN</Button>
-            <Button onClick={() => onClickAdmin(member.userId)}>ADMIN</Button>
-          </Box> */}
           <MemberMenu
             socket={socket}
             user={user}
@@ -155,18 +130,32 @@ function MemberList({ socket, currentRoom, members }) {
   )
 }
 
-function FriendList({ friends }) {
-  if (!friends || !friends.length) return <Text>You have no friends</Text>
+
+
+function FriendList({ socket, friends, members }) {
+
+  const onClickInvite = (userId: string) => {
+    socket.emit('inviteMember', userId)
+    console.log('invite :', userId)
+  }
+  if (!friends || !friends.length) return
+
   return (
     <>
-      {friends.map((friend) => (
-        <Text>{friend.username}</Text>
+      <Text fontSize='xs' color='gray.400'>Invite your friends to the channel</Text>
+      {friends.map((friend) =>
+      (
+        <Stack direction='row' align='center' key={friend.userId}>
+          <Text>{friend.username}</Text>
+          <Button onClick={() => {onClickInvite(friend.userId)}}>invite</Button>
+        </Stack>
       ))}
     </>
   )
 }
 
 function MemberListModal({ socket, currentRoom }) {
+  const currentUser = useUser().user
   const [members, setMembers] = useState<User[]>([])
   const [friends, setFriends] = useState()
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -192,11 +181,18 @@ function MemberListModal({ socket, currentRoom }) {
     })
       .then((r) => r.json())
       .then((data) => {
+        //exclude members from friends list
+        for (let i = 0; i < data.length; i++)
+        {
+          if (currentRoom.members.includes(data[i].userId)) {
+            data.splice(i, 1)
+          }
+        }
+        console.log('data :', data)
         setFriends(data)
-        console.log('get Friends')
-        console.log(data)
+        socket.emit('getMembers', currentRoom.id)
       })
-  }, [])
+  }, [currentRoom])
 
   return (
     <>
@@ -222,14 +218,12 @@ function MemberListModal({ socket, currentRoom }) {
               currentRoom={currentRoom}
               members={members}
             />
-            <Text>Friends</Text>
-            <FriendList friends={friends} />
+            {currentRoom.members.includes(currentUser.userId) && (
+                <FriendList socket={socket} friends={friends} members={members}/>
+            )}
           </ModalBody>
           <ModalFooter>
-            <Button onClick={onClose}>Close</Button>
-            {/* <Button colorScheme='blue' variant='ghost'>
-              Invite User
-            </Button> */}
+            {/* <Button onClick={onClose}>Close</Button> */}
           </ModalFooter>
         </ModalContent>
       </Modal>
