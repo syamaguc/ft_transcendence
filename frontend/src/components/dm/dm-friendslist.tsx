@@ -64,19 +64,16 @@ const PREFIX_URL = '/dm'
 
 function DMFriendsList({ socket }: Props) {
   const { user: currentUser } = useUser()
-  const { data: users, error } = useSWR(
-    `${API_URL}/api/user/search`,
-    fetchUsers
-  )
+  const { friends, countAll, countOnline } = useFriends()
+  const { blocked } = useBlocked()
   const router = useRouter()
 
-  const isLoading = !users && !error
-  console.log(users)
-  console.log('isLoading: ', isLoading)
+  const isNotBlocked = (element: PartialUserInfo) => {
+    return currentUser.blockedUsers.indexOf(element.userId) === -1
+  }
 
-  const onClickDM = (userId: string) => {
-    socket.emit('getRoomIdByUserIds', userId)
-    console.log('getRoomIdByUserIds')
+  const isOnline = (element: PartialUserInfo) => {
+    return element.status === 'Online' && isNotBlocked(element)
   }
 
   useEffect(() => {
@@ -86,17 +83,6 @@ function DMFriendsList({ socket }: Props) {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
-  const { friends, countAll, countOnline } = useFriends()
-  const { blocked } = useBlocked()
-
-  const isNotBlocked = (element: PartialUserInfo) => {
-    return currentUser.blockedUsers.indexOf(element.userId) === -1
-  }
-
-  const isOnline = (element: PartialUserInfo) => {
-    return element.status === 'Online' && isNotBlocked(element)
-  }
 
   return (
     <Container maxW='2xl' py='12'>
@@ -134,7 +120,11 @@ function DMFriendsList({ socket }: Props) {
                   <Divider />
                   <Stack>
                     {friends.filter(isOnline).map((friend: PartialUserInfo) => (
-                      <DMFriendItem key={friend.username} friend={friend} />
+                      <DMFriendItem
+                        key={friend.username}
+                        friend={friend}
+                        socket={socket}
+                      />
                     ))}
                   </Stack>
                 </Stack>
@@ -156,7 +146,11 @@ function DMFriendsList({ socket }: Props) {
                     {friends
                       .filter(isNotBlocked)
                       .map((friend: PartialUserInfo) => (
-                        <DMFriendItem key={friend.username} friend={friend} />
+                        <DMFriendItem
+                          key={friend.username}
+                          friend={friend}
+                          socket={socket}
+                        />
                       ))}
                   </Stack>
                 </Stack>
@@ -192,70 +186,6 @@ function DMFriendsList({ socket }: Props) {
         </Stack>
       </Tabs>
     </Container>
-  )
-
-  return (
-    <>
-      <Flex
-        h='55px'
-        borderBottom='1px solid'
-        borderColor='gray.100'
-        p={4}
-        align='center'
-      >
-        <Text>Friends</Text>
-      </Flex>
-      <Flex w='100%'>
-        <Box w='100%' p='2'>
-          <Stack w='100%'>
-            {users &&
-              users
-                .filter((user) => user.userId !== currentUser.userId)
-                .map((user: User) => (
-                  <Stack
-                    key={user.userId}
-                    w='100%'
-                    direction='row'
-                    align='center'
-                    py='2'
-                    px='8'
-                    borderRadius='md'
-                    transition='color 0.2s'
-                    _hover={{ bg: 'gray.50', cursor: 'pointer' }}
-                  >
-                    <Avatar
-                      key={user.userId}
-                      size='sm'
-                      src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                      mr='12px'
-                    >
-                      <AvatarBadge boxSize='1.25em' bg='green.500' />
-                    </Avatar>
-                    <Flex direction='row' align='center' w='full'>
-                      <Stack direction='column' spacing='0'>
-                        <Text fontWeight='800' fontSize='md'>
-                          {user.username}
-                        </Text>
-                        <Text fontWeight='600' color='gray.400' fontSize='sm'>
-                          {user.status}
-                        </Text>
-                      </Stack>
-                      <Spacer />
-                      <Circle bg='gray.100' size='38px' mr='16px'>
-                        <FiMessageSquare
-                          onClick={() => onClickDM(user.userId)}
-                        />
-                      </Circle>
-                      <Circle bg='gray.100' size='38px' mr='16px'>
-                        <FiMoreVertical />
-                      </Circle>
-                    </Flex>
-                  </Stack>
-                ))}
-          </Stack>
-        </Box>
-      </Flex>
-    </>
   )
 }
 
