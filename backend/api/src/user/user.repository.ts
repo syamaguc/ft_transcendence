@@ -146,7 +146,7 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 			return true
 		} catch (e) {
 			if (e.code == '23505')
-				throw new InternalServerErrorException(
+				throw new BadRequestException(
 					'Username or email already taken',
 				)
 			throw new InternalServerErrorException()
