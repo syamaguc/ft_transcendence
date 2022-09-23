@@ -144,10 +144,10 @@ const ChatCreationForm = ({ socket }: Props) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme='blue' mr={3} onClick={onClose}>
+              <Button variant='ghost' mr={3} onClick={onClose}>
                 Cancel
               </Button>
-              <Button variant='ghost' type='submit' onClick={onClose}>
+              <Button colorScheme='blue' type='submit' onClick={onClose}>
                 Create Channel
               </Button>
             </ModalFooter>
