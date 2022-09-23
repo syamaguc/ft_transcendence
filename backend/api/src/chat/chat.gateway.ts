@@ -256,6 +256,7 @@ export class ChatGateway {
 		}
 		//leave private room
 		if (room.is_private) {
+			this.unwatchRoom(roomId, socket)
 			socket.emit('leavePrivateRoom')
 		}
 	}
