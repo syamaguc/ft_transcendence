@@ -61,12 +61,17 @@ const DMSendBox = ({ socket }) => {
   )
 }
 
-const FakeDMSendBox = () => {
+const FakeDMSendBox = ({ currentRoom }) => {
+  let placeholder = ''
+  if (currentRoom) {
+    placeholder = 'You cannot send messages to a user you have blocked.'
+  }
+
   return (
     <>
       <Textarea
         isDisabled
-        placeholder='You cannot send messages to a user you have blocked.'
+        placeholder={placeholder}
         minH='unset'
         overflow='hidden'
         w='100%'
@@ -138,7 +143,7 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
         {currentRoom && isNotBlocked(currentRoom) ? (
           <DMSendBox socket={socket} />
         ) : (
-          <FakeDMSendBox />
+          <FakeDMSendBox currentRoom={currentRoom} />
         )}
       </Flex>
     </>
