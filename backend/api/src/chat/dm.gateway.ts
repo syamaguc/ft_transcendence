@@ -92,7 +92,10 @@ export class DMGateway {
 		const clientUserId = socket.data.userId
 		if (rooms.length == 2) socket.leave(rooms[1])
 		const room: DMRawData = await this.DMService.getRoomByRoomId(roomId)
-		if (room.user1id != clientUserId && room.user2id != clientUserId) {
+		if (
+			!room ||
+			(room.user1id != clientUserId && room.user2id != clientUserId)
+		) {
 			throw new WsException('Room Not Found')
 		}
 		socket.join(roomId)

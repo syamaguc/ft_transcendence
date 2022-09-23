@@ -73,10 +73,12 @@ export class DMService {
 		const room: DMRoom = await this.DMRoomRepository.findOne({
 			where: { id: roomId },
 		})
-		if (room.memberA != clientUserId && room.memberB != clientUserId) {
+		if (
+			!room ||
+			(room.memberA != clientUserId && room.memberB != clientUserId)
+		) {
 			throw new WsException('Room Not Found')
 		}
-		if (!room) throw new WsException('Room Not Found')
 		const messagesWithUserInfo = await messageRepository.getDMMessages(
 			roomId,
 		)
