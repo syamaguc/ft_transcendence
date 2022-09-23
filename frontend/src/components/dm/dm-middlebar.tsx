@@ -1,6 +1,6 @@
 import { Text, Box, Flex } from '@chakra-ui/layout'
 import { Avatar } from '@chakra-ui/avatar'
-import { MessageObject } from 'src/types/chat'
+import { DMObject, MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from '../chat/profile-modal'
 import AlwaysScrollToBottom from '../chat/always-scroll-bottom'
@@ -22,6 +22,39 @@ const timestampToTime = (timestamp) => {
   return `${yyyy}/${MM}/${dd} ${HH}:${mm}`
 }
 
+type Props = {
+  message: MessageObject
+}
+
+const MessageBlock = ({ message }: Props) => {
+  const { user: currentUser } = useUser()
+
+  const isNotBlocked = (userId: string) => {
+    return currentUser.blockedUsers.indexOf(userId) === -1
+  }
+
+  return (
+    <>
+      {isNotBlocked(message.userId) ? (
+        <Flex m={4} align='flex-start'>
+          <ProfileModal message={message} />
+          <Flex direction='column' maxW='90%'>
+            <Flex align='flex-end'>
+              <Text as='b' marginEnd={2}>
+                {message.username}
+              </Text>
+              <Text fontSize='xs' pb='1px'>
+                {timestampToTime(message.timestamp)}
+              </Text>
+            </Flex>
+            <Text whiteSpace='pre-wrap'>{message.message}</Text>
+          </Flex>
+        </Flex>
+      ) : null}
+    </>
+  )
+}
+
 const DmMiddleBar = ({ chatLog }) => {
   return (
     <Flex
@@ -33,25 +66,7 @@ const DmMiddleBar = ({ chatLog }) => {
     >
       {chatLog.length
         ? chatLog.map((message: MessageObject) => (
-            <Flex
-              key={message.id}
-              m={4}
-              direction='horizontal'
-              align='flex-start'
-            >
-              <ProfileModal message={message} />
-              <Flex direction='column' maxW='90%'>
-                <Flex direction='horizontal' align='flex-end'>
-                  <Text as='b' marginEnd={2}>
-                    {message.username}
-                  </Text>
-                  <Text fontSize='xs' pb='1px'>
-                    {timestampToTime(message.timestamp)}
-                  </Text>
-                </Flex>
-                <Text whiteSpace='pre-wrap'>{message.message}</Text>
-              </Flex>
-            </Flex>
+            <MessageBlock key={message.id} message={message} />
           ))
         : null}
       <AlwaysScrollToBottom />

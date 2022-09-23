@@ -12,6 +12,9 @@ import { DMService } from './dm.service'
 import { ChatService } from './chat.service'
 import { UseGuards } from '@nestjs/common'
 import { SocketGuard } from 'src/user/guards/socketAuth.guard'
+import { DMObject, DMRawData } from './interfaces/dm.interface'
+import { DMRoom } from './entities/dm-room.entity'
+import { WsException } from '@nestjs/websockets'
 
 @WebSocketGateway({ namespace: '/dm', cors: { origin: '*' } })
 export class DMGateway {
@@ -54,7 +57,11 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`)
-		const messageLog = await this.DMService.getMessageLogByRoomId(roomId)
+		const clientUserId = socket.data.userId
+		const messageLog = await this.DMService.getMessageLogByRoomId(
+			roomId,
+			clientUserId,
+		)
 		socket.emit('getMessageLog', messageLog)
 	}
 
@@ -62,8 +69,15 @@ export class DMGateway {
 	@UseGuards(SocketGuard)
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.data.userId}`)
-		const rooms = await this.DMService.getRoomsByUserId(socket.data.userId)
-		socket.emit('getRooms', rooms)
+		const clientUserId = socket.data.userId
+		const rooms = await this.DMService.getRoomsByUserId(clientUserId)
+		let DMObjectsForFront: DMObject[] = []
+		rooms.map((room) => {
+			DMObjectsForFront.push(
+				this.createDMObjectForFront(room, clientUserId),
+			)
+		})
+		socket.emit('getRooms', DMObjectsForFront)
 	}
 
 	// room which user is watching
@@ -75,10 +89,21 @@ export class DMGateway {
 	) {
 		this.logger.log(`watchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
+		const clientUserId = socket.data.userId
 		if (rooms.length == 2) socket.leave(rooms[1])
+		const room: DMRawData = await this.DMService.getRoomByRoomId(roomId)
+		if (
+			!room ||
+			(room.user1id != clientUserId && room.user2id != clientUserId)
+		) {
+			throw new WsException('Room Not Found')
+		}
 		socket.join(roomId)
-		const room = await this.DMService.getRoomByRoomId(roomId)
-		socket.emit('watchRoom', room)
+		const DMObjectForFront: DMObject = this.createDMObjectForFront(
+			room,
+			clientUserId,
+		)
+		socket.emit('watchRoom', DMObjectForFront)
 	}
 
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
@@ -89,24 +114,42 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`createRoom called for ${username}`)
-		const selfUserId = socket.data.userId
-		const userId = await this.DMService.getUserIdByUsername(username)
-		const existingRoom = await this.DMService.getRoomByUserIds(
+		const clientUserId = socket.data.userId
+		const userId: string = await this.DMService.getUserIdByUsername(
+			username,
+		)
+		const existingRoom: DMRoom = await this.DMService.getRoomByUserIds(
 			userId,
-			selfUserId,
+			clientUserId,
 		)
 		if (existingRoom) {
-			const DMRoom = await this.DMService.getRoomByRoomId(existingRoom.id)
-			socket.emit('updateRoom', DMRoom)
+			const DMRoom: DMRawData = await this.DMService.getRoomByRoomId(
+				existingRoom.id,
+			)
+			const DMObjectForFront: DMObject = this.createDMObjectForFront(
+				DMRoom,
+				clientUserId,
+			)
+			socket.emit('updateRoom', DMObjectForFront)
 			return
 		}
-		const createdRoom = await this.DMService.createRoomByUserIds(
+		const createdRoom: DMRoom = await this.DMService.createRoomByUserIds(
 			userId,
-			selfUserId,
+			clientUserId,
 		)
-		const newDMRoom = await this.DMService.getRoomByRoomId(createdRoom.id)
-		socket.emit('updateRoom', newDMRoom)
-		this.sendAddRoomByUserId(socket, userId, newDMRoom)
+		const newDMRoom: DMRawData = await this.DMService.getRoomByRoomId(
+			createdRoom.id,
+		)
+		const DMObjectForClient: DMObject = this.createDMObjectForFront(
+			newDMRoom,
+			clientUserId,
+		)
+		socket.emit('updateRoom', DMObjectForClient)
+		const DMObjectForOther: DMObject = this.createDMObjectForFront(
+			newDMRoom,
+			userId,
+		)
+		this.sendAddRoomByUserId(socket, userId, DMObjectForOther)
 	}
 
 	@SubscribeMessage('getRoomIdByUserIds')
@@ -118,22 +161,26 @@ export class DMGateway {
 		this.logger.log(
 			`getRoomIdByUserIds: for ${socket.data.userId} and ${userId}`,
 		)
-		let room = await this.DMService.getRoomByUserIds(
-			socket.data.userId,
-			userId,
-		)
+		const clientUserId = socket.data.userId
+		let room = await this.DMService.getRoomByUserIds(clientUserId, userId)
 		if (!room) {
 			room = await this.DMService.createRoomByUserIds(
 				userId,
-				socket.data.userId,
+				clientUserId,
 			)
-			const newDMRoom = await this.DMService.getRoomByRoomId(room.id)
-			this.sendAddRoomByUserId(socket, userId, newDMRoom)
+			const newDMRoom: DMRawData = await this.DMService.getRoomByRoomId(
+				room.id,
+			)
+			const DMObjectForFront: DMObject = this.createDMObjectForFront(
+				newDMRoom,
+				userId,
+			)
+			this.sendAddRoomByUserId(socket, userId, DMObjectForFront)
 		}
 		socket.emit('getRoomIdByUserIds', room.id)
 	}
 
-	sendAddRoomByUserId(socket: Socket, userId: string, newDMRoom: any) {
+	sendAddRoomByUserId(socket: Socket, userId: string, newDMRoom: DMObject) {
 		this.logger.log('sendAddRoomByUserId called')
 		if (socket.nsp.sockets) {
 			socket.nsp.sockets.forEach((value: Socket) => {
@@ -143,6 +190,22 @@ export class DMGateway {
 				}
 			})
 		}
+	}
+
+	createDMObjectForFront(room: DMRawData, userIdToSend: string): DMObject {
+		let name = room.user1
+		let userId = room.user1id
+		if (userId === userIdToSend) {
+			name = room.user2
+			userId = room.user2id
+		}
+		const DMObjectForFront: DMObject = {
+			id: room.id,
+			name,
+			userId,
+		}
+		console.log(userId, room, DMObjectForFront)
+		return DMObjectForFront
 	}
 }
 

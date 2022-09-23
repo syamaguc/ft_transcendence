@@ -12,10 +12,8 @@ import {
   ModalFooter,
   useDisclosure,
   useColorModeValue,
-  useToast,
 } from '@chakra-ui/react'
-import { useRouter } from 'next/router'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Socket } from 'socket.io-client'
 
 type Props = {
@@ -24,9 +22,6 @@ type Props = {
 
 const DMCreationForm = ({ socket }: Props) => {
   const userNameInputRef = useRef<HTMLInputElement>()
-  const router = useRouter()
-  const toast = useToast()
-  const didLogRef = useRef(false)
 
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -34,22 +29,6 @@ const DMCreationForm = ({ socket }: Props) => {
     console.log('onClickCreate called', enteredUserName)
     socket.emit('createRoom', enteredUserName)
   }
-
-  useEffect(() => {
-    if (didLogRef.current === false) {
-      didLogRef.current = true
-      socket.on('exception', ({ status, message }) => {
-        console.log(status, message)
-        toast({
-          description: message,
-          status: status,
-          duration: 5000,
-          isClosable: true,
-        })
-      })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
