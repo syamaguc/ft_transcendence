@@ -16,6 +16,7 @@ import UserStatusInfo from '@components/user-status-info'
 import UserStatistics from '@components/user-statistics'
 import MatchHistory from '@components/match-history'
 import UserActions from '@components/user-actions'
+import GameInvite from '@components/game-invite'
 
 function UserDetail() {
   const router = useRouter()
@@ -51,7 +52,7 @@ function UserDetail() {
                 <MatchHistory user={user} />
                 <Stack direction='row'>
                   <UserActions user={user} />
-                  <Button>Invite</Button>
+                  <GameInvite user={user} router={router} />
                 </Stack>
               </Stack>
             )}

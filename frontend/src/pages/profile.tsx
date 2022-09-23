@@ -197,10 +197,16 @@ function TwoFactorAuth() {
               <Text>
                 Open the Google Authenticator app and scan this QR code.
               </Text>
-              {qrCodeUrl && (
-                <ChakraNextImage src={qrCodeUrl} width='300px' height='300px' />
-              )}
-              {!qrCodeUrl && <Text>{htmlText}</Text>}
+              <Stack align='center'>
+                {qrCodeUrl && (
+                  <ChakraNextImage
+                    src={qrCodeUrl}
+                    width='300px'
+                    height='300px'
+                  />
+                )}
+                {!qrCodeUrl && <Text>{htmlText}</Text>}
+              </Stack>
               <FormControl
                 mt={4}
                 isInvalid={

@@ -17,7 +17,11 @@ const DMSideBar = ({ socket, router }: Props) => {
   const [DMRooms, setDMRooms] = useState<DMObject[]>([])
   const [newDMRoom, setnewDMRoom] = useState<DMObject>()
   const didLogRef = useRef(false)
-  const { user } = useUser()
+  const { user: currentUser } = useUser()
+
+  const isNotBlocked = (element: DMObject) => {
+    return currentUser.blockedUsers.indexOf(element.userId) === -1
+  }
 
   useEffect(() => {
     if (didLogRef.current === false) {
@@ -76,7 +80,7 @@ const DMSideBar = ({ socket, router }: Props) => {
       </Flex>
       <Flex width='100%' p={2} direction='column'>
         {DMRooms.length
-          ? DMRooms.map((DMRoom: DMObject) => (
+          ? DMRooms.filter(isNotBlocked).map((DMRoom: DMObject) => (
               <Flex
                 as='button'
                 p={3}
@@ -88,7 +92,7 @@ const DMSideBar = ({ socket, router }: Props) => {
                 }}
                 key={DMRoom.id}
               >
-                {DMRoom.user1 == user.username ? DMRoom.user2 : DMRoom.user1}
+                {DMRoom.name}
               </Flex>
             ))
           : null}

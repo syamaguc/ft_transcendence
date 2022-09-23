@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { AddMessageDto } from './dto/chat-property.dto'
 import { Message } from './entities/message.entity'
-import { v4 as uuidv4 } from 'uuid'
+import { v4 as uuidv4, validate as isValidUUID } from 'uuid'
 import { DMRoom } from './entities/dm-room.entity'
 import { Repository } from 'typeorm'
 import { messageRepository } from './message.repository'
 import { User } from 'src/user/entities/user.entity'
 import { UsersRepository } from 'src/user/user.repository'
 import { WsException } from '@nestjs/websockets'
+import { DMRawData } from './interfaces/dm.interface'
 
 @Injectable()
 export class DMService {
@@ -64,19 +65,35 @@ export class DMService {
 		return messageRepository.addMessage(message)
 	}
 
-	async getMessageLogByRoomId(roomId: string): Promise<any> {
+	async getMessageLogByRoomId(
+		roomId: string,
+		clientUserId: string,
+	): Promise<any> {
+		if (!isValidUUID(roomId)) throw new WsException('Room Not Found')
+		const room: DMRoom = await this.DMRoomRepository.findOne({
+			where: { id: roomId },
+		})
+		if (
+			!room ||
+			(room.memberA != clientUserId && room.memberB != clientUserId)
+		) {
+			throw new WsException('Room Not Found')
+		}
 		const messagesWithUserInfo = await messageRepository.getDMMessages(
 			roomId,
 		)
 		return messagesWithUserInfo
 	}
 
-	async getRoomByRoomId(roomId: string): Promise<any[]> {
+	async getRoomByRoomId(roomId: string): Promise<DMRawData> {
+		if (!isValidUUID(roomId)) throw new WsException('Room Not Found')
 		const room = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
 				'userA.username AS user1',
+				'userA.userId AS user1id',
 				'userB.username AS user2',
+				'userB.userId AS user2id',
 			])
 			.where('dm.id = :roomId', { roomId })
 			.innerJoin(User, 'userA', 'dm.memberA = userA.userId')
@@ -85,12 +102,14 @@ export class DMService {
 		return room
 	}
 
-	async getRoomsByUserId(userId: string): Promise<any[]> {
+	async getRoomsByUserId(userId: string): Promise<DMRawData[]> {
 		const rooms = await this.DMRoomRepository.createQueryBuilder('dm')
 			.select([
 				'dm.id AS id',
 				'userA.username AS user1',
+				'userA.userId AS user1id',
 				'userB.username AS user2',
+				'userB.userId AS user2id',
 			])
 			.orderBy('dm.time_created', 'DESC')
 			.where('dm.memberA = :userId', { userId })
