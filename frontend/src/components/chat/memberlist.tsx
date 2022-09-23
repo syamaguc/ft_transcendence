@@ -17,6 +17,7 @@ import {
   ModalCloseButton,
   useDisclosure,
   IconButton,
+  Badge,
 } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { Avatar } from '@chakra-ui/avatar'
@@ -28,21 +29,18 @@ import { useUser } from 'src/lib/use-user'
 const API_URL = 'http://localhost:3000'
 
 function MemberStatus({ user, currentRoom, member }) {
-  if (user.user.userId == member.userId) {
-    return (
-      <>
-        <Text ml={1}>me</Text>
-      </>
-    )
-  }
-  if (currentRoom.admins.indexOf(member.userId) != -1) {
-    return (
-      <>
-        <Text ml={1}>admin</Text>
-      </>
-    )
-  }
-  return null
+  return (
+    <Stack spacing='1' direction='row'>
+      {(user.user.userId == member.userId) && (
+        <Badge colorScheme='green'>me</Badge>
+      )}
+      {(currentRoom.admins.includes(member.userId)) && (
+        <Badge colorScheme='orange'>admin</Badge>
+      )}
+      {(currentRoom.owner == member.userId) && (
+        <Badge colorScheme='purple'>owner</Badge>
+      )}
+    </Stack>)
 }
 
 function MemberMenu({ socket, user, currentRoom, member }) {
@@ -116,8 +114,10 @@ function MemberList({ socket, currentRoom, members }) {
             src={`${API_URL}/api/user/avatar/${member.profile_picture}`}
             marginEnd={3}
           />
-          <Text>{member.username}</Text>
-          <MemberStatus user={user} currentRoom={currentRoom} member={member} />
+          <Box>
+            <MemberStatus user={user} currentRoom={currentRoom} member={member} />
+            <Text>{member.username}</Text>
+          </Box>
           <MemberMenu
             socket={socket}
             user={user}
