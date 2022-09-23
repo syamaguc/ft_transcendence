@@ -61,12 +61,7 @@ const DMCreationForm = ({ socket }: Props) => {
             </ModalBody>
 
             <ModalFooter>
-              <Button
-                colorScheme='blue'
-                mr={3}
-                type='submit'
-                onClick={onClose}
-              >
+              <Button colorScheme='blue' mr={3} type='submit' onClick={onClose}>
                 Create DM
               </Button>
             </ModalFooter>
