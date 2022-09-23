@@ -282,10 +282,16 @@ export default function UserBasicInfo({ user, router }: UserBasicInfoProps) {
           status = 'success'
         } else if (res.status === 400) {
           const data = await res.json()
-          message =
-            typeof data.message === 'object'
-              ? data.message[0]
-              : 'Internal error occurred'
+          if (typeof data.message === 'string') {
+            message =
+              modalField === 'username'
+                ? 'username already exists'
+                : 'email already exists'
+          } else if (typeof data.message === 'object') {
+            message = data.message[0]
+          } else {
+            message = 'Internal error occurred'
+          }
         } else if (res.status === 403) {
           const data = await res.json()
           message =
