@@ -1,14 +1,8 @@
 import {
   Avatar,
-  AvatarBadge,
-  AvatarBadgeProps,
-  Badge,
-  Box,
   Button,
-  Container,
   Divider,
   Heading,
-  Flex,
   FormControl,
   FormLabel,
   FormErrorMessage,
@@ -23,23 +17,13 @@ import {
   ModalCloseButton,
   ModalBody,
   ModalFooter,
-  Spacer,
-  Skeleton,
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import {
-  useState,
-  useEffect,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-} from 'react'
-import { FiFile } from 'react-icons/fi'
+import { useState, useEffect, forwardRef } from 'react'
 
-import ChakraNextImage from '@components/chakra-next-image'
 import UserStatusBadge from '@components/user-status-badge'
-import UserStatusInfo from '@components/user-status-info'
+import { NextRouter } from 'next/router'
 
 import NextLink from 'next/link'
 import { useFormik, FormikErrors } from 'formik'
@@ -49,6 +33,9 @@ import { fetchPartialUserInfo, fetchText } from 'src/lib/fetchers'
 import { User, PartialUserInfo, GameHistory } from 'src/types/user'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
+
+import UserActions from '@components/user-actions'
+import GameInvite from '@components/game-invite'
 
 type PreviewProps = {
   user: User
@@ -222,9 +209,10 @@ interface BasicInfoFormValues {
 
 type UserBasicInfoProps = {
   user: User
+  router: NextRouter
 }
 
-export default function UserBasicInfo({ user }: UserBasicInfoProps) {
+export default function UserBasicInfo({ user, router }: UserBasicInfoProps) {
   const avatarForm = useDisclosure()
   const { user: currentUser, mutateUser } = useUser()
   const toast = useToast()
@@ -378,6 +366,12 @@ export default function UserBasicInfo({ user }: UserBasicInfoProps) {
                 onClose={avatarForm.onClose}
               />
             </>
+          )}
+          {!isCurrentUser && (
+            <Stack direction='row'>
+              <UserActions user={user} />
+              <GameInvite user={user} router={router} />
+            </Stack>
           )}
         </Stack>
       </Stack>

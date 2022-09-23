@@ -3,6 +3,7 @@ import { Avatar } from '@chakra-ui/avatar'
 import { MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from './profile-modal'
+import MessageIcon from './message-icon'
 import AlwaysScrollToBottom from './always-scroll-bottom'
 
 const API_URL = 'http://localhost:3000'
@@ -36,7 +37,7 @@ const MessageFilter = ({ currentRoom, message }) => {
   //else
   return (
     <Flex key={message.id} m={4} align='flex-start'>
-      <ProfileModal message={message} />
+      <MessageIcon message={message} />
       <Flex direction='column' maxW='90%'>
         <Flex align='flex-end'>
           <Text as='b' marginEnd={2}>
