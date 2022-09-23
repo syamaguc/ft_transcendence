@@ -48,8 +48,7 @@ const Chat = () => {
 
   useEffect(() => {
     if (!socket) return
-    socket.on('connect', () => {
-    })
+    socket.on('connect', () => {})
     socket.on('updateNewMessage', (message: MessageObject) => {
       setMsg(message)
     })

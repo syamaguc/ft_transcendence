@@ -324,4 +324,3 @@ export class ChatGateway {
 		this.server.to(room.id).emit('updateRoom', room)
 	}
 }
-

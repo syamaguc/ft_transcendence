@@ -25,8 +25,7 @@ const Chat = () => {
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
-      socket.on('connect', () => {
-      })
+      socket.on('connect', () => {})
       socket.on('updateNewMessage', (message: MessageObject) => {
         setMsg(message)
       })
