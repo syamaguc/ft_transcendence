@@ -22,6 +22,7 @@ import {
 
 import { useFormik, FormikErrors } from 'formik'
 import useSWR from 'swr'
+import { useRouter } from 'next/router'
 
 import { fetchText } from 'src/lib/fetchers'
 import { API_URL } from 'src/constants'
@@ -37,6 +38,7 @@ import MatchHistory from '@components/match-history'
 
 export default function Profile() {
   const { user } = useUser()
+  const router = useRouter()
 
   return (
     <Layout>
@@ -47,7 +49,7 @@ export default function Profile() {
               Profile
             </Heading>
             <Stack spacing='8'>
-              <UserBasicInfo user={user} />
+              <UserBasicInfo user={user} router={router} />
               <UserStatusInfo user={user} />
               <TwoFactorAuth />
               <UserStatistics user={user} />
