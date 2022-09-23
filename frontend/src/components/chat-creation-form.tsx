@@ -102,15 +102,15 @@ const ChatCreationForm = ({ socket }: Props) => {
       if (!enteredChannelName) return
       if (enteredIsProtected == true && enteredIsPrivate == false) {
         enteredPassword = passwordInputRef.current.value
-      }
-      if (!enteredPassword || /\s/g.test(enteredPassword)) {
-        toast({
-          description: 'Password cannot be empty or contain whitespace',
-          status: 'error',
-          duration: 5000,
-          isClosable: true,
-        })
-        return
+        if (!enteredPassword || /\s/g.test(enteredPassword)) {
+          toast({
+            description: 'Password cannot be empty or contain whitespace',
+            status: 'error',
+            duration: 5000,
+            isClosable: true,
+          })
+          return
+        }
       }
 
       const enterdData: CreateChatRoomDto = {
