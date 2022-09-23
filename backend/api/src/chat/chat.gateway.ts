@@ -60,6 +60,24 @@ export class ChatGateway {
 		this.updateRoom(newRoom)
 	}
 
+	leaveBanUser(socket: Socket, userId: string, room: ChatRoom) {
+		if (socket.nsp.sockets) {
+			socket.nsp.sockets.forEach((value: Socket) => {
+				if (value.data.userId == userId) {
+					//leave protected room
+					if (room.password) {
+						this.unwatchRoom(room.id, value)
+					}
+					//leave private room
+					if (room.is_private) {
+						this.unwatchRoom(room.id, value)
+						socket.to(value.id).emit('leavePrivateRoom')
+					}
+				}
+			})
+		}
+	}
+
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('banMember')
 	async banUser(
@@ -69,8 +87,15 @@ export class ChatGateway {
 		const room = [...socket.rooms].slice(0)[1]
 		this.logger.log(`banUser: recieved [${userId}] to room[${room}]`)
 		const newRoom = await this.chatService.banUser(userId, room)
-		//update the channel info
+
+		// refresh the user's room list (don't show private rooms)
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket)
+		if (tmp) {
+			const rooms = await this.chatService.getRooms(tmp)
+			tmp.emit('getRooms', rooms)
+		}
 		this.updateRoom(newRoom)
+		this.leaveBanUser(socket, userId, newRoom)
 	}
 
 	@UseGuards(SocketGuard)
@@ -114,15 +139,15 @@ export class ChatGateway {
 	@SubscribeMessage('getRooms')
 	async getRooms(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`getRooms: for ${socket.id}`)
-		const rooms = await this.chatService.getRooms()
-		const emitRooms: ChatRoom[] = []
-		for (let i = 0; i < rooms.length; i++) {
-			const room = rooms[i]
-			if (!room.is_private || room.members.includes(socket.data.userId)) {
-				emitRooms.push(room)
-			}
-		}
-		socket.emit('getRooms', emitRooms)
+		const rooms = await this.chatService.getRooms(socket)
+		// const emitRooms: ChatRoom[] = []
+		// for (let i = 0; i < rooms.length; i++) {
+		// 	const room = rooms[i]
+		// 	if (!room.is_private || room.members.includes(socket.data.userId)) {
+		// 		emitRooms.push(room)
+		// 	}
+		// }
+		socket.emit('getRooms', rooms)
 	}
 
 	@UseGuards(SocketGuard)
@@ -159,6 +184,36 @@ export class ChatGateway {
 		this.logger.log(`unwatchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
 		if (rooms.length == 2) socket.leave(rooms[1])
+	}
+
+	@UseGuards(SocketGuard)
+	@SubscribeMessage('inviteMember')
+	async inviteMember(
+		@MessageBody() userId: string,
+		@ConnectedSocket() socket: Socket,
+	) {
+		const room = [...socket.rooms].slice(0)[1]
+		this.logger.log(`inviteMember: recieved [${userId}] to room[${room}]`)
+		const newRoom = await this.chatService.inviteMember(userId, room)
+		// find the user's socket
+		// let tmp: Socket
+		// if (socket.nsp.sockets) {
+		// 	socket.nsp.sockets.forEach((value: Socket) => {
+		// 		if (value.data.userId == userId) {
+		// 			tmp = value
+		// 		}
+		// 	})
+		// }
+		const tmp: Socket = this.chatService.findSocketUserId(userId, socket)
+		// refresh the user's room list
+		if (tmp) {
+			const rooms = await this.chatService.getRooms(tmp)
+			tmp.emit('getRooms', rooms)
+		}
+		//update the member list
+		this.getMembers(room, socket)
+		//update the channel info
+		this.updateRoom(newRoom)
 	}
 
 	@UseGuards(SocketGuard)
@@ -214,8 +269,14 @@ export class ChatGateway {
 			roomId,
 		)
 		this.updateRoom(room)
+		//leave protected room
 		if (room.password) {
 			this.unwatchRoom(roomId, socket)
+		}
+		//leave private room
+		if (room.is_private) {
+			this.unwatchRoom(roomId, socket)
+			socket.emit('leavePrivateRoom')
 		}
 	}
 
