@@ -4,8 +4,8 @@ services:
     container_name: api
     build:
       context: ./backend/api/
-      dockerfile: Dockerfile.dev
-      # dockerfile: Dockerfile.prod
+        # dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile.prod
     tty: true
     ports:
       - 3000:3000
