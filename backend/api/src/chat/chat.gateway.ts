@@ -5,6 +5,8 @@ import {
 	MessageBody,
 	ConnectedSocket,
 } from '@nestjs/websockets'
+import { ValidationPipe, UsePipes } from '@nestjs/common'
+
 import { Logger } from '@nestjs/common'
 import { UseGuards } from '@nestjs/common'
 import { Server, Socket } from 'socket.io'
@@ -13,7 +15,9 @@ import { AddMessageDto, CreateChatRoomDto } from './dto/chat-property.dto'
 import { ChatService } from './chat.service'
 import { Message } from './entities/message.entity'
 import { ChatRoom } from './entities/chat-room.entity'
+import { ArgumentsHost, Catch, HttpException } from '@nestjs/common'
 import { WsException } from '@nestjs/websockets'
+import { UseFilters } from '@nestjs/common'
 
 @WebSocketGateway({ namespace: '/chat', cors: { origin: '*' } })
 export class ChatGateway {
@@ -283,6 +287,14 @@ export class ChatGateway {
 	/* also join to a created room. Frontend has to update the room to newly returned room*/
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('createRoom')
+	//@UsePipes(new ValidationPipe())
+	@UsePipes(
+		new ValidationPipe({
+			exceptionFactory() {
+				return new WsException('invalid channel name')
+			},
+		}),
+	)
 	async createRoom(
 		@MessageBody() createChatRoomDto: CreateChatRoomDto,
 		@ConnectedSocket() socket: Socket,
