@@ -18,8 +18,7 @@ const barBaseWidth = 50
 const ballBaseSize = 50
 const ballSpeed = 20
 const barSpeed = 20
-// const settingTime = 30
-const settingTime = 10
+const settingTime = 30
 
 class BallDirection {
 	ballRadian: number
