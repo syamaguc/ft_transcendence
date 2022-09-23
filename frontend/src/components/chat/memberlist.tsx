@@ -18,6 +18,7 @@ import {
   useDisclosure,
   IconButton,
   Badge,
+  Spacer,
 } from '@chakra-ui/react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { Avatar } from '@chakra-ui/avatar'
@@ -145,6 +146,7 @@ function FriendList({ socket, friends, members }) {
       {friends.map((friend) => (
         <Stack direction='row' align='center' key={friend.userId}>
           <Text>{friend.username}</Text>
+          <Spacer />
           <Button
             onClick={() => {
               onClickInvite(friend.userId)
