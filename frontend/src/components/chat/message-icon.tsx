@@ -2,7 +2,14 @@ import {
   Text,
   Flex,
   Stack,
+  Box,
+  BoxProps,
   Button,
+  Tooltip,
+  Circle,
+  Grid,
+  GridItem,
+  Image,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -21,7 +28,7 @@ import {
   PopoverAnchor,
   useDisclosure,
 } from '@chakra-ui/react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { Avatar } from '@chakra-ui/avatar'
 import { useUser } from 'src/lib/use-user'
@@ -34,6 +41,9 @@ import { Socket } from 'net'
 import useSWR from 'swr'
 import { fetchUserInfo } from 'src/lib/fetchers'
 import UserStatusBadge from '@components/user-status-badge'
+import UserBasicInfo from '@components/user-basic-info'
+import UserStatistics from '@components/user-statistics'
+import MatchHistory from '@components/match-history'
 
 import { API_URL } from 'src/constants'
 
@@ -42,6 +52,8 @@ type MessageIconProps = {
 }
 const MessageIcon = ({ message }: MessageIconProps) => {
   const [user, setUser] = useState<User>()
+  const popover = useDisclosure()
+  const modal = useDisclosure()
   const [overlay, setOverlay] = useState(false)
   const router = useRouter()
 
@@ -71,19 +83,25 @@ const MessageIcon = ({ message }: MessageIconProps) => {
         <PopoverContent>
           {user && (
             <PopoverBody>
-              <Stack
-                direction='row'
-                align='start'
-                // py='2'
-                // px='2'
-              >
-                <Avatar
-                  size='lg'
-                  src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
-                  mr='12px'
+              <Stack direction='row' align='start' py='2' px='2'>
+                <Tooltip
+                  label='View profile'
+                  placement='bottom'
+                  hasArrow
+                  arrowSize={6}
+                  borderRadius='base'
                 >
-                  <UserStatusBadge boxSize='1em' status={user.status} />
-                </Avatar>
+                  <Avatar
+                    size='lg'
+                    src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                    mr='12px'
+                    _hover={{ cursor: 'pointer', opacity: '0.8' }}
+                    // onClick={() => router.push(`/users/${user.username}`)}
+                    onClick={modal.onOpen}
+                  >
+                    <UserStatusBadge boxSize='1em' status={user.status} />
+                  </Avatar>
+                </Tooltip>
                 <Flex direction='row' align='center' w='full'>
                   <Stack spacing='2'>
                     <Stack direction='column' spacing='0'>
@@ -94,13 +112,10 @@ const MessageIcon = ({ message }: MessageIconProps) => {
                         {user.status}
                       </Text>
                     </Stack>
-                    <Stack direction='column'>
-                      <Button
-                        size='sm'
-                        onClick={() => router.push(`/users/${user.username}`)}
-                      >
-                        View profile
-                      </Button>
+                    <Stack direction='row'>
+                      <Button size='xs'>Add friend</Button>
+                      <Button size='xs'>Block</Button>
+                      <Button size='xs'>Invite</Button>
                     </Stack>
                   </Stack>
                 </Flex>
@@ -109,7 +124,64 @@ const MessageIcon = ({ message }: MessageIconProps) => {
           )}
         </PopoverContent>
       </Popover>
+      <Modal size='xl' onClose={modal.onClose} isOpen={modal.isOpen} isCentered>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalBody>
+            {user && (
+              <Stack>
+                <Stack
+                  borderRadius='xl'
+                  direction='row'
+                  spacing='8'
+                  align='start'
+                  py='4'
+                  px='0'
+                  mx='8'
+                >
+                  <Avatar
+                    size='xl'
+                    src={`${API_URL}/api/user/avatar/${user.profile_picture}`}
+                  >
+                    <UserStatusBadge boxSize='0.9em' status={user.status} />
+                  </Avatar>
+                  <Stack direction='column' spacing='2'>
+                    <Text fontWeight='600' fontSize='2xl' mt='2'>
+                      {user.username}
+                    </Text>
+                    <Stack direction='row'>
+                      <Button size='sm'>Add friend</Button>
+                      <Button size='sm'>Block</Button>
+                      <Button size='sm'>Invite</Button>
+                    </Stack>
+                  </Stack>
+                </Stack>
+                <UserStatistics user={user} />
+                <ScrollView maxH='40vh'>
+                  <MatchHistory user={user} />
+                </ScrollView>
+              </Stack>
+            )}
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </>
+  )
+}
+
+const ScrollView = (props: BoxProps) => {
+  const ref = useRef<any>()
+
+  return (
+    <Box
+      ref={ref}
+      flex='1'
+      id='routes'
+      overflow='auto'
+      // px='6'
+      // pb='6'
+      {...props}
+    />
   )
 }
 
