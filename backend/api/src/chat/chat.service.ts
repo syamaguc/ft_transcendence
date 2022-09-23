@@ -234,7 +234,7 @@ export class ChatService {
 	}
 
 	async leaveRoom(userId: string, roomId: string): Promise<ChatRoom> {
-		let room: ChatRoom = await chatRepository.findId(roomId)
+		const room: ChatRoom = await chatRepository.findId(roomId)
 
 		const membersIndex = room.members.indexOf(userId)
 		if (membersIndex != -1) {

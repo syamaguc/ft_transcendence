@@ -90,7 +90,8 @@ const ChatCreationForm = ({ socket }: Props) => {
       const enteredIsPrivate = isPrivateInputRef.current.checked
       const enteredIsProtected = isProtectedInputRef.current.checked
       let enteredPassword = ''
-      if (enteredIsProtected == true) {
+      if (!enteredChannelName) return
+      if (enteredIsProtected == true && enteredIsPrivate == false) {
         enteredPassword = passwordInputRef.current.value
       }
       console.log(

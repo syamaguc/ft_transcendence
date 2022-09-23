@@ -10,22 +10,9 @@ import { User } from 'src/types/user'
 
 type DMTopBarProps = {
   currentRoom: DMObject
-  user: User
 }
 
-const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
-  const [roomName, setRoomName] = useState<string>('')
-
-  useEffect(() => {
-    if (currentRoom) {
-      setRoomName(
-        currentRoom.user1 == user.username
-          ? currentRoom.user2
-          : currentRoom.user1
-      )
-    }
-  }, [currentRoom, user])
-
+const DMTopBar = ({ currentRoom }: DMTopBarProps) => {
   return (
     <Flex
       h='55px'
@@ -34,7 +21,7 @@ const DMTopBar = ({ currentRoom, user }: DMTopBarProps) => {
       p={4}
       align='center'
     >
-      <Text>@ {roomName}</Text>
+      <Text>@ {currentRoom && currentRoom.name}</Text>
     </Flex>
   )
 }
@@ -74,6 +61,31 @@ const DMSendBox = ({ socket }) => {
   )
 }
 
+const FakeDMSendBox = ({ currentRoom }) => {
+  let placeholder = ''
+  if (currentRoom) {
+    placeholder = 'You cannot send messages to a user you have blocked.'
+  }
+
+  return (
+    <>
+      <Textarea
+        isDisabled
+        placeholder={placeholder}
+        minH='unset'
+        overflow='hidden'
+        w='100%'
+        minRows={1}
+        maxRows={10}
+        as={ResizeTextarea}
+      />
+      <Button isDisabled ml={3} px={6} type='submit'>
+        Send
+      </Button>
+    </>
+  )
+}
+
 type DMContentProps = {
   socket: Socket
   roomId: string
@@ -84,8 +96,11 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
   const [chatLog, setChatLog] = useState<MessageObject[]>([])
   const [msg, setMsg] = useState<MessageObject>()
   const [currentRoom, setCurrentRoom] = useState<DMObject>()
-  const { user } = useUser()
+  const { user: currentUser } = useUser()
 
+  const isNotBlocked = (element: DMObject) => {
+    return currentUser.blockedUsers.indexOf(element.userId) === -1
+  }
   useEffect(() => {
     if (didLogRef.current === false) {
       didLogRef.current = true
@@ -122,10 +137,14 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
 
   return (
     <>
-      <DMTopBar currentRoom={currentRoom} user={user} />
+      <DMTopBar currentRoom={currentRoom} />
       <DmMiddleBar chatLog={chatLog} />
       <Flex p={4}>
-        <DMSendBox socket={socket} />
+        {currentRoom && isNotBlocked(currentRoom) ? (
+          <DMSendBox socket={socket} />
+        ) : (
+          <FakeDMSendBox currentRoom={currentRoom} />
+        )}
       </Flex>
     </>
   )

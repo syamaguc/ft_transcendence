@@ -9,8 +9,6 @@ export async function setSession(session: Session) {
     body: JSON.stringify(session),
   })
 
-  console.log('setSession: ', res)
-
   if (!res.ok) {
     console.error('Failed to set isFirstTime')
   }
@@ -60,17 +58,12 @@ export async function getSession(): Promise<Session> {
 export async function setIsFirstTime(toggle: boolean) {
   const session = await getSession()
 
-  console.log('setIsFirstTime: before', session)
   const didTwoFactorAuth =
     typeof session?.didTwoFactorAuth === 'boolean'
       ? session.didTwoFactorAuth
       : false
 
   const res = await setSession({
-    isFirstTime: toggle,
-    didTwoFactorAuth: didTwoFactorAuth,
-  })
-  console.log('setIsFirstTime: after', {
     isFirstTime: toggle,
     didTwoFactorAuth: didTwoFactorAuth,
   })
@@ -83,15 +76,10 @@ export async function setIsFirstTime(toggle: boolean) {
 export async function setDidTwoFactorAuth(toggle: boolean) {
   const session = await getSession()
 
-  console.log('setDidTwoFactorAuth: before', session)
   const isFirstTime =
     typeof session?.isFirstTime === 'boolean' ? session.isFirstTime : false
 
   const res = await setSession({
-    isFirstTime: isFirstTime,
-    didTwoFactorAuth: toggle,
-  })
-  console.log('setDidTwoFactorAuth: after', {
     isFirstTime: isFirstTime,
     didTwoFactorAuth: toggle,
   })

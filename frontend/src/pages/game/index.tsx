@@ -1,4 +1,5 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react'
+import { useToast } from '@chakra-ui/react'
 import io from 'socket.io-client'
 import { useRouter } from 'next/router'
 import { Center, Flex } from '@chakra-ui/react'
@@ -20,6 +21,7 @@ export default function GameMatching() {
   const [gameRoomsLog, setGameRoomsLog] = useState(false)
   const [myGameRoomId, setMyGameRoomId] = useState()
   const [deleteRoomId, setDeleteRoomId] = useState()
+  const toast = useToast()
 
   useEffect(() => {
     if (user) setUserId(user['userId'])
@@ -39,7 +41,7 @@ export default function GameMatching() {
   const matching = useCallback(() => {
     if (!server || !userId) return
     changeButton(1)
-    server.emit('registerMatch', { userId: userId })
+    server.emit('registerMatch')
   }, [server, userId])
 
   const cancel = useCallback(() => {
@@ -70,7 +72,7 @@ export default function GameMatching() {
   }, [])
 
   useEffect(() => {
-    if (!server || !router.isReady || gameRoomsLog || !userId) return
+    if (!server || !router.isReady || gameRoomsLog || !userId || !toast) return
     server.on('goGameRoom', (data: string) => {
       router.push('/game/' + data)
     })
@@ -84,15 +86,24 @@ export default function GameMatching() {
       const status = data['status']
       if (status == 1) {
         changeButton(1)
-        server.emit('registerMatch', { userId: userId })
+        server.emit('registerMatch')
       } else if (status == 2) {
         setMyGameRoomId(data['gameRoomId'])
         changeButton(2)
       }
     })
 
-    server.emit('readyGameIndex', { userId: userId })
-  }, [gameRoomsLog, server, router, userId])
+    server.on('exception', ({ status, message }) => {
+      toast({
+        description: message,
+        status: status,
+        duration: 5000,
+        isClosable: true,
+      })
+    })
+
+    server.emit('readyGameIndex')
+  }, [gameRoomsLog, server, router, userId, toast])
 
   useEffect(() => {
     if (!gameRoomsLog) return
