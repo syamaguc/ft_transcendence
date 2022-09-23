@@ -1,12 +1,20 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm'
 // import { MessageI } from "../interface/message.interface"
 import { Message } from './message.entity'
+import {
+	IsNotEmpty,
+	MinLength,
+	MaxLength,
+	IsAlphanumeric,
+} from 'class-validator'
 
 @Entity()
 export class ChatRoom {
 	@PrimaryGeneratedColumn('uuid')
 	id: string
 
+  @IsNotEmpty()
+  @IsAlphanumeric()
 	@Column('text', { default: '' })
 	name: string
 
