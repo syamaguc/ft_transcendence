@@ -114,38 +114,31 @@ const SideBar = ({
   useEffect(() => {
     if (!socket) return
     socket.on('getMessageLog', (messageLog: MessageObject[]) => {
-      console.log('messageLog loaded', messageLog)
       setChatLog(messageLog)
     })
     socket.on('getRooms', (rooms: ChannelObject[]) => {
       setChatRooms(rooms)
     })
     socket.on('updateRoom', (channel: ChannelObject) => {
-      console.log('updateRoom received : ', channel)
       setRoom(channel)
     })
     socket.on('updateRoomDelete', (channel: ChannelObject) => {
-      console.log('updateRoomDelete received : ', channel)
       setRoom(channel)
       setDeleteFlag(true)
     })
     socket.on('deleteRoom', () => {
-      console.log('deleteRoom received ')
       setCurrentRoom(DEFAULT_ROOM)
       setChatLog([])
     })
     socket.on('leavePrivateRoom', () => {
-      console.log('leavePrivateRoom received')
       socket.emit('getRooms')
       setCurrentRoom(DEFAULT_ROOM)
       setChatLog([])
     })
     socket.on('refreshRooms', () => {
-      console.log('refreshRooms received')
       socket.emit('getRooms')
     })
     socket.on('updateCurrentRoom', (channelId: string) => {
-      console.log('updateCurrentRoom received : ', channelId)
       setMoveChannelId(channelId)
     })
     socket.emit('getRooms')
