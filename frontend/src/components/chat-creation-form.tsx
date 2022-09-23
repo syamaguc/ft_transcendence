@@ -17,6 +17,7 @@ import {
   ModalBody,
   ModalFooter,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react'
 import { MutableRefObject, useRef, useCallback } from 'react'
 import { Socket } from 'socket.io-client'
@@ -88,6 +89,7 @@ const ChatCreationForm = ({ socket }: Props) => {
   const isPrivateInputRef = useRef<HTMLInputElement>()
   const isProtectedInputRef = useRef<HTMLInputElement>()
   const passwordInputRef = useRef<HTMLInputElement>()
+  const toast = useToast()
 
   const onClickCreate = useCallback(
     (event: React.FormEvent<HTMLFormElement>) => {
@@ -107,6 +109,16 @@ const ChatCreationForm = ({ socket }: Props) => {
         enteredIsProtected,
         enteredPassword
       )
+      if (!enteredPassword || /\s/g.test(enteredPassword)) {
+        toast({
+          description: 'Password cannot be empty or contain whitespace',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        })
+        return
+      }
+
       const enterdData: CreateChatRoomDto = {
         name: enteredChannelName,
         // owner: 'user',
