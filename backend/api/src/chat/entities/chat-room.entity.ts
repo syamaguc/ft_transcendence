@@ -13,8 +13,8 @@ export class ChatRoom {
 	@PrimaryGeneratedColumn('uuid')
 	id: string
 
-  @IsNotEmpty()
-  @IsAlphanumeric()
+	@IsNotEmpty()
+	@IsAlphanumeric()
 	@Column('text', { default: '' })
 	name: string
 

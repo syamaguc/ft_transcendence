@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger'
 import {
 	IsNotEmpty,
-  IsString,
+	IsString,
 	MinLength,
 	MaxLength,
 	IsAlphanumeric,
-    maxLength,
+	maxLength,
 } from 'class-validator'
 
 export class CreateChatRoomDto {
