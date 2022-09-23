@@ -60,6 +60,24 @@ export class ChatGateway {
 		this.updateRoom(newRoom)
 	}
 
+	leaveBanUser(socket: Socket, userId: string, room: ChatRoom) {
+		if (socket.nsp.sockets) {
+			socket.nsp.sockets.forEach((value: Socket) => {
+				if (value.data.userId == userId) {
+					//leave protected room
+					if (room.password) {
+						this.unwatchRoom(room.id, value)
+					}
+					//leave private room
+					if (room.is_private) {
+						this.unwatchRoom(room.id, value)
+						socket.to(value.id).emit('leavePrivateRoom')
+					}
+				}
+			})
+		}
+	}
+
 	@UseGuards(SocketGuard)
 	@SubscribeMessage('banMember')
 	async banUser(
@@ -77,6 +95,7 @@ export class ChatGateway {
 			tmp.emit('getRooms', rooms)
 		}
 		this.updateRoom(newRoom)
+		this.leaveBanUser(socket, userId, newRoom)
 	}
 
 	@UseGuards(SocketGuard)
