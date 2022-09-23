@@ -51,6 +51,7 @@ const GameInvite = ({ user, router }: Props) => {
     <>
       {inviteStatus == 0 && (
         <Button
+          size='sm'
           onClick={() =>
             server && server.emit('gameInvite', { userId: user.userId })
           }
@@ -60,6 +61,7 @@ const GameInvite = ({ user, router }: Props) => {
       )}
       {inviteStatus == 1 && (
         <Button
+          size='sm'
           onClick={() =>
             server && server.emit('gameInviteReady', { userId: user.userId })
           }
@@ -69,6 +71,7 @@ const GameInvite = ({ user, router }: Props) => {
       )}
       {inviteStatus == 2 && (
         <Button
+          size='sm'
           onClick={() =>
             server && server.emit('gameReceiveInvite', { userId: user.userId })
           }
@@ -77,12 +80,12 @@ const GameInvite = ({ user, router }: Props) => {
         </Button>
       )}
       {inviteStatus == 3 && (
-        <Button onClick={() => router.push('/game/' + roomId)}>
+        <Button size='sm' onClick={() => router.push('/game/' + roomId)}>
           Join Room
         </Button>
       )}
       {inviteStatus == 4 && (
-        <Button onClick={() => router.push('/game/' + roomId)}>
+        <Button size='sm' onClick={() => router.push('/game/' + roomId)}>
           Back My Game
         </Button>
       )}

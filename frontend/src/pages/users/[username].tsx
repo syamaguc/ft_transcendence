@@ -1,5 +1,5 @@
 import Layout from '@components/layout'
-import { Box, Button, Container, Text, Stack, useToast } from '@chakra-ui/react'
+import { Box, Container, Text, Stack } from '@chakra-ui/react'
 import useSWR from 'swr'
 import { fetchUserInfo } from 'src/lib/fetchers'
 import { useRouter } from 'next/router'
@@ -11,13 +11,10 @@ import UserBasicInfo from '@components/user-basic-info'
 import UserStatusInfo from '@components/user-status-info'
 import UserStatistics from '@components/user-statistics'
 import MatchHistory from '@components/match-history'
-import UserActions from '@components/user-actions'
-import GameInvite from '@components/game-invite'
 
 function UserDetail() {
   const router = useRouter()
   const { username } = router.query
-  const { user: currentUser } = useUser()
 
   const { data, error } = useSWR(
     `${API_URL}/api/user/userInfo?username=${username}`,
@@ -43,16 +40,10 @@ function UserDetail() {
             )}
             {user && (
               <Stack spacing='8'>
-                <UserBasicInfo user={user} />
+                <UserBasicInfo user={user} router={router} />
                 <UserStatusInfo user={user} />
                 <UserStatistics user={user} />
                 <MatchHistory user={user} />
-                {user.userId !== currentUser.userId && (
-                  <Stack direction='row'>
-                    <UserActions user={user} />
-                    <GameInvite user={user} router={router} />
-                  </Stack>
-                )}
               </Stack>
             )}
           </Stack>

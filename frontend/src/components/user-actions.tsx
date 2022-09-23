@@ -82,7 +82,7 @@ function RemoveFriendButton({ friend }: RemoveFriendButtonProps) {
   }
 
   return (
-    <Button onClick={removeFriend} isLoading={isLoading}>
+    <Button size='sm' onClick={removeFriend} isLoading={isLoading}>
       Remove friend
     </Button>
   )
@@ -138,7 +138,7 @@ function AddFriendButton({ user }: AddFriendButtonProps) {
     setIsLoading(false)
   }
   return (
-    <Button onClick={addFriend} isLoading={isLoading}>
+    <Button size='sm' onClick={addFriend} isLoading={isLoading}>
       Add Friend
     </Button>
   )
@@ -194,7 +194,7 @@ function BlockButton({ user }: BlockButtonProps) {
   }
 
   return (
-    <Button onClick={blockUser} isLoading={isLoading}>
+    <Button size='sm' onClick={blockUser} isLoading={isLoading}>
       Block
     </Button>
   )
@@ -248,7 +248,7 @@ function UnblockButton({ user }: UnblockButtonProps) {
   }
 
   return (
-    <Button onClick={unblockUser} isLoading={isLoading}>
+    <Button size='sm' onClick={unblockUser} isLoading={isLoading}>
       Unblock
     </Button>
   )

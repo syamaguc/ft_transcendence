@@ -122,12 +122,14 @@ const MessageIcon = ({ message }: MessageIconProps) => {
                         {user.status}
                       </Text>
                     </Stack>
-                    {message.username !== currentUser.username && (
-                      <Stack direction='row'>
-                        <UserActions user={user} />
-                        <GameInvite user={user} router={router} />
-                      </Stack>
-                    )}
+                    <Stack>
+                      <Button
+                        size='sm'
+                        onClick={() => router.push(`/users/${user.username}`)}
+                      >
+                        Go to profile
+                      </Button>
+                    </Stack>
                   </Stack>
                 </Flex>
               </Stack>
