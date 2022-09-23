@@ -44,6 +44,8 @@ import UserStatusBadge from '@components/user-status-badge'
 import UserBasicInfo from '@components/user-basic-info'
 import UserStatistics from '@components/user-statistics'
 import MatchHistory from '@components/match-history'
+import UserActions from '@components/user-actions'
+import GameInvite from '@components/game-invite'
 
 import { API_URL } from 'src/constants'
 
@@ -51,22 +53,30 @@ type MessageIconProps = {
   message: MessageObject
 }
 const MessageIcon = ({ message }: MessageIconProps) => {
-  const [user, setUser] = useState<User>()
+  // const [user, setUser] = useState<User>()
   const popover = useDisclosure()
   const modal = useDisclosure()
   const [overlay, setOverlay] = useState(false)
   const router = useRouter()
+  const { user: currentUser } = useUser()
 
-  const onClickProfile = (message: MessageObject) => {
-    fetch(`${API_URL}/api/user/userInfo?username=${message.username}`, {
-      credentials: 'include',
-    })
-      .then((r) => r.json())
-      .then((data) => {
-        console.log(data)
-        setUser(data)
-      })
-  }
+  // const onClickProfile = (message: MessageObject) => {
+  //   fetch(`${API_URL}/api/user/userInfo?username=${message.username}`, {
+  //     credentials: 'include',
+  //   })
+  //     .then((r) => r.json())
+  //     .then((data) => {
+  //       console.log(data)
+  //       setUser(data)
+  //     })
+  // }
+
+  const { data, error } = useSWR(
+    `${API_URL}/api/user/userInfo?username=${message.username}`,
+    fetchUserInfo
+  )
+
+  const user = data?.user
 
   return (
     <>
@@ -77,7 +87,7 @@ const MessageIcon = ({ message }: MessageIconProps) => {
             src={`${API_URL}/api/user/avatar/${message.profile_picture}`}
             m={2}
             _hover={{ cursor: 'pointer' }}
-            onClick={() => onClickProfile(message)}
+            // onClick={() => onClickProfile(message)}
           />
         </PopoverTrigger>
         <PopoverContent>
@@ -112,11 +122,12 @@ const MessageIcon = ({ message }: MessageIconProps) => {
                         {user.status}
                       </Text>
                     </Stack>
-                    <Stack direction='row'>
-                      <Button size='xs'>Add friend</Button>
-                      <Button size='xs'>Block</Button>
-                      <Button size='xs'>Invite</Button>
-                    </Stack>
+                    {message.username !== currentUser.username && (
+                      <Stack direction='row'>
+                        <UserActions user={user} />
+                        <GameInvite user={user} router={router} />
+                      </Stack>
+                    )}
                   </Stack>
                 </Flex>
               </Stack>
@@ -149,11 +160,12 @@ const MessageIcon = ({ message }: MessageIconProps) => {
                     <Text fontWeight='600' fontSize='2xl' mt='2'>
                       {user.username}
                     </Text>
-                    <Stack direction='row'>
-                      <Button size='sm'>Add friend</Button>
-                      <Button size='sm'>Block</Button>
-                      <Button size='sm'>Invite</Button>
-                    </Stack>
+                    {message.username !== currentUser.username && (
+                      <Stack direction='row'>
+                        <UserActions user={user} />
+                        <GameInvite user={user} router={router} />
+                      </Stack>
+                    )}
                   </Stack>
                 </Stack>
                 <UserStatistics user={user} />

@@ -1,15 +1,11 @@
 import Layout from '@components/layout'
 import { Box, Button, Container, Text, Stack, useToast } from '@chakra-ui/react'
-import { useState } from 'react'
 import useSWR from 'swr'
 import { fetchUserInfo } from 'src/lib/fetchers'
 import { useRouter } from 'next/router'
-
-import { User, PartialUserInfo } from 'src/types/user'
-import { API_URL } from 'src/constants'
 import { useUser } from 'src/lib/use-user'
-import { useFriends } from 'src/lib/use-friends'
-import { useBlocked } from 'src/lib/use-blocked'
+
+import { API_URL } from 'src/constants'
 
 import UserBasicInfo from '@components/user-basic-info'
 import UserStatusInfo from '@components/user-status-info'
@@ -21,6 +17,7 @@ import GameInvite from '@components/game-invite'
 function UserDetail() {
   const router = useRouter()
   const { username } = router.query
+  const { user: currentUser } = useUser()
 
   const { data, error } = useSWR(
     `${API_URL}/api/user/userInfo?username=${username}`,
@@ -50,10 +47,12 @@ function UserDetail() {
                 <UserStatusInfo user={user} />
                 <UserStatistics user={user} />
                 <MatchHistory user={user} />
-                <Stack direction='row'>
-                  <UserActions user={user} />
-                  <GameInvite user={user} router={router} />
-                </Stack>
+                {user.userId !== currentUser.userId && (
+                  <Stack direction='row'>
+                    <UserActions user={user} />
+                    <GameInvite user={user} router={router} />
+                  </Stack>
+                )}
               </Stack>
             )}
           </Stack>

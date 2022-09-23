@@ -23,15 +23,13 @@ export default function UserActions({ user }: UserActionsProps) {
           ) : (
             <AddFriendButton user={user} />
           )}
+          {currentUser.blockedUsers.indexOf(user.userId) > -1 ? (
+            <UnblockButton user={user} />
+          ) : (
+            <BlockButton user={user} />
+          )}
         </>
       )}
-      <>
-        {currentUser.blockedUsers.indexOf(user.userId) > -1 ? (
-          <UnblockButton user={user} />
-        ) : (
-          <BlockButton user={user} />
-        )}
-      </>
     </Stack>
   )
 }
