@@ -93,7 +93,7 @@ const ButtonLeave = ({ socket, currentRoom, isJoined }: Props) => {
         isOwner ? (
           <ButtonDelete socket={socket} currentRoom={currentRoom} />
         ) : (
-          <Button size='sm' m={2} onClick={onClickLeave}>
+          <Button size='sm' onClick={onClickLeave}>
             Leave
           </Button>
         )

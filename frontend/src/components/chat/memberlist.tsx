@@ -207,8 +207,6 @@ function MemberListModal({ socket, currentRoom }) {
     <>
       <IconButton
         size='sm'
-        mr={0}
-        ml='auto'
         icon={<UsersIcon />}
         onClick={() => {
           onOpen()

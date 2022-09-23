@@ -1,5 +1,5 @@
 import { Box, Flex } from '@chakra-ui/layout'
-import { Image, Button, Text, IconButton } from '@chakra-ui/react'
+import { Stack, Spacer, Image, Button, Text, IconButton } from '@chakra-ui/react'
 import { ChannelObject, MessageObject } from 'src/types/chat'
 import { UsersIcon } from '@components/icons/users'
 import MemberListModal from './memberlist'
@@ -27,13 +27,17 @@ const TopBar = ({ socket, currentRoom, isJoined }) => {
           >
             # {currentRoom.name}
           </Text>
-          <MemberListModal socket={socket} currentRoom={currentRoom} />
-          <ChannelInfo socket={socket} currentRoom={currentRoom} />
-          <ButtonLeave
-            socket={socket}
-            currentRoom={currentRoom}
-            isJoined={isJoined}
-          />
+          <Spacer/>
+          <Stack direction='row' spacing='1'>
+            <MemberListModal socket={socket} currentRoom={currentRoom} />
+            <ChannelInfo socket={socket} currentRoom={currentRoom} />
+            <ButtonLeave
+              socket={socket}
+              currentRoom={currentRoom}
+              isJoined={isJoined}
+            />
+          </Stack>
+
         </>
       )}
     </Flex>
