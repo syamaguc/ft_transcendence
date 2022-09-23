@@ -111,7 +111,6 @@ function ChannelInfo({ socket, currentRoom }) {
       .then((r) => r.json())
       .then((data) => {
         setOwner(data)
-        console.log(data)
       })
   }, [])
 

@@ -29,7 +29,6 @@ const Chat = () => {
         setRoomId(tmpRoomId[0])
       }
       socket.on('exception', ({ status, message }) => {
-        console.log(status, message)
         if (message === 'Room Not Found') {
           router.push('/dm')
           return

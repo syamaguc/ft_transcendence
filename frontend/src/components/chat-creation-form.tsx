@@ -103,12 +103,6 @@ const ChatCreationForm = ({ socket }: Props) => {
       if (enteredIsProtected == true && enteredIsPrivate == false) {
         enteredPassword = passwordInputRef.current.value
       }
-      console.log(
-        'onClickCreate called',
-        enteredIsPrivate,
-        enteredIsProtected,
-        enteredPassword
-      )
       if (!enteredPassword || /\s/g.test(enteredPassword)) {
         toast({
           description: 'Password cannot be empty or contain whitespace',

@@ -155,7 +155,6 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 		const fs = require('fs')
 		const filePath = '../upload/image/' + image
 		fs.stat(filePath, function (err, stats) {
-			// console.log(stats);
 			if (err) {
 				return console.error(err)
 			}

@@ -26,7 +26,6 @@ const DMCreationForm = ({ socket }: Props) => {
   const onClickCreate = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const enteredUserName = userNameInputRef.current.value
-    console.log('onClickCreate called', enteredUserName)
     socket.emit('createRoom', enteredUserName)
   }
 

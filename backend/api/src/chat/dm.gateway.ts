@@ -185,7 +185,6 @@ export class DMGateway {
 		if (socket.nsp.sockets) {
 			socket.nsp.sockets.forEach((value: Socket) => {
 				if (value.data.userId == userId) {
-					console.log(value)
 					value.emit('addRoom', newDMRoom)
 				}
 			})
@@ -208,8 +207,3 @@ export class DMGateway {
 		return DMObjectForFront
 	}
 }
-
-// handleDisconnect(@ConnectedSocket() socket: Socket) {
-//   //クライアント切断時
-//   this.logger.log(`Client disconnected: ${socket.id}`);
-// }

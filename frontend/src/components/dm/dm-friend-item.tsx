@@ -38,7 +38,6 @@ function DMFriendItem({ friend, socket }: FriendItemProps) {
 
   const onClickDM = (userId: string) => {
     socket.emit('getRoomIdByUserIds', userId)
-    console.log('getRoomIdByUserIds')
   }
 
   return (

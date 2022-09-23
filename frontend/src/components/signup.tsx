@@ -107,7 +107,6 @@ export function SignupForm() {
         const data = await res.json()
 
         if (res.ok) {
-          console.log('data: ', data)
           await setIsFirstTime(true)
           await mutateUser()
           actions.setSubmitting(false)

@@ -30,19 +30,4 @@ export const chatRepository = AppDataSource.getRepository(ChatRoom).extend({
 			.getOne()
 		return members
 	},
-
-	// async addMessage(newMessage: MessageI, roomId: string): Promise<Message> {
-	// 	const room : ChatRoom = await this.findId(roomId);
-	// 	const msg: Message = {
-	// 		...newMessage,
-	// 		room: room,
-	// 	};
-	// 	try {
-	// 		await this.save(room);
-	// 	} catch (e) {
-	// 		console.log(e);
-	// 		throw new InternalServerErrorException();
-	// 	}
-	// 	return msg;
-	// }
 })

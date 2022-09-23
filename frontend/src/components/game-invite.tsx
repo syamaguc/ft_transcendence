@@ -17,9 +17,7 @@ const GameInvite = ({ user, router }: Props) => {
   useEffect(() => {
     const tempServer = io(API_URL, { transports: ['websocket'] })
     setServer(tempServer)
-    console.log('connect', tempServer.id)
     return () => {
-      console.log('disconnect', tempServer.id)
       tempServer.disconnect()
     }
   }, [router])
@@ -36,7 +34,6 @@ const GameInvite = ({ user, router }: Props) => {
     })
 
     server.on('exception', ({ status, message }) => {
-      console.log(status, message)
       toast({
         description: message,
         status: status,
