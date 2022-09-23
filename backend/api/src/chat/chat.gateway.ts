@@ -43,7 +43,6 @@ export class ChatGateway {
 			socket.data.userId,
 			room,
 		)
-		console.log(socket.data.userId)
 		this.server.to(room).emit('updateNewMessage', newMessage)
 	}
 
@@ -292,7 +291,6 @@ export class ChatGateway {
 			socket.data.userId,
 		)
 		newChatRoom = await this.joinRoom(newChatRoom.id, socket)
-		this.logger.log(newChatRoom)
 		if (newChatRoom.is_private) {
 			this.server.to(socket.id).emit('updateRoom', newChatRoom)
 		} else {
@@ -327,7 +325,3 @@ export class ChatGateway {
 	}
 }
 
-// handleDisconnect(@ConnectedSocket() socket: Socket) {
-//   //クライアント切断時
-//   this.logger.log(`Client disconnected: ${socket.id}`);
-// }

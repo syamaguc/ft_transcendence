@@ -34,7 +34,6 @@ const DMSendBox = ({ socket }) => {
       message: inputText,
       timestamp: new Date(),
     }
-    console.log('send : ', message)
     socket.emit('addMessage', message)
     setInputText('')
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -106,16 +105,13 @@ const DMContent = ({ socket, roomId }: DMContentProps) => {
       didLogRef.current = true
 
       socket.on('getMessageLog', (messageLog: MessageObject[]) => {
-        console.log('messageLog loaded', messageLog)
         setChatLog(messageLog)
       })
       socket.on('updateNewMessage', (message: MessageObject) => {
-        console.log('recieved : ', message)
         setMsg(message)
       })
       socket.on('watchRoom', (room: DMObject) => {
         setCurrentRoom(room)
-        console.log('watchRoom:', room)
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

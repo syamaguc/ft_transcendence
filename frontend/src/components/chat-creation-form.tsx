@@ -101,12 +101,6 @@ const ChatCreationForm = ({ socket }: Props) => {
       if (enteredIsProtected == true && enteredIsPrivate == false) {
         enteredPassword = passwordInputRef.current.value
       }
-      console.log(
-        'onClickCreate called',
-        enteredIsPrivate,
-        enteredIsProtected,
-        enteredPassword
-      )
       const enterdData: CreateChatRoomDto = {
         name: enteredChannelName,
         // owner: 'user',

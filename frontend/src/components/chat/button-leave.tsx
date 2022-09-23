@@ -26,7 +26,6 @@ const ButtonDelete = ({ socket, currentRoom }) => {
   const onClickDelete = useCallback(() => {
     if (!currentRoom || !socket) return
     socket.emit('deleteRoom', currentRoom.id)
-    console.log('deleteRoom', currentRoom.id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoom])
 
@@ -72,13 +71,9 @@ const ButtonLeave = ({ socket, currentRoom, isJoined }: Props) => {
   const onClickLeave = useCallback(() => {
     if (!currentRoom || !socket) return
     socket.emit('leaveRoom', currentRoom.id)
-    console.log('leaveRoom', currentRoom.id)
   }, [currentRoom, socket])
 
   useEffect(() => {
-    // if (!currentRoom) return
-    console.log(currentRoom.owner)
-    console.log('userId = ', user.userId)
     if (currentRoom.owner == user.userId) {
       setIsOwers(true)
     } else {

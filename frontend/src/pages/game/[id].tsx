@@ -40,7 +40,6 @@ function Game() {
   const toast = useToast()
 
   const keyDownHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    console.log(event.code)
     if (event.code === 'ArrowUp') {
       keyStatus.current.upPressed = true
     } else if (event.code === 'ArrowDown') {
@@ -49,7 +48,6 @@ function Game() {
   }
 
   const keyUpHandler = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    console.log(event.code)
     if (event.code === 'ArrowUp') {
       keyStatus.current.upPressed = false
     } else if (event.code === 'ArrowDown') {
@@ -76,9 +74,7 @@ function Game() {
   useEffect(() => {
     const tempServer = io(API_URL, { transports: ['websocket'] })
     setServer(tempServer)
-    console.log('connect', tempServer.id)
     return () => {
-      console.log('disconnect', tempServer.id)
       tempServer.disconnect()
     }
   }, [router])

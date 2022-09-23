@@ -105,8 +105,6 @@ function AddFriendButton({ user }: AddFriendButtonProps) {
     setIsLoading(true)
     await new Promise((resolve) => setTimeout(resolve, 500))
 
-    console.log(user)
-
     if (currentUser.friends.indexOf(user.userId) > -1) {
       message = 'Already friends with that user'
     } else {

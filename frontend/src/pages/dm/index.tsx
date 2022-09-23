@@ -26,10 +26,8 @@ const Chat = () => {
     if (didLogRef.current === false) {
       didLogRef.current = true
       socket.on('connect', () => {
-        console.log('connection ID : ', socket.id)
       })
       socket.on('updateNewMessage', (message: MessageObject) => {
-        console.log('recieved : ', message)
         setMsg(message)
       })
     }

@@ -84,7 +84,6 @@ const BottomBar = ({
       message: inputText,
       timestamp: new Date(),
     }
-    console.log('send : ', message)
     socket.emit('addMessage', message)
     setInputText('')
   }, [inputText, setInputText, socket])
@@ -92,7 +91,6 @@ const BottomBar = ({
   const onClickJoin = useCallback(() => {
     if (!currentRoom || !socket) return
     socket.emit('joinRoom', currentRoom.id)
-    console.log('joinroom', currentRoom.id)
   }, [currentRoom, socket])
 
   if (currentRoom.id == 'default-channel') {

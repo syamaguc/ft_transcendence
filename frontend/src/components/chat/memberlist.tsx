@@ -48,17 +48,14 @@ function MemberStatus({ user, currentRoom, member }) {
 function MemberMenu({ socket, user, currentRoom, member }) {
   const onClickMute = (userId: string) => {
     socket.emit('muteMember', userId)
-    console.log(userId, ' has been muted from the channel')
   }
 
   const onClickBan = (userId: string) => {
     socket.emit('banMember', userId)
-    console.log(userId, ' has been banned from the channel')
   }
 
   const onClickAdmin = (userId: string) => {
     socket.emit('addAdmin', userId)
-    console.log(userId, ' has been added to admin in channel')
   }
 
   //if the member was the current user
@@ -133,7 +130,6 @@ function MemberList({ socket, currentRoom, members }) {
 function FriendList({ socket, friends, members }) {
   const onClickInvite = (userId: string) => {
     socket.emit('inviteMember', userId)
-    console.log('invite :', userId)
   }
   if (!friends || !friends.length) return
 
@@ -195,7 +191,6 @@ function MemberListModal({ socket, currentRoom }) {
             i--
           }
         }
-        console.log('data :', data)
         setFriends(data)
         socket.emit('getMembers', currentRoom.id)
       })

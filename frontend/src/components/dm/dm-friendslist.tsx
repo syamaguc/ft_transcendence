@@ -55,7 +55,6 @@ function DMFriendsList({ socket }: Props) {
 
   useEffect(() => {
     socket.on('getRoomIdByUserIds', (id: string) => {
-      console.log('getRoomIdByUserIds get = ', id)
       router.push(PREFIX_URL + '/' + id)
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps

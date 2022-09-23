@@ -82,7 +82,6 @@ export function LoginForm() {
         const data = await res.json()
 
         if (res.ok) {
-          console.log('data: ', data)
           await setIsFirstTime(false)
           await mutateUser()
           actions.setSubmitting(false)
@@ -104,7 +103,6 @@ export function LoginForm() {
           }
         }
       } catch (err) {
-        console.log(err)
         toast({
           description: 'Internal error occurred',
           status: 'error',

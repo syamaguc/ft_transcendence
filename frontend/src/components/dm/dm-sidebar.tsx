@@ -27,15 +27,12 @@ const DMSideBar = ({ socket, router }: Props) => {
     if (didLogRef.current === false) {
       didLogRef.current = true
       socket.on('getRooms', (rooms: DMObject[]) => {
-        console.log('getRooms received: ', rooms)
         setDMRooms(rooms)
       })
       socket.on('updateRoom', (newDMRoom: DMObject) => {
-        console.log('updateRoom called: ', newDMRoom)
         router.push(PREFIX_URL + '/' + newDMRoom.id)
       })
       socket.on('addRoom', (newDMRoom: DMObject) => {
-        console.log('addRoom called: ', newDMRoom)
         setnewDMRoom(newDMRoom)
       })
       socket.emit('getRooms')
@@ -46,7 +43,6 @@ const DMSideBar = ({ socket, router }: Props) => {
   useEffect(() => {
     if (newDMRoom) {
       setDMRooms([newDMRoom, ...DMRooms])
-      console.log(DMRooms)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newDMRoom])

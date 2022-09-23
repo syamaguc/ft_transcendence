@@ -49,14 +49,11 @@ const Chat = () => {
   useEffect(() => {
     if (!socket) return
     socket.on('connect', () => {
-      console.log('connection ID : ', socket.id)
     })
     socket.on('updateNewMessage', (message: MessageObject) => {
-      console.log('recieved : ', message)
       setMsg(message)
     })
     socket.on('exception', ({ status, message }) => {
-      console.log(status, message)
       toast({
         description: message,
         status: status,
@@ -68,12 +65,8 @@ const Chat = () => {
 
   useEffect(() => {
     if (!user) return
-    console.log('check if joined')
     if (user) {
-      console.log('effect user', user)
-      console.log('effect room', currentRoom)
       const members = currentRoom.members
-      console.log('index', members.indexOf(user.userId))
       if (members.indexOf(user.userId) != -1) {
         setIsJoined(true)
       } else {
