@@ -32,16 +32,17 @@ const API_URL = 'http://localhost:3000'
 function MemberStatus({ user, currentRoom, member }) {
   return (
     <Stack spacing='1' direction='row'>
-      {(user.user.userId == member.userId) && (
+      {user.user.userId == member.userId && (
         <Badge colorScheme='green'>me</Badge>
       )}
-      {(currentRoom.admins.includes(member.userId)) && (
+      {currentRoom.admins.includes(member.userId) && (
         <Badge colorScheme='orange'>admin</Badge>
       )}
-      {(currentRoom.owner == member.userId) && (
+      {currentRoom.owner == member.userId && (
         <Badge colorScheme='purple'>owner</Badge>
       )}
-    </Stack>)
+    </Stack>
+  )
 }
 
 function MemberMenu({ socket, user, currentRoom, member }) {
@@ -116,7 +117,11 @@ function MemberList({ socket, currentRoom, members }) {
             marginEnd={3}
           />
           <Box>
-            <MemberStatus user={user} currentRoom={currentRoom} member={member} />
+            <MemberStatus
+              user={user}
+              currentRoom={currentRoom}
+              member={member}
+            />
             <Text>{member.username}</Text>
           </Box>
           <MemberMenu
