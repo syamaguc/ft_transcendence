@@ -14,6 +14,7 @@ import { UseGuards } from '@nestjs/common'
 import { SocketGuard } from 'src/user/guards/socketAuth.guard'
 import { DMObject, DMRawData } from './interfaces/dm.interface'
 import { DMRoom } from './entities/dm-room.entity'
+import { WsException } from '@nestjs/websockets'
 
 @WebSocketGateway({ namespace: '/dm', cors: { origin: '*' } })
 export class DMGateway {
@@ -56,7 +57,11 @@ export class DMGateway {
 		@ConnectedSocket() socket: Socket,
 	) {
 		this.logger.log(`getMessageLog: for ${roomId}`)
-		const messageLog = await this.DMService.getMessageLogByRoomId(roomId)
+		const clientUserId = socket.data.userId
+		const messageLog = await this.DMService.getMessageLogByRoomId(
+			roomId,
+			clientUserId,
+		)
 		socket.emit('getMessageLog', messageLog)
 	}
 
@@ -84,12 +89,16 @@ export class DMGateway {
 	) {
 		this.logger.log(`watchRoom: ${socket.id} watched ${roomId}`)
 		const rooms = [...socket.rooms].slice(0)
+		const clientUserId = socket.data.userId
 		if (rooms.length == 2) socket.leave(rooms[1])
+		const room: DMRawData = await this.DMService.getRoomByRoomId(roomId)
+		if (room.user1id != clientUserId && room.user2id != clientUserId) {
+			throw new WsException('Room Not Found')
+		}
 		socket.join(roomId)
-		const room = await this.DMService.getRoomByRoomId(roomId)
 		const DMObjectForFront: DMObject = this.createDMObjectForFront(
 			room,
-			socket.data.userId,
+			clientUserId,
 		)
 		socket.emit('watchRoom', DMObjectForFront)
 	}

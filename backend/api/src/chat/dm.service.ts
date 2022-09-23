@@ -65,11 +65,17 @@ export class DMService {
 		return messageRepository.addMessage(message)
 	}
 
-	async getMessageLogByRoomId(roomId: string): Promise<any> {
+	async getMessageLogByRoomId(
+		roomId: string,
+		clientUserId: string,
+	): Promise<any> {
 		if (!isValidUUID(roomId)) throw new WsException('Room Not Found')
 		const room: DMRoom = await this.DMRoomRepository.findOne({
 			where: { id: roomId },
 		})
+		if (room.memberA != clientUserId && room.memberB != clientUserId) {
+			throw new WsException('Room Not Found')
+		}
 		if (!room) throw new WsException('Room Not Found')
 		const messagesWithUserInfo = await messageRepository.getDMMessages(
 			roomId,
