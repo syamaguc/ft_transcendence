@@ -206,6 +206,7 @@ const SideBar = ({
     <Flex width='100%' direction='column' bg='gray.100' overflowX='scroll'>
       <Flex
         width='100%'
+        height='55px'
         p={(5, 5, 2, 2)}
         borderBottom='1px solid'
         borderBottomColor='gray.200'
