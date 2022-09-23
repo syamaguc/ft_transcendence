@@ -45,16 +45,10 @@ const Chat = () => {
   return (
     <Layout>
       <Flex>
-        <Flex
-          maxW='300px'
-          w='20%'
-          h='90vh'
-          borderEnd='1px solid'
-          borderColor='gray'
-        >
+        <Flex w='240px' h='90vh' borderEnd='1px solid' borderColor='gray'>
           <DMSideBar router={router} socket={socket} />
         </Flex>
-        <Flex h='90vh' minW='80%' w='calc(100vw - 300px)' direction='column'>
+        <Flex h='90vh' w='calc(100vw - 240px)' direction='column'>
           <DMFriendsList socket={socket} />
         </Flex>
       </Flex>

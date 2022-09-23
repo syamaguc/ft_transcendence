@@ -188,6 +188,12 @@ export const UsersRepository = AppDataSource.getRepository(User).extend({
 				error: 'the user is already in your friend list',
 			})
 		}
+		if (user.friends.length >= 20) {
+			throw new ForbiddenException({
+				status: HttpStatus.FORBIDDEN,
+				error: 'cannot add more than 20 friends',
+			})
+		}
 		user.friends.push(friend)
 		try {
 			await this.save(user)
