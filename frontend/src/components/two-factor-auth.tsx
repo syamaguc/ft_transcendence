@@ -9,13 +9,9 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useState } from 'react'
-import ChakraNextImage from 'src/components/chakra-next-image'
 import { AuthCard } from '@components/auth'
 
 import { useFormik, FormikErrors } from 'formik'
-import useSWR from 'swr'
-
-import { fetchText } from 'src/lib/fetchers'
 import { setDidTwoFactorAuth } from 'src/lib/session'
 import { useUser } from 'src/lib/use-user'
 import { API_URL } from 'src/constants'
@@ -24,18 +20,6 @@ export function TwoFactorAuthForm() {
   const { mutateUser } = useUser()
   const toast = useToast()
   const [isLoading, setIsLoading] = useState(false)
-
-  const { data } = useSWR(`${API_URL}/api/auth/2fa`, fetchText)
-
-  const htmlText = data?.text
-  let qrCodeUrl: string = null
-  if (htmlText) {
-    const re = /https:\/\/chart\.googleapis\.com[^']*/
-    const match = htmlText.match(re)
-    if (match[0]) {
-      qrCodeUrl = match[0]
-    }
-  }
 
   const validate = (values: { code: string }) => {
     const errors: FormikErrors<{ code: string }> = {}
@@ -120,14 +104,8 @@ export function TwoFactorAuthForm() {
       <AuthCard title='Two-factor Auth'>
         <form id='form-2fa' onSubmit={formik.handleSubmit}>
           <Stack spacing='6'>
-            <Text>
-              Open the Google Authenticator app and scan this QR code.
-            </Text>
+            <Text>Open the Google Authenticator app and enter code.</Text>
             <Stack spacing='5' align='center'>
-              {qrCodeUrl && (
-                <ChakraNextImage src={qrCodeUrl} width='300px' height='300px' />
-              )}
-              {!qrCodeUrl && <Text>{htmlText}</Text>}
               <FormControl
                 mt={4}
                 isInvalid={
