@@ -47,6 +47,7 @@ const ChatCreationFormContent = ({
   passwordInputRef,
 }: Refs) => {
   const [hideFlag, setHideFlag] = useBoolean()
+  const [disableFlag, setDisableFlag] = useBoolean()
 
   return (
     <>
@@ -55,11 +56,17 @@ const ChatCreationFormContent = ({
         <FormLabel htmlFor='is_private' mb='0'>
           Private Channel
         </FormLabel>
-        <Switch id='is_private' ref={isPrivateInputRef} />
+        <Switch
+          isDisabled={hideFlag}
+          id='is_private'
+          ref={isPrivateInputRef}
+          onChange={setDisableFlag.toggle}
+        />
         <FormLabel htmlFor='is_private' mb='0'>
           Protect Channel
         </FormLabel>
         <Switch
+          isDisabled={disableFlag}
           id='is_protected'
           ref={isProtectedInputRef}
           onChange={setHideFlag.toggle}
