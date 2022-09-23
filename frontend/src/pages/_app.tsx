@@ -1,9 +1,10 @@
 import '../styles/globals.css'
 import type { AppProps } from 'next/app'
 import Head from 'next/head'
-import Chakra from '../chakra'
 import { Box, Spinner } from '@chakra-ui/react'
 import { SWRConfig } from 'swr'
+import { ChakraProvider } from '@chakra-ui/react'
+import theme from '../theme'
 
 import { fetchJson } from 'src/lib/fetchers'
 import { useUser } from 'src/lib/use-user'
@@ -17,7 +18,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         <meta content='IE=edge' httpEquiv='X-UA-Compatible' />
         <meta content='width=device-width, initial-scale=1' name='viewport' />
       </Head>
-      <Chakra cookies={pageProps.cookies}>
+      <ChakraProvider theme={theme}>
         <SWRConfig
           value={{
             fetcher: fetchJson,
@@ -38,7 +39,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Alerts />
           </AlertsProvider>
         </SWRConfig>
-      </Chakra>
+      </ChakraProvider>
     </>
   )
 }

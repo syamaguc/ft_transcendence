@@ -125,34 +125,8 @@ const HeaderContent = () => {
                 </NavLink>
               ))}
             </HStack>
-            <HStack spacing='4' display={{ base: 'none', md: 'flex' }}>
-              <ChakraLink
-                isExternal
-                aria-label='Go to Github'
-                href={'https://github.com/syamaguc/ft_transcendence/'}
-              >
-                <Icon
-                  as={GithubIcon}
-                  display='block'
-                  transition='color 0.2s'
-                  w='5'
-                  h='5'
-                  _hover={{ color: 'gray.600' }}
-                />
-              </ChakraLink>
-            </HStack>
           </HStack>
           <HStack spacing='5'>
-            <IconButton
-              size='md'
-              fontSize='lg'
-              aria-label={`Switch to ${text} mode`}
-              variant='ghost'
-              color='current'
-              ml={{ base: '0', md: '3' }}
-              onClick={toggleMode}
-              icon={<SwitchIcon />}
-            />
             <MobileNavButton
               ref={mobileNavBtnRef}
               aria-label='Open menu'

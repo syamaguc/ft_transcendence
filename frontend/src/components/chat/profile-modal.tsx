@@ -60,7 +60,7 @@ const ProfileModal = ({ message }) => {
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>{message.username}'s Profile</ModalHeader>
+          <ModalHeader>{message.username} Profile</ModalHeader>
           <ModalCloseButton />
           <ModalBody>{user ? profileBody() : null}</ModalBody>
           <ModalFooter>

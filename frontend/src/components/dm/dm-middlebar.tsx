@@ -4,6 +4,7 @@ import { DMObject, MessageObject } from 'src/types/chat'
 import { useUser } from 'src/lib/use-user'
 import ProfileModal from '../chat/profile-modal'
 import AlwaysScrollToBottom from '../chat/always-scroll-bottom'
+import MessageIcon from 'src/components/chat/message-icon'
 
 const API_URL = 'http://localhost:3000'
 
@@ -37,7 +38,7 @@ const MessageBlock = ({ message }: Props) => {
     <>
       {isNotBlocked(message.userId) ? (
         <Flex m={4} align='flex-start'>
-          <ProfileModal message={message} />
+          <MessageIcon message={message} />
           <Flex direction='column' maxW='90%'>
             <Flex align='flex-end'>
               <Text as='b' marginEnd={2}>
