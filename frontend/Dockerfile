@@ -26,7 +26,9 @@ ENV NEXT_TELEMETRY_DISABLED 1
 
 EXPOSE 3001
 
-CMD ["npm", "run", "dev"]
+RUN npm run build
+
+CMD ["npm", "run", "start"]
 
 
 # Rebuild the source code only when needed
