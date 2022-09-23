@@ -5,8 +5,6 @@ import Document, {
   NextScript,
   DocumentContext,
 } from 'next/document'
-import { ColorModeScript } from '@chakra-ui/react'
-import theme from '../theme'
 
 class MyDocument extends Document {
   static getInitialProps(ctx: DocumentContext) {
@@ -18,8 +16,6 @@ class MyDocument extends Document {
       <Html lang='ja'>
         <Head />
         <body>
-          {/* Make Color mode to persist when you refresh page*/}
-          <ColorModeScript initialColorMode={theme.config.initialColorMode} />
           <Main />
           <NextScript />
         </body>
