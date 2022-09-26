@@ -12,7 +12,7 @@ We created a web application with chat and games.
 
 ## Usage
 
-First  you need to put the correct values in the file.
+If you want to use the 42API, first you need to put the correct values in the file.
 
 /backend/api/.env.sample/default.env
 
